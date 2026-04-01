@@ -1,0 +1,16 @@
+{
+  "RequireNewClick": true,
+  "Interactions": [
+    "ShieldCap_Secondary_Guard"
+  ],
+  "Tags": {
+    "Attack": [
+      "Melee"
+    ]
+  },
+  "Rules": {
+    "Interrupting": [
+      "Primary"
+    ]
+  }
+}

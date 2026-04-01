@@ -1,0 +1,16 @@
+{
+  "QualityValue": 5,
+  "ItemTooltipTexture": "UI/ItemQualities/Tooltips/ItemTooltipTechnical.png",
+  "ItemTooltipArrowTexture": "UI/ItemQualities/Tooltips/ItemTooltipShieldCapArrow.png",
+  "SlotTexture": "UI/ItemQualities/Slots/SlotShieldCap.png",
+  "BlockSlotTexture": "UI/ItemQualities/Slots/SlotShieldCap.png",
+  "SpecialSlotTexture": "UI/ItemQualities/Slots/SlotShieldCap.png",
+  "TextColor": "#a1f0ff",
+  "LocalizationKey": "server.general.qualities.Legendary",
+  "VisibleQualityLabel": true,
+  "RenderSpecialSlot": true,
+  "ItemEntityConfig": {
+    "ParticleSystemId": "Drop_Legendary",
+    "ParticleColor": "#d2fbff"
+  }
+}

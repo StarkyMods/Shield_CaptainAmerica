@@ -1,0 +1,9 @@
+{
+  "Name": "ShieldCap Call Cooldown",
+  "Duration": 1,
+  "StatusEffectIcon": "UI/StatusEffects/Weapon_Shield_CaptainAmerica_Starky.png",
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "ValueType": "Absolute",
+  "Invulnerable": false
+}

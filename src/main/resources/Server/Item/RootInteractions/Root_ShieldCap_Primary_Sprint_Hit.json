@@ -1,0 +1,10 @@
+{
+  "Cooldown": {
+    "Cooldown": 3,
+    "Id": "ShieldCapSprintHit"
+  },
+  "Interactions": [
+    "ShieldCap_Primary_Sprint_Charging"
+  ],
+  "RequireNewClick": true
+}

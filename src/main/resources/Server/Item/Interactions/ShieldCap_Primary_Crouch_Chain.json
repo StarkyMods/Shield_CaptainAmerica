@@ -1,0 +1,25 @@
+{
+  "Type": "Chaining",
+  "ChainingAllowance": 2,
+  "ChainId": "ShieldCap_Crouch",
+  "Next": [
+    {
+      "Type": "StatsCondition",
+      "Costs": {
+        "Stamina": 2
+      },
+      "ValueType": "Absolute",
+      "Next": "ShieldCap_Primary_Crouch_Swing_Spin_Right",
+      "Failed": "ShieldCap_Primary_Chain"
+    },
+    {
+      "Type": "StatsCondition",
+      "Costs": {
+        "Stamina": 2
+      },
+      "ValueType": "Absolute",
+      "Next": "ShieldCap_Primary_Crouch_UpperCut",
+      "Failed": "ShieldCap_Primary_Chain"
+    }
+  ]
+}

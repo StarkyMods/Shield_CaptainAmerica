@@ -1,0 +1,57 @@
+{
+  "Type": "Selector",
+  "$Comment": "Length of Combat",
+  "RunTime": 0.1,
+  "Effects": {
+    "CameraEffect": "ShieldCap_Big_Hit_Camera",
+    "Particles": [
+      {
+        "SystemId": "Shield_Bash",
+        "TargetEntityPart": "PrimaryItem",
+        "TargetNodeName": "Handle",
+        "RotationOffset": {
+          "Yaw": -180,
+          "Roll": -90
+        }
+      }
+    ],
+    "ItemAnimationId": "ShieldCapRoll"
+  },
+  "Selector": {
+    "Id": "AOECircle",
+    "Range": 4
+  },
+  "HitEntity": {
+    "Interactions": [
+      {
+        "Type": "Replace",
+        "Var": "FallStar_Hit_Damage",
+        "DefaultOk": true,
+        "DefaultValue": {
+          "Interactions": [
+            "ShieldCap_Primary_Damage"
+          ]
+        }
+      }
+    ]
+  },
+  "Next": {
+    "Type": "ApplyForce",
+    "Direction": {
+      "Z": -2
+    },
+    "Force": 12,
+    "AdjustVertical": false,
+    "VelocityConfig": {
+      "GroundResistance": 0.936,
+      "GroundResistanceMax": 0.928,
+      "AirResistance": 0.924,
+      "AirResistanceMax": 0.932,
+      "Threshold": 3,
+      "Style": "Linear"
+    },
+    "ChangeVelocityType": "Add",
+    "WaitForGround": false,
+    "WaitForCollision": false
+  }
+}

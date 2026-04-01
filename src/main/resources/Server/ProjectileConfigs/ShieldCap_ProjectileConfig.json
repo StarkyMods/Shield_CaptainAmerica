@@ -1,0 +1,61 @@
+{
+  "Model": "ShieldCap_Projectile",
+  "LaunchForce": 40,
+  "Physics": {
+    "Type": "Standard",
+    "SticksVertically": false,
+    "ComputeYaw": true,
+    "ComputePitch": true,
+    "Gravity": 2,
+    "Bounciness": 0.95,
+    "BounceCount": 2,
+    "BounceLimit": 0.1,
+    "Density": 2000,
+    "RotationMode": "Velocity",
+    "TerminalVelocityAir": 90,
+    "TerminalVelocityWater": 60,
+    "HitWaterImpulseLoss": 0
+  },
+  "Interactions": {
+    "ProjectileHit": {
+      "Cooldown": {
+        "Cooldown": 0
+      },
+      "Interactions": [
+        {
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "ShieldCap_Throw_Damage",
+          "DefaultValue": {
+            "Interactions": [
+              "ShieldCap_Throw_Damage"
+            ]
+          }
+        },
+        {
+          "Type": "ShieldCap_Throw_Homing_Impact"
+        }
+      ]
+    },
+    "ProjectileMiss": {
+      "Cooldown": {
+        "Cooldown": 0
+      },
+      "Interactions": [
+        {
+          "Type": "ShieldCap_Throw_Homing_Return_On_Miss"
+        }
+      ]
+    },
+    "ProjectileBounce": {
+      "Cooldown": {
+        "Cooldown": 0
+      },
+      "Interactions": [
+        {
+          "Type": "ShieldCap_Throw_Homing_Bounce"
+        }
+      ]
+    }
+  }
+}

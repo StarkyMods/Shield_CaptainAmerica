@@ -1,0 +1,7 @@
+{
+  "Type": "CameraShake",
+  "CameraShake": "ShieldCap_Jump_Falling_CameraShake",
+  "Intensity": {
+    "Value": 0.3
+  }
+}
