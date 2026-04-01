@@ -101,7 +101,11 @@
               "RootInteraction": "PerfectDodge"
             }
           },
-          "Next": "Zephyr_Dodge"
+          "Next": {
+            "Type": "Zephyr_Dodge_Config",
+            "AnimationStyle": "roll",
+            "Next": "Zephyr_Dodge"
+          }
         }
       ]
     },
