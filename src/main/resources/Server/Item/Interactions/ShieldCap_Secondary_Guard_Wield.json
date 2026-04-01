@@ -1,0 +1,84 @@
+{
+  "Type": "Wielding",
+  "Effects": {
+    "ItemAnimationId": "Guard",
+    "ClearAnimationOnFinish": true,
+    "WorldSoundEventId": "SFX_Shield_T2_Raise",
+    "LocalSoundEventId": "SFX_Shield_T2_Raise_Local"
+  },
+  "Forks": {
+    "Primary": {
+      "Interactions": [
+        {
+          "Type": "ShieldCap_Sprint_Condition_Java",
+          "Next": {
+            "Type": "RunRootInteraction",
+            "RootInteraction": "Root_ShieldCap_Primary_Sprint_Hit_Gated"
+          },
+          "Failed": {
+            "Type": "ShieldCap_Secondary_Guard_Bash_Cooldown_Java",
+            "Next": {
+              "Type": "RunRootInteraction",
+              "RootInteraction": "Root_ShieldCap_Secondary_Guard_Bash"
+            },
+            "Failed": {
+              "Type": "Simple",
+              "RunTime": 0.0
+            }
+          }
+        }
+      ],
+      "Cooldown": {
+        "Cooldown": 2
+      }
+    }
+  },
+  "AngledWielding": {
+    "Angle": 0,
+    "AngleDistance": 160,
+    "DamageModifiers": {
+      "Physical": 0,
+      "Projectile": 0,
+      "Poison": 0,
+      "Fall": 0
+    },
+    "KnockbackModifiers": {
+      "Physical": 0.2,
+      "Projectile": 0.15,
+      "Fall": 0.1
+    }
+  },
+  "StaminaCost": {
+    "Value": 12,
+    "CostType": "Damage"
+  },
+  "CancelOnOtherClick": true,
+  "Failed": {
+    "Type": "Simple",
+    "Effects": {
+      "Particles": [
+        {
+          "SystemId": "Shield_Shatter"
+        }
+      ],
+      "WorldSoundEventId": "SFX_Shield_T1_Break",
+      "LocalSoundEventId": "SFX_Shield_T1_Break"
+    }
+  },
+  "BlockedEffects": {
+    "WorldSoundEventId": "SFX_Shield_T2_Impact",
+    "WorldParticles": [
+      {
+        "SystemId": "Shield_Block"
+      }
+    ]
+  },
+  "Next": {
+    "$Comment": "Standard regen delay upon ending guarding on all weapons",
+    "Type": "ChangeStat",
+    "Behaviour": "Set",
+    "StatModifiers": {
+      "StaminaRegenDelay": -0.8
+    }
+  }
+}

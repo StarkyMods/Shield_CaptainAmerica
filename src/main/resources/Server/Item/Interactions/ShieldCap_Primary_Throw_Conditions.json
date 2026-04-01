@@ -1,0 +1,16 @@
+{
+  "Type": "StatsCondition",
+  "Costs": {
+    "Stamina": 4
+  },
+  "ValueType": "Absolute",
+  "Next": {
+    "Type": "ChangeStat",
+    "StatModifiers": {
+      "Stamina": -4
+    },
+    "ValueType": "Absolute",
+    "Behaviour": "Add",
+    "Next": "ShieldCap_Primary_Throw"
+  }
+}

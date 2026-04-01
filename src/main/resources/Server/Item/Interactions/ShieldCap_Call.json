@@ -1,0 +1,20 @@
+{
+  "Type": "EffectCondition",
+  "Match": "None",
+  "Next": {
+    "Type": "Serial",
+    "Interactions": [
+      "ShieldCap_Thrown_Force_Return",
+      {
+        "Type": "Simple",
+        "Effects": {
+          "ItemAnimationId": "ShieldCapCalling"
+        },
+        "CancelOnItemChange": true
+      }
+    ]
+  },
+  "EntityEffectIds": [
+    "ShieldCap_Call_Cooldown"
+  ]
+}

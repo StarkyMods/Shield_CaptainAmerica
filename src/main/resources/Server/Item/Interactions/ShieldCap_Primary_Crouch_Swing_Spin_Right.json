@@ -1,0 +1,64 @@
+{
+  "Type": "Simple",
+  "Next": {
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "Interactions": [
+          {
+            "Type": "ChangeStat",
+            "StatModifiers": {
+              "Stamina": -2
+            },
+            "Behaviour": "Add",
+            "ValueType": "Absolute",
+            "Next": {
+              "Type": "Selector",
+              "$Comment": "Length of Combat",
+              "Selector": {
+                "Id": "AOECircle",
+                "Range": 2.5
+              },
+              "HitEntity": {
+                "Interactions": [
+                  {
+                    "Type": "Replace",
+                    "DefaultValue": {
+                      "Interactions": [
+                        "ShieldCap_Primary_Damage"
+                      ]
+                    },
+                    "Var": "Crouch_Swing_Spin_Right_Damage",
+                    "DefaultOk": true
+                  }
+                ]
+              },
+              "IgnoreOwner": true,
+              "HorizontalSpeedMultiplier": 0,
+              "RunTime": 0.35
+            },
+            "HorizontalSpeedMultiplier": 0,
+            "RunTime": 0.5,
+            "Failed": "ShieldCap_Primary_Chain"
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "RunTime": 0.85,
+            "Effects": {
+              "ClearAnimationOnFinish": true,
+              "ItemAnimationId": "ShieldCapCrouchSwingSpinRight"
+            },
+            "HorizontalSpeedMultiplier": 0
+          }
+        ]
+      }
+    ],
+    "HorizontalSpeedMultiplier": 0
+  },
+  "HorizontalSpeedMultiplier": 0,
+  "RunTime": 0
+}

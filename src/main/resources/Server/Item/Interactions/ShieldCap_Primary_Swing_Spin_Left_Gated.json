@@ -1,0 +1,5 @@
+{
+  "Type": "ShieldCap_Sprint_Condition_Java",
+  "Next": "ShieldCap_Primary_Swing_Left",
+  "Failed": "ShieldCap_Primary_Swing_Spin_Left"
+}

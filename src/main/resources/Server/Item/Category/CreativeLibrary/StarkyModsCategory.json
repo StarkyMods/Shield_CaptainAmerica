@@ -1,0 +1,20 @@
+{
+  "Icon": "Icons/ItemCategories/StarkyCategory.png",
+  "Order": 2,
+  "Children": [
+    {
+      "Id": "Weapons",
+      "Name": "server.ui.starkymodscategory.weapons",
+      "Icon": "Icons/ItemCategories/Items-Weapons.png",
+      "InfoDisplayMode": "Tooltip"
+    },
+    {
+      "Id": "Items",
+      "Name": "server.ui.starkymodscategory.items",
+      "Icon": "Icons/ItemCategories/Items-Ingredients.png",
+      "InfoDisplayMode": "Tooltip"
+    }
+  ],
+  "Name": "StarkyModsCategory",
+  "Id": "StarkyModsCategory"
+}

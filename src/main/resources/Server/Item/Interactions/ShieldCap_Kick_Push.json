@@ -1,0 +1,99 @@
+{
+  "Type": "StatsCondition",
+  "Next": {
+    "Type": "ChangeStat",
+    "StatModifiers": {
+      "Stamina": -3
+    },
+    "Effects": {
+      "ItemAnimationId": "ShieldCapKickPush",
+      "ClearAnimationOnFinish": false
+    },
+    "RunTime": 0,
+    "Next": {
+      "Type": "ChangeStat",
+      "Behaviour": "Set",
+      "StatModifiers": {
+        "StaminaRegenDelay": -1.5
+      },
+      "Next": {
+        "Type": "ApplyForce",
+        "Direction": {
+          "Z": 0,
+          "Y": 1
+        },
+        "Force": 11,
+        "AdjustVertical": false,
+        "VelocityConfig": {
+          "GroundResistance": 0.936,
+          "GroundResistanceMax": 0.928,
+          "AirResistance": 0.924,
+          "AirResistanceMax": 0.932,
+          "Threshold": 3,
+          "Style": "Linear"
+        },
+        "ChangeVelocityType": "Add",
+        "WaitForGround": false,
+        "WaitForCollision": false,
+        "Next": {
+          "Type": "Simple",
+          "HorizontalSpeedMultiplier": 0,
+          "RunTime": 0.3,
+          "Next": {
+            "Type": "Parallel",
+            "Interactions": [
+              {
+                "Interactions": [
+                  "ShieldCap_Kick_Push_Selector"
+                ]
+              },
+              {
+                "Interactions": [
+                  {
+                    "Type": "Simple",
+                    "RunTime": 0.1,
+                    "HorizontalSpeedMultiplier": 0,
+                    "Next": {
+                      "Type": "ApplyForce",
+                      "Direction": {
+                        "Z": 1
+                      },
+                      "AdjustVertical": true,
+                      "Force": 8,
+                      "WaitForGround": false,
+                      "WaitForCollision": false,
+                      "ChangeVelocityType": "Add",
+                      "VelocityConfig": {
+                        "GroundResistance": 0.936,
+                        "GroundResistanceMax": 0.928,
+                        "AirResistance": 0.924,
+                        "AirResistanceMax": 0.932,
+                        "Threshold": 3,
+                        "Style": "Linear"
+                      },
+                      "HorizontalSpeedMultiplier": 0,
+                      "RunTime": 1
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "RunTime": 0.15
+      },
+      "Effects": {
+        "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
+        "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local"
+      },
+      "HorizontalSpeedMultiplier": 0,
+      "RunTime": 0.1
+    },
+    "HorizontalSpeedMultiplier": 0
+  },
+  "Costs": {
+    "Stamina": 3
+  },
+  "ValueType": "Absolute",
+  "HorizontalSpeedMultiplier": 0
+}

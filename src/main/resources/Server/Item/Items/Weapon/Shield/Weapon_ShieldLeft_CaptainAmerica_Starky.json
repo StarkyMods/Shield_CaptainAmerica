@@ -1,0 +1,130 @@
+{
+  "Parent": "Template_Weapon_Shield",
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Shield_CaptainAmerica_Starky.name",
+    "Description": "server.items.Weapon_Shield_CaptainAmerica_Starky.description"
+  },
+  "Model": "Items/Weapons/StarkyMods/starkyshieldcaptainamericaleft.blockymodel",
+  "Texture": "Items/Weapons/StarkyMods/starkyshieldcaptainamericalit.png",
+  "Icon": "Icons/ItemsGenerated/Weapon_Shield_CaptainAmerica_Starky.png",
+  "Quality": "Legendary",
+  "ItemLevel": 100,
+  "InteractionVars": {
+    "Guard_Start_StaminaCost": {
+      "Interactions": [
+        {
+          "$Comment": "The amount of stamina consumed upon starting guarding",
+          "Type": "ChangeStat",
+          "StatModifiers": {
+            "Stamina": -0.5
+          }
+        }
+      ]
+    },
+    "Guard_Wield": {
+      "Interactions": [
+        {
+          "$Comment": "Actively guarding with the weapon",
+          "Parent": "Weapon_Shield_Secondary_Guard_Wield",
+          "Effects": {
+            "WorldSoundEventId": "SFX_Shield_T2_Raise",
+            "LocalSoundEventId": "SFX_Shield_T2_Raise_Local"
+          },
+          "StaminaCost": {
+            "Value": 12,
+            "CostType": "Damage"
+          },
+          "BlockedEffects": {
+            "WorldSoundEventId": "SFX_Shield_T2_Impact"
+          }
+        }
+      ]
+    },
+    "Guard_Bash": {
+      "Interactions": [
+        {
+          "Type": "ApplyEffect",
+          "EffectId": "Stamina_Broken_Immune"
+        },
+        {
+          "$Comment": "Effects and stamina consumed upon a guard bash",
+          "Parent": "Weapon_Shield_Secondary_Guard_Bash",
+          "Effects": {
+            "WorldSoundEventId": "SFX_Shield_T2_Swing",
+            "LocalSoundEventId": "SFX_Shield_T2_Swing_Local"
+          },
+          "StatModifiers": {
+            "Stamina": -2
+          }
+        }
+      ]
+    },
+    "Guard_Bash_Damage": {
+      "Interactions": [
+        {
+          "$Comment": "Damage & Effects on a successful hit with the guard shove attack",
+          "Parent": "Weapon_Shield_Secondary_Guard_Bash_Damage",
+          "DamageEffects": {
+            "WorldSoundEventId": "SFX_Shield_T2_Impact",
+            "LocalSoundEventId": "SFX_Shield_T2_Impact"
+          }
+        }
+      ]
+    }
+  },
+  "Scale": 2.8,
+  "Categories": [
+    "Items.Weapons",
+    "StarkyModsCategory.Weapons"
+  ],
+  "Interactions": {
+    "SwapFrom": {
+      "Interactions": [
+        {
+          "Type": "ShieldCap_Refresh_Java"
+        }
+      ]
+    },
+    "SwapTo": {
+      "Interactions": [
+        {
+          "Type": "ShieldCap_Refresh_Java"
+        }
+      ]
+    },
+    "Primary": "Root_Unarmed_Attack_Swing_Left",
+    "Secondary": "Root_Weapon_Shield_Secondary_Guard"
+  },
+  "Weapon": {},
+  "Utility": {
+    "Usable": true
+  },
+  "DroppedItemAnimation": "Items/Animations/Dropped/Dropped_Diagonal_Left.blockyanim",
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ],
+    "Family": [
+      "Shield"
+    ]
+  },
+  "Reticle": "DefaultMelee",
+  "ItemSoundSetId": "ISS_Weapons_Shield_Metal",
+  "PlayerAnimationsId": "Shield",
+  "MaxDurability": 0,
+  "FuelQuality": 0,
+  "DurabilityLossOnHit": 0.21,
+  "Variant": true,
+  "ItemAppearanceConditions": {
+    "MjolnirOverchargedStatus": [
+      {
+        "ModelVFXId": "ShieldCap_Blue2",
+        "Condition": [
+          0,
+          0
+        ],
+        "ConditionValueType": "Absolute"
+      }
+    ]
+  }
+}

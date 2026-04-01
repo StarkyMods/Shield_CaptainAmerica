@@ -1,0 +1,69 @@
+{
+  "Icon": "Icons/ItemsGenerated/Weapon_Shield_Thrown_Starky.png",
+  "Quality": "ShieldCap_Thrown_Quality",
+  "Categories": [
+    "StarkyModsCategory.Items",
+    "Items.Weapons"
+  ],
+  "PlayerAnimationsId": "ShieldCap_Thrown_Animations",
+  "IconProperties": {
+    "Scale": 0.6,
+    "Rotation": [
+      0,
+      0,
+      0
+    ],
+    "Translation": [
+      0,
+      -13
+    ]
+  },
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ]
+  },
+  "ItemEntity": {
+    "ParticleSystemId": null
+  },
+  "ItemSoundSetId": "ISS_Weapon_Blunt_Large",
+  "ItemLevel": 100,
+  "MaxDurability": 0,
+  "DurabilityLossOnHit": 0.21,
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Shield_CaptainAmerica_Starky.name",
+    "Description": "server.items.Weapon_Shield_CaptainAmerica_Starky.description"
+  },
+  "MaxStack": 1,
+  "Model": "Items/Projectiles/Projectile.blockymodel",
+  "Texture": "Items/Weapons/StarkyMods/starkyshieldcaptainamericalit.png",
+  "Scale": 0.7,
+  "FuelQuality": 0,
+  "Weapon": {
+    "StatModifiers": {
+      "SignatureEnergy": [
+        {
+          "CalculationType": "Additive",
+          "Target": "Max",
+          "Amount": 100
+        }
+      ]
+    },
+    "EntityStatsToClear": [
+      "MjolnirThrowTrigger"
+    ]
+  },
+  "Variant": true,
+  "Utility": {
+    "Usable": true
+  },
+  "Interactions": {
+    "Secondary": {
+      "Interactions": [
+        "ShieldCap_Call"
+      ],
+      "RequireNewClick": true
+    },
+    "Primary": "Root_ShieldCap_Throw_Kick"
+  }
+}

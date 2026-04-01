@@ -1,0 +1,255 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Shield_CaptainAmerica_Starky.name",
+    "Description": "server.items.Weapon_Shield_CaptainAmerica_Starky.description"
+  },
+  "Model": "Items/Weapons/StarkyMods/starkyshieldcaptainamericaright.blockymodel",
+  "Texture": "Items/Weapons/StarkyMods/starkyshieldcaptainamericalit.png",
+  "Icon": "Icons/ItemsGenerated/Weapon_Shield_CaptainAmerica_Starky.png",
+  "Quality": "ShieldCap_Quality",
+  "ItemLevel": 100,
+  "Scale": 2.8,
+  "Categories": [
+    "Items.Weapons",
+    "StarkyModsCategory.Weapons"
+  ],
+  "Interactions": {
+    "SwapFrom": {
+      "Interactions": [
+        {
+          "Type": "Parallel",
+          "Interactions": [
+            {
+              "Interactions": [
+                {
+                  "Type": "Simple",
+                  "RunTime": 0.66,
+                  "Effects": {
+                    "ItemAnimationId": "ShieldCapHandToBack",
+                    "ClearAnimationOnFinish": true
+                  },
+                  "CancelOnItemChange": false
+                }
+              ]
+            },
+            {
+              "Interactions": [
+                {
+                  "Type": "Serial",
+                  "Interactions": [
+                    {
+                      "Type": "Simple",
+                      "RunTime": 0.66
+                    },
+                    {
+                      "Type": "ShieldCap_Refresh_Java",
+                      "RunTime": 0
+                    },
+                    {
+                      "Type": "ChangeActiveSlot"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "SwapTo": {
+      "Interactions": [
+        {
+          "Type": "Parallel",
+          "Interactions": [
+            {
+              "Interactions": [
+                {
+                  "Type": "ShieldCap_Refresh_Java",
+                  "RunTime": 0
+                }
+              ]
+            },
+            {
+              "Type": "Serial",
+              "Interactions": [
+                {
+                  "Type": "Simple",
+                  "RunTime": 0.2,
+                  "Effects": {
+                    "ItemAnimationId": "ShieldCapBackToHand",
+                    "ClearAnimationOnFinish": true
+                  },
+                  "CancelOnItemChange": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "Secondary": "Root_ShieldCap_Secondary_Guard",
+    "Primary": "Root_ShieldCap_Primary",
+    "Ability3": {
+      "Interactions": [
+        {
+          "Type": "StarkyPluginPresentCondition",
+          "Failed": {
+            "Type": "StarkyPluginPresentCondition",
+            "PluginName": "Perfect Dodges",
+            "Next": {
+              "Type": "RunRootInteraction",
+              "RootInteraction": "PerfectDodge"
+            }
+          },
+          "Next": "Zephyr_Dodge"
+        }
+      ]
+    },
+    "Ability2": "Root_ShieldCap_Kick_Push"
+  },
+  "Weapon": {
+    "StatModifiers": {
+      "SignatureEnergy": [
+        {
+          "Target": "Max",
+          "CalculationType": "Additive",
+          "Amount": 100
+        }
+      ]
+    }
+  },
+  "DroppedItemAnimation": "Items/Animations/Dropped/Dropped_Diagonal_Left.blockyanim",
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ],
+    "Family": [
+      "Shield"
+    ]
+  },
+  "Reticle": "DefaultMelee",
+  "ItemSoundSetId": "ISS_Weapons_Shield_Metal",
+  "PlayerAnimationsId": "ShieldCap_Animations",
+  "ItemAppearanceConditions": {
+    "MjolnirOverchargedStatus": [
+      {
+        "ModelVFXId": "ShieldCap_Blue2",
+        "Condition": [
+          0,
+          0
+        ],
+        "ConditionValueType": "Absolute"
+      }
+    ]
+  },
+  "DurabilityLossOnHit": 0.21,
+  "FuelQuality": 0,
+  "MaxDurability": 0,
+  "Utility": {
+    "Usable": true
+  },
+  "IconProperties": {
+    "Scale": 1.7,
+    "Rotation": [
+      351,
+      64,
+      342
+    ],
+    "Translation": [
+      3.5,
+      -13.8
+    ]
+  },
+  "InteractionVars": {
+    "Swing_Left_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Primary_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 30
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 12
+            }
+          ]
+        }
+      ]
+    },
+    "Swing_Right_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Primary_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 30
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 12
+            }
+          ]
+        }
+      ]
+    },
+    "Sprint_Hit_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Primary_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 30
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 12
+            }
+          ]
+        }
+      ]
+    },
+    "Guard_Bash_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Secondary_Guard_Bash_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 40
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 12
+            }
+          ]
+        }
+      ]
+    },
+    "Swing_Push_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Primary_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 30
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 12
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

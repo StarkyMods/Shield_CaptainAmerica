@@ -1,0 +1,52 @@
+{
+  "Type": "StatsCondition",
+  "Next": {
+    "Type": "ChangeStat",
+    "StatModifiers": {
+      "Stamina": -1
+    },
+    "Effects": {
+      "ItemAnimationId": "ShieldCapThrowKick",
+      "ClearAnimationOnFinish": false
+    },
+    "RunTime": 0,
+    "Next": {
+      "Type": "ChangeStat",
+      "Behaviour": "Set",
+      "StatModifiers": {
+        "StaminaRegenDelay": -1.5
+      },
+      "Next": {
+        "Type": "ApplyForce",
+        "Direction": {
+          "Z": 0,
+          "Y": 1
+        },
+        "Force": 11,
+        "AdjustVertical": false,
+        "VelocityConfig": {
+          "GroundResistance": 0.936,
+          "GroundResistanceMax": 0.928,
+          "AirResistance": 0.924,
+          "AirResistanceMax": 0.932,
+          "Threshold": 3,
+          "Style": "Linear"
+        },
+        "ChangeVelocityType": "Add",
+        "WaitForGround": false,
+        "WaitForCollision": false,
+        "Next": "ShieldCap_Kick_Push_Selector",
+        "RunTime": 0.15
+      },
+      "HorizontalSpeedMultiplier": 0,
+      "RunTime": 0
+    },
+    "HorizontalSpeedMultiplier": 0
+  },
+  "Costs": {
+    "Stamina": 1
+  },
+  "ValueType": "Absolute",
+  "HorizontalSpeedMultiplier": 0,
+  "RunTime": 0
+}

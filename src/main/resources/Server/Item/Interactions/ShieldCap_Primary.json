@@ -1,0 +1,24 @@
+{
+  "Type": "ShieldCap_Guard_Inactive_Condition_Java",
+  "Next": {
+    "Type": "Condition",
+    "Failed": {
+      "Type": "Condition",
+      "Next": {
+        "Type": "RunRootInteraction",
+        "RootInteraction": "Root_ShieldCap_Primary_Crouch_Chain_Gated"
+      },
+      "Crouching": true,
+      "Failed": "ShieldCap_Primary_Charging"
+    },
+    "Jumping": true,
+    "Next": {
+      "Type": "RunRootInteraction",
+      "RootInteraction": "Root_ShieldCap_Primary_Jump_Hit_Gated"
+    }
+  },
+  "Failed": {
+    "Type": "Simple",
+    "RunTime": 0.0
+  }
+}

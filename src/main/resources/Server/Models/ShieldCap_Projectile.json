@@ -1,0 +1,47 @@
+{
+  "Model": "Items/Weapons/StarkyMods/starkyshieldcaptainamericaprojectile.blockymodel",
+  "Texture": "Items/Weapons/StarkyMods/starkyshieldcaptainamericaback_attachment.png",
+  "HitBox": {
+    "Min": {
+      "X": -0.2,
+      "Y": -0.2,
+      "Z": -0.2
+    },
+    "Max": {
+      "X": 0.2,
+      "Y": 0.2,
+      "Z": 0.2
+    }
+  },
+  "Trails": [
+    {
+      "PositionOffset": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "TrailId": "Small_Projectile",
+      "RotationOffset": {
+        "Yaw": 0,
+        "Pitch": 0,
+        "Roll": 0
+      },
+      "FixedRotation": false
+    },
+    {
+      "PositionOffset": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "TrailId": "Wind",
+      "RotationOffset": {
+        "Roll": 90.0,
+        "Pitch": 0,
+        "Yaw": 0
+      }
+    }
+  ],
+  "MinScale": 1,
+  "MaxScale": 1
+}
