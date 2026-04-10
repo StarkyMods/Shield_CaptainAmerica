@@ -1,6 +1,9 @@
 {
   "Interactions": [
-    "ShieldCap_Throw_Kick"
+    {
+      "Type": "ShieldCap_Throw_Kick_Window_Java",
+      "Next": "ShieldCap_Throw_Kick"
+    }
   ],
   "RequireNewClick": true
 }

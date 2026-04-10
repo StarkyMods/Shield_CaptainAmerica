@@ -19,7 +19,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public final class ShieldCapReturnReticleInjector {
     private static final String RETURN_WINDOW_EVENT_TAG = "ShieldCap_ReturnWindow";
-    private static final String RETURN_WINDOW_RETICLE_PART = "UI/Reticles/ServerEvents/OnHit/Default.png";
+    private static final String RETURN_WINDOW_RETICLE_PART = "UI/Reticles/Melee.png";
     private static final float RETURN_WINDOW_DURATION_SECONDS = 0.14f;
 
     private static Field serverEventsField;
@@ -74,6 +74,10 @@ public final class ShieldCapReturnReticleInjector {
             return;
         }
         playerRef.getPacketHandler().writeNoCache(returnWindowReticleEvent);
+    }
+
+    public static long getReturnWindowDurationMs() {
+        return Math.round(RETURN_WINDOW_DURATION_SECONDS * 1000.0f);
     }
 
     @SuppressWarnings("unchecked")

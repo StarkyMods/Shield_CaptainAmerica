@@ -14,7 +14,7 @@
         "Y": 4
       },
       "Force": 25,
-      "AdjustVertical": true,
+      "AdjustVertical": false,
       "VelocityConfig": {
         "GroundResistance": 0.936,
         "GroundResistanceMax": 0.928,
@@ -32,11 +32,11 @@
         "Next": {
           "Type": "ApplyForce",
           "Direction": {
-            "Z": -3,
+            "Z": -1,
             "Y": -2
           },
           "Force": 25,
-          "AdjustVertical": true,
+          "AdjustVertical": false,
           "VelocityConfig": {
             "GroundResistance": 0.936,
             "GroundResistanceMax": 0.928,

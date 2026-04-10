@@ -1,0 +1,17 @@
+{
+  "Type": "Charging",
+  "DisplayProgress": true,
+  "AllowIndefiniteHold": true,
+  "MouseSensitivityAdjustmentDuration": 0.1,
+  "MouseSensitivityAdjustmentTarget": 0.7,
+  "Effects": {
+    "ItemAnimationId": "ShieldCapCharging"
+  },
+  "Next": {
+    "0": {
+      "Type": "RunRootInteraction",
+      "RootInteraction": "Root_ShieldCap_Primary_Jump_Hit_Gated"
+    },
+    "0.5": "ShieldCap_Primary_Throw_Conditions"
+  }
+}

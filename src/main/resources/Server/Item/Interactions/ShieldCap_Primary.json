@@ -1,7 +1,7 @@
 {
   "Type": "ShieldCap_Guard_Inactive_Condition_Java",
   "Next": {
-    "Type": "Condition",
+    "Type": "ShieldCap_Airborne_Condition_Java",
     "Failed": {
       "Type": "Condition",
       "Next": {
@@ -11,11 +11,7 @@
       "Crouching": true,
       "Failed": "ShieldCap_Primary_Charging"
     },
-    "Jumping": true,
-    "Next": {
-      "Type": "RunRootInteraction",
-      "RootInteraction": "Root_ShieldCap_Primary_Jump_Hit_Gated"
-    }
+    "Next": "ShieldCap_Primary_Jump_Charging"
   },
   "Failed": {
     "Type": "Simple",

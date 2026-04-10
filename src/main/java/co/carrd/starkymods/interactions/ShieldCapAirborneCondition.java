@@ -4,8 +4,8 @@ import javax.annotation.Nonnull;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.protocol.InteractionState;
+import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.protocol.MovementStates;
 import com.hypixel.hytale.protocol.WaitForDataFrom;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
@@ -13,19 +13,18 @@ import com.hypixel.hytale.server.core.entity.movement.MovementStatesComponent;
 import com.hypixel.hytale.server.core.modules.entity.EntityModule;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
-import com.hypixel.hytale.server.core.modules.physics.component.Velocity;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
-public final class ShieldCapSprintCondition extends SimpleInstantInteraction {
+public final class ShieldCapAirborneCondition extends SimpleInstantInteraction {
     @Nonnull
-    public static final BuilderCodec<ShieldCapSprintCondition> CODEC =
+    public static final BuilderCodec<ShieldCapAirborneCondition> CODEC =
             BuilderCodec
                     .builder(
-                            ShieldCapSprintCondition.class,
-                            ShieldCapSprintCondition::new,
+                            ShieldCapAirborneCondition.class,
+                            ShieldCapAirborneCondition::new,
                             SimpleInstantInteraction.CODEC
                     )
-                    .documentation("Checks a reliable sprint-forward condition for ShieldCap primary.")
+                    .documentation("Checks whether the player is airborne for ShieldCap primary jump routing.")
                     .build();
 
     @Nonnull
@@ -38,24 +37,12 @@ public final class ShieldCapSprintCondition extends SimpleInstantInteraction {
     protected void firstRun(@Nonnull InteractionType type,
                             @Nonnull InteractionContext context,
                             @Nonnull CooldownHandler cooldownHandler) {
-        if (!passesSprintOrJumpCondition(context)) {
+        if (!isAirborne(context)) {
             markFailed(context);
         }
     }
 
-    private static void markFailed(@Nonnull InteractionContext context) {
-        if (context.getState() != null) {
-            context.getState().state = InteractionState.Failed;
-        }
-        if (context.getClientState() != null) {
-            context.getClientState().state = InteractionState.Failed;
-        }
-        if (context.getServerState() != null) {
-            context.getServerState().state = InteractionState.Failed;
-        }
-    }
-
-    private static boolean passesSprintOrJumpCondition(@Nonnull InteractionContext context) {
+    private static boolean isAirborne(@Nonnull InteractionContext context) {
         if (context.getCommandBuffer() == null) {
             return false;
         }
@@ -71,17 +58,18 @@ public final class ShieldCapSprintCondition extends SimpleInstantInteraction {
         MovementStatesComponent movementComponent =
                 context.getCommandBuffer().getComponent(entityRef, EntityModule.get().getMovementStatesComponentType());
         MovementStates movementStates = movementComponent == null ? null : movementComponent.getMovementStates();
-        if (movementStates == null) {
-            return false;
+        return movementStates != null && !movementStates.onGround;
+    }
+
+    private static void markFailed(@Nonnull InteractionContext context) {
+        if (context.getState() != null) {
+            context.getState().state = InteractionState.Failed;
         }
-
-        if (movementStates.sprinting) {
-            return true;
+        if (context.getClientState() != null) {
+            context.getClientState().state = InteractionState.Failed;
         }
-
-        Velocity velocity = context.getCommandBuffer().getComponent(entityRef, EntityModule.get().getVelocityComponentType());
-        double verticalVelocity = velocity != null && velocity.getVelocity() != null ? velocity.getVelocity().y : 0.0d;
-
-        return !movementStates.onGround && (movementStates.jumping || verticalVelocity > 0.1d);
+        if (context.getServerState() != null) {
+            context.getServerState().state = InteractionState.Failed;
+        }
     }
 }

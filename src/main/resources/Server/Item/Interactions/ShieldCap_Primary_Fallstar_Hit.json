@@ -1,0 +1,44 @@
+{
+  "Type": "StatsCondition",
+  "Costs": {
+    "Stamina": 3
+  },
+  "ValueType": "Absolute",
+  "Failed": "ShieldCap_Primary_Swing_Left",
+  "Next": {
+    "Type": "ChangeStat",
+    "Next": {
+      "Type": "ApplyForce",
+      "Direction": {
+        "Z": -1,
+        "Y": -2
+      },
+      "Force": 25,
+      "AdjustVertical": false,
+      "VelocityConfig": {
+        "GroundResistance": 0.936,
+        "GroundResistanceMax": 0.928,
+        "AirResistance": 0.924,
+        "AirResistanceMax": 0.932,
+        "Threshold": 3,
+        "Style": "Linear"
+      },
+      "ChangeVelocityType": "Add",
+      "WaitForGround": true,
+      "WaitForCollision": false,
+      "Next": "ShieldCap_Primary_Jump_Hit_Selector",
+      "Effects": {
+        "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
+        "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
+        "ItemAnimationId": "ShieldCapJumpFallStar",
+        "ClearAnimationOnFinish": false,
+        "CameraEffect": "ShieldCap_Jump_Falling_Camera"
+      }
+    },
+    "StatModifiers": {
+      "Stamina": -3
+    },
+    "Behaviour": "Add",
+    "ValueType": "Absolute"
+  }
+}
