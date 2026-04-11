@@ -40,7 +40,11 @@ public final class ShieldCapForceReturn extends SimpleInstantInteraction {
             return;
         }
 
-        ShieldCapThrowHomingService.forceReturnToOwner(playerRef.getUuid());
+        boolean foundProjectile =
+                ShieldCapThrowHomingService.forceReturnToOwner(playerRef.getUuid(), playerRef.getReference());
+        if (!foundProjectile) {
+            ShieldCapCatch.restoreToOwner(context.getCommandBuffer().getStore(), playerRef.getReference());
+        }
     }
 
     private Player resolvePlayer(@Nonnull CommandBuffer<EntityStore> commandBuffer,

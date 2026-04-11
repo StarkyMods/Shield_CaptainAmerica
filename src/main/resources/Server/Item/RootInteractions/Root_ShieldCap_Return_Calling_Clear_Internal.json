@@ -1,0 +1,26 @@
+{
+  "Interactions": [
+    {
+      "Type": "Serial",
+      "Interactions": [
+        {
+          "Type": "Simple",
+          "RunTime": 0.01,
+          "Effects": {
+            "ItemAnimationId": "Fall",
+            "ClearAnimationOnFinish": true
+          }
+        },
+        {
+          "Type": "Simple",
+          "RunTime": 0.01,
+          "Effects": {
+            "ItemAnimationId": "Run",
+            "ClearAnimationOnFinish": true
+          }
+        }
+      ]
+    }
+  ],
+  "RequireNewClick": false
+}

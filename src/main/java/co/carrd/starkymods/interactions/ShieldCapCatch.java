@@ -1,5 +1,9 @@
 package co.carrd.starkymods.interactions;
 
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nonnull;
 
 import org.bson.BsonDocument;
@@ -18,11 +22,13 @@ import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.modules.projectile.ProjectileModule;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 public final class ShieldCapCatch extends SimpleInstantInteraction {
     private static final String THROWN_ITEM_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String RETURNED_ITEM_ID = "Weapon_Shield_CaptainAmerica_Starky";
+    private static final long[] CALLING_ANIMATION_CLEAR_RETRY_DELAYS_MS = new long[] {500L, 650L, 800L};
 
     @Nonnull
     public static final BuilderCodec<ShieldCapCatch> CODEC =
@@ -79,6 +85,9 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
         }
 
         if (!restored || projectileRef == null || !projectileRef.isValid()) {
+            if (restored) {
+                scheduleCallingAnimationClearPasses(store, ownerRef);
+            }
             return;
         }
 
@@ -89,6 +98,54 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
                 uuidComponent == null ? null : uuidComponent.getUuid(),
                 0L
         );
+        scheduleCallingAnimationClearPasses(store, ownerRef);
+    }
+
+    private static void scheduleCallingAnimationClearPasses(Store<EntityStore> store,
+                                                            Ref<EntityStore> ownerRef) {
+        if (store == null || ownerRef == null || !ownerRef.isValid()
+                || store.getExternalData() == null || store.getExternalData().getWorld() == null) {
+            return;
+        }
+
+        UUID ownerUuid = getEntityUuid(store, ownerRef);
+        World world = store.getExternalData().getWorld();
+        if (ownerUuid == null || world == null) {
+            return;
+        }
+
+        for (long delayMs : CALLING_ANIMATION_CLEAR_RETRY_DELAYS_MS) {
+            scheduleCallingAnimationClear(ownerUuid, world, delayMs);
+        }
+    }
+
+    private static void scheduleCallingAnimationClear(UUID ownerUuid,
+                                                      World world,
+                                                      long delayMs) {
+        if (ownerUuid == null || world == null) {
+            return;
+        }
+
+        Runnable task = () -> {
+            if (!world.isAlive()) {
+                return;
+            }
+
+            ShieldCapThrowHomingService.queueReturnCallingAnimationClear(ownerUuid);
+        };
+
+        CompletableFuture<Void> timer = new CompletableFuture<>();
+        timer.completeOnTimeout(null, delayMs, TimeUnit.MILLISECONDS)
+                .thenRunAsync(task, world);
+    }
+
+    private static UUID getEntityUuid(Store<EntityStore> store, Ref<EntityStore> ref) {
+        if (store == null || ref == null || !ref.isValid()) {
+            return null;
+        }
+
+        UUIDComponent uuidComponent = store.getComponent(ref, UUIDComponent.getComponentType());
+        return uuidComponent == null ? null : uuidComponent.getUuid();
     }
 
     private static boolean restoreInContainer(ItemContainer container) {

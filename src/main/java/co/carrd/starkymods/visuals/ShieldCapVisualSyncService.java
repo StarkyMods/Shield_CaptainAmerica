@@ -6,6 +6,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.inventory.Inventory;
@@ -28,6 +29,7 @@ public final class ShieldCapVisualSyncService {
     private static final String BASE_SHIELD_ID = "Weapon_Shield_CaptainAmerica_Starky";
     private static final String RIGHT_SHIELD_ID = "Weapon_ShieldRight_CaptainAmerica_Starky";
     private static final String LEFT_SHIELD_ID = "Weapon_ShieldLeft_CaptainAmerica_Starky";
+    private static final String THROWN_SHIELD_ID = "Weapon_ShieldCap_Thrown_Starky";
 
     private final Set<UUID> syncingPlayers = ConcurrentHashMap.newKeySet();
     private final Set<UUID> pendingSyncPlayers = ConcurrentHashMap.newKeySet();
@@ -36,11 +38,14 @@ public final class ShieldCapVisualSyncService {
             new ConcurrentHashMap<>();
 
     private EventRegistration<String, PlayerReadyEvent> playerReadyRegistration;
+    private EventRegistration<String, AddPlayerToWorldEvent> addPlayerToWorldRegistration;
     private EventRegistration<Void, PlayerDisconnectEvent> disconnectRegistration;
 
     public void register(JavaPlugin plugin) {
         playerReadyRegistration =
                 plugin.getEventRegistry().registerGlobal(PlayerReadyEvent.class, this::handlePlayerReady);
+        addPlayerToWorldRegistration =
+                plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorld);
         disconnectRegistration = plugin.getEventRegistry().register(PlayerDisconnectEvent.class, this::handleDisconnect);
     }
 
@@ -48,6 +53,10 @@ public final class ShieldCapVisualSyncService {
         if (playerReadyRegistration != null) {
             playerReadyRegistration.unregister();
             playerReadyRegistration = null;
+        }
+        if (addPlayerToWorldRegistration != null) {
+            addPlayerToWorldRegistration.unregister();
+            addPlayerToWorldRegistration = null;
         }
         if (disconnectRegistration != null) {
             disconnectRegistration.unregister();
@@ -118,8 +127,68 @@ public final class ShieldCapVisualSyncService {
             return;
         }
 
-        registerInventoryListeners(event.getPlayer());
-        syncDeferred(event.getPlayer(), true);
+        handlePlayerEnteredWorld(event.getPlayer(), true);
+    }
+
+    private void handleAddPlayerToWorld(AddPlayerToWorldEvent event) {
+        if (event == null || event.getHolder() == null) {
+            return;
+        }
+
+        World world = event.getWorld();
+        if (world == null) {
+            return;
+        }
+
+        world.execute(() -> {
+            Player player = event.getHolder().getComponent(Player.getComponentType());
+            if (player != null) {
+                handlePlayerEnteredWorld(player, true);
+            }
+        });
+    }
+
+    private void handlePlayerEnteredWorld(Player player, boolean forceBackRebuild) {
+        if (player == null) {
+            return;
+        }
+
+        sanitizeThrownShieldItems(player);
+        registerInventoryListeners(player);
+        syncDeferred(player, forceBackRebuild);
+    }
+
+    private void sanitizeThrownShieldItems(Player player) {
+        if (player == null) {
+            return;
+        }
+
+        Inventory inventory = player.getInventory();
+        if (inventory == null) {
+            return;
+        }
+
+        sanitizeThrownShieldItems(inventory.getHotbar());
+        sanitizeThrownShieldItems(inventory.getUtility());
+        sanitizeThrownShieldItems(inventory.getStorage());
+        sanitizeThrownShieldItems(inventory.getBackpack());
+        sanitizeThrownShieldItems(inventory.getTools());
+        sanitizeThrownShieldItems(inventory.getArmor());
+    }
+
+    private void sanitizeThrownShieldItems(ItemContainer container) {
+        if (container == null) {
+            return;
+        }
+
+        for (short slot = 0; slot < container.getCapacity(); slot++) {
+            ItemStack current = container.getItemStack(slot);
+            if (!matchesId(current, THROWN_SHIELD_ID)) {
+                continue;
+            }
+
+            container.setItemStackForSlot(slot, remapItem(current, BASE_SHIELD_ID));
+        }
     }
 
     private void handleDisconnect(PlayerDisconnectEvent event) {

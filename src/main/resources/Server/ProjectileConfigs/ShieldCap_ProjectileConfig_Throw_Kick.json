@@ -3,12 +3,12 @@
   "LaunchForce": 40,
   "Physics": {
     "Type": "Standard",
-    "SticksVertically": true,
+    "SticksVertically": false,
     "ComputeYaw": true,
     "ComputePitch": true,
     "Gravity": 2,
-    "Bounciness": 0,
-    "BounceCount": 0,
+    "Bounciness": 0.95,
+    "BounceCount": 2,
     "BounceLimit": 0.1,
     "Density": 2000,
     "RotationMode": "Velocity",
@@ -44,6 +44,16 @@
       "Interactions": [
         {
           "Type": "ShieldCap_Throw_Kick_Block_Impact"
+        }
+      ]
+    },
+    "ProjectileBounce": {
+      "Cooldown": {
+        "Cooldown": 0
+      },
+      "Interactions": [
+        {
+          "Type": "ShieldCap_Throw_Homing_Bounce"
         }
       ]
     }
