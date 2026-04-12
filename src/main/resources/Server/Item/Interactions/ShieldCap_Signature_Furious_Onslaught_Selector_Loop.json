@@ -1,0 +1,8 @@
+{
+  "Type": "ShieldCap_Signature_Furious_Onslaught_Active_Condition_Java",
+  "Failed": {
+    "Type": "Simple",
+    "RunTime": 0.0
+  },
+  "Next": "ShieldCap_Signature_Furious_Onslaught_Selector"
+}

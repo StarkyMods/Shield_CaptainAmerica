@@ -433,15 +433,6 @@
       "Looping": false,
       "BlendingDuration": 0.3
     },
-    "Groundslam_Attack": {
-      "ThirdPerson": "Characters/Animations/Main_Handed/StarkyMods/Mjolnir_Jump_Attack.blockyanim",
-      "ThirdPersonMoving": "Characters/Animations/Main_Handed/StarkyMods/Mjolnir_Jump_Attack_Moving.blockyanim",
-      "ThirdPersonFace": "Characters/Animations/Expressions/Rage.blockyanim",
-      "FirstPerson": "Characters/Animations/Items/Dual_Handed/Mace/Attacks/Swing_Down_Charged/Swing_Down_Charged_FPS.blockyanim",
-      "KeepPreviousFirstPersonAnimation": true,
-      "Speed": 0.4,
-      "BlendingDuration": 0
-    },
     "PP_Parry": {
       "ThirdPerson": "Characters/Animations/Main_Handed/StarkyMods/Attacks/Perfect_Parries/Parry.blockyanim",
       "ThirdPersonMoving": "Characters/Animations/Main_Handed/StarkyMods/Attacks/Perfect_Parries/Parry.blockyanim",
@@ -655,6 +646,16 @@
       "Speed": 1.3,
       "BlendingDuration": 0.13,
       "Looping": false
+    },
+    "ShieldCapFuriousOnslaught": {
+      "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Sprint_Guard.blockyanim",
+      "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Sprint_Guard.blockyanim",
+      "ThirdPersonFace": "Characters/Animations/Expressions/Rage.blockyanim",
+      "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Guard_FPS.blockyanim",
+      "KeepPreviousFirstPersonAnimation": true,
+      "Speed": 1.1,
+      "BlendingDuration": 0.2,
+      "Looping": true
     }
   },
   "Camera": {

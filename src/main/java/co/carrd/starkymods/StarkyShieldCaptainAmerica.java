@@ -25,6 +25,11 @@ import co.carrd.starkymods.interactions.ShieldCapThrowKickBlockImpact;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickImpact;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickRecentMarker;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickWindowCondition;
+import co.carrd.starkymods.interactions.ShieldCapSignatureFuriousOnslaught;
+import co.carrd.starkymods.interactions.ShieldCapSignatureFuriousOnslaughtActiveCondition;
+import co.carrd.starkymods.interactions.ShieldCapSignatureFuriousOnslaughtTickSystem;
+import co.carrd.starkymods.interactions.ShieldCapFuriousOnslaughtTargetCooldown;
+import co.carrd.starkymods.interactions.ShieldCapInvulnerabilityClear;
 import co.carrd.starkymods.interactions.ShieldCapThrowHomingTickSystem;
 import co.carrd.starkymods.interactions.StarkyPluginPresentCondition;
 import co.carrd.starkymods.visuals.ShieldCapBackModelSystems;
@@ -79,6 +84,26 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
                 "ShieldCap_Refresh_Java",
                 ShieldCapRefreshVisualsInteraction.class,
                 ShieldCapRefreshVisualsInteraction.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_Signature_Furious_Onslaught_Java",
+                ShieldCapSignatureFuriousOnslaught.class,
+                ShieldCapSignatureFuriousOnslaught.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_Signature_Furious_Onslaught_Active_Condition_Java",
+                ShieldCapSignatureFuriousOnslaughtActiveCondition.class,
+                ShieldCapSignatureFuriousOnslaughtActiveCondition.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_Furious_Onslaught_Target_Cooldown_Java",
+                ShieldCapFuriousOnslaughtTargetCooldown.class,
+                ShieldCapFuriousOnslaughtTargetCooldown.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_Invulnerability_Clear_Java",
+                ShieldCapInvulnerabilityClear.class,
+                ShieldCapInvulnerabilityClear.CODEC
         );
         getCodecRegistry(Interaction.CODEC).register(
                 "ShieldCap_Primary_Selector_Java",
@@ -202,6 +227,7 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         );
         getEntityStoreRegistry().registerSystem(new ShieldCapThrowHomingTickSystem());
         getEntityStoreRegistry().registerSystem(new ShieldCapPrimaryJumpStateTickSystem());
+        getEntityStoreRegistry().registerSystem(new ShieldCapSignatureFuriousOnslaughtTickSystem());
         visualSyncService.register(this);
         returnKickInputService.register(this);
         returnReticleInjector.register(this);

@@ -1,0 +1,18 @@
+{
+  "Parent": "DamageEntityParent",
+  "DamageCalculator": {
+    "BaseDamage": {
+      "Physical": 70
+    }
+  },
+  "DamageEffects": {
+    "WorldSoundEventId": "SFX_T1_Impact_Blunt",
+    "LocalSoundEventId": "SFX_T1_Impact_Blunt",
+    "WorldParticles": [
+      {
+        "SystemId": "Impact_Shield_Bash"
+      }
+    ]
+  },
+  "Next": "ShieldCap_Signature_Furious_Onslaught_Damage_Next"
+}

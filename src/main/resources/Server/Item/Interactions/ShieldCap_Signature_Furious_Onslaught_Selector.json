@@ -1,0 +1,22 @@
+{
+  "Type": "Selector",
+  "RunTime": 0.083,
+  "Effects": {
+    "CameraEffect": "Shield_Bash"
+  },
+  "Selector": {
+    "Id": "Stab",
+    "TestLineOfSight": true,
+    "ExtendTop": 1.5,
+    "ExtendLeft": 2.0,
+    "ExtendRight": 2.0,
+    "ExtendBottom": 1.5,
+    "StartDistance": 0.0,
+    "EndDistance": 2.8
+  },
+  "HitEntity": {
+    "Interactions": [
+      "ShieldCap_Signature_Furious_Onslaught_Hit_Gate"
+    ]
+  }
+}

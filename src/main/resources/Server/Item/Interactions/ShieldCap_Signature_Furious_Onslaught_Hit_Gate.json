@@ -1,0 +1,13 @@
+{
+  "Type": "ShieldCap_Furious_Onslaught_Target_Cooldown_Java",
+  "Next": {
+    "Type": "Replace",
+    "Var": "Furious_Onslaught_Knockback",
+    "DefaultOk": true,
+    "DefaultValue": {
+      "Interactions": [
+        "ShieldCap_Signature_Furious_Onslaught_Knockback"
+      ]
+    }
+  }
+}

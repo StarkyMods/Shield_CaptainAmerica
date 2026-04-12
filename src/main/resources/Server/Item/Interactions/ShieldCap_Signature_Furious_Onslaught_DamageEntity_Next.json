@@ -1,0 +1,22 @@
+{
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "RunTime": 0.1
+    },
+    {
+      "Type": "ShieldCap_Invulnerability_Clear_Java"
+    },
+    {
+      "Type": "Replace",
+      "Var": "Furious_Onslaught_Damage",
+      "DefaultOk": true,
+      "DefaultValue": {
+        "Interactions": [
+          "ShieldCap_Signature_Furious_Onslaught_Damage"
+        ]
+      }
+    }
+  ]
+}

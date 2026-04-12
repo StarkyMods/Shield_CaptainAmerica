@@ -1,0 +1,65 @@
+{
+  "Type": "StatsCondition",
+  "Costs": {
+    "SignatureEnergy": 100
+  },
+  "ValueType": "Percent",
+  "Failed": {
+    "Type": "SendMessage",
+    "Message": "You need 100% Signature Energy to use Furious Onslaught"
+  },
+  "Next": {
+    "Type": "ChangeStat",
+    "StatModifiers": {
+      "SignatureEnergy": -100
+    },
+    "ValueType": "Percent",
+    "Behaviour": "Add",
+    "RunTime": 0,
+    "Next": {
+      "Type": "Parallel",
+      "Interactions": [
+        {
+          "Interactions": [
+            {
+              "Type": "Simple",
+              "RunTime": 7.0,
+              "Effects": {
+                "ItemAnimationId": "ShieldCapFuriousOnslaught",
+                "ClearAnimationOnFinish": true
+              },
+              "CancelOnItemChange": true
+            }
+          ]
+        },
+        {
+          "Interactions": [
+            {
+              "Type": "ShieldCap_Signature_Furious_Onslaught_Java",
+              "DurationSeconds": 7.0,
+              "SprintSpeed": 90.0,
+              "UseVelocityConfig": false,
+              "GroundSpeedMultiplier": 1.0,
+              "AirSpeedMultiplier": 0.01,
+              "GroundResistance": 0.936,
+              "GroundResistanceMax": 0.928,
+              "AirResistance": 0.924,
+              "AirResistanceMax": 0.932,
+              "Threshold": 3.0,
+              "ResistanceStyle": "Linear"
+            }
+          ]
+        },
+        {
+          "Interactions": [
+            {
+              "Type": "ApplyEffect",
+              "EffectId": "ShieldCap_Furious_Onslaught_Screen",
+              "RunTime": 0
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

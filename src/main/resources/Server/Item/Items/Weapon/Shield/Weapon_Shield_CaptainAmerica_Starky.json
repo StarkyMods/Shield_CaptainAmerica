@@ -89,6 +89,7 @@
     },
     "Secondary": "Root_ShieldCap_Secondary_Guard",
     "Primary": "Root_ShieldCap_Primary",
+    "Ability1": "Root_ShieldCap_Signature_Furious_Onslaught",
     "Ability3": {
       "Interactions": [
         {
@@ -252,6 +253,25 @@
               "Amount": 12
             }
           ]
+        }
+      ]
+    },
+    "Furious_Onslaught_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Signature_Furious_Onslaught_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 80
+            }
+          }
+        }
+      ]
+    },
+    "Furious_Onslaught_Knockback": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Signature_Furious_Onslaught_Knockback"
         }
       ]
     }

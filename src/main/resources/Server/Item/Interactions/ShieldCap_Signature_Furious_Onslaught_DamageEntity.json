@@ -1,0 +1,9 @@
+{
+  "Type": "DamageEntity",
+  "DamageCalculator": {
+    "BaseDamage": {
+      "Physical": 0
+    }
+  },
+  "Next": "ShieldCap_Signature_Furious_Onslaught_DamageEntity_Next"
+}
