@@ -1,0 +1,82 @@
+{
+  "Type": "StatsCondition",
+  "Costs": {
+    "Stamina": 3
+  },
+  "ValueType": "Absolute",
+  "Failed": "ShieldCap_Guard_Charging",
+  "Next": {
+    "Type": "ChangeStat",
+    "Next": {
+      "Type": "Parallel",
+      "Interactions": [
+        {
+          "Interactions": [
+            {
+              "Type": "ApplyForce",
+              "Direction": {
+                "Z": -3,
+                "Y": 0.4
+              },
+              "Force": 60,
+              "AdjustVertical": false,
+              "VelocityConfig": {
+                "GroundResistance": 0.936,
+                "GroundResistanceMax": 0.928,
+                "AirResistance": 0.924,
+                "AirResistanceMax": 0.932,
+                "Threshold": 3,
+                "Style": "Linear"
+              },
+              "ChangeVelocityType": "Add",
+              "WaitForGround": false,
+              "WaitForCollision": false,
+              "Effects": {
+                "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
+                "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
+                "ItemAnimationId": "ShieldCapGuardCharged",
+                "ClearAnimationOnFinish": true
+              },
+              "RunTime": 1
+            }
+          ]
+        },
+        {
+          "Interactions": [
+            {
+              "Type": "Selector",
+              "Selector": {
+                "Id": "Stab",
+                "TestLineOfSight": true,
+                "EndDistance": 3.2
+              },
+              "HitEntity": {
+                "Interactions": [
+                  {
+                    "Type": "Replace",
+                    "Var": "Guard_Push_Knockback",
+                    "DefaultOk": true,
+                    "DefaultValue": {
+                      "Interactions": [
+                        "ShieldCap_Secondary_Guard_Bash_Damage"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "RunTime": 0.4
+            }
+          ]
+        }
+      ],
+      "HorizontalSpeedMultiplier": 0
+    },
+    "StatModifiers": {
+      "Stamina": -3
+    },
+    "Behaviour": "Add",
+    "ValueType": "Absolute",
+    "HorizontalSpeedMultiplier": 0
+  },
+  "HorizontalSpeedMultiplier": 0
+}

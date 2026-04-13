@@ -1,0 +1,44 @@
+{
+  "Type": "Charging",
+  "Next": {
+    "0": {
+      "Type": "RunRootInteraction",
+      "RootInteraction": "Root_ShieldCap_Secondary_Guard_Bash"
+    },
+    "1": {
+      "Type": "RunRootInteraction",
+      "RootInteraction": "Root_ShieldCap_Guard_Dash_Push",
+      "HorizontalSpeedMultiplier": 0
+    }
+  },
+  "AllowIndefiniteHold": true,
+  "DisplayProgress": true,
+  "MouseSensitivityAdjustmentTarget": 0.5,
+  "MouseSensitivityAdjustmentDuration": 0.2,
+  "CancelOnItemChange": true,
+  "HorizontalSpeedMultiplier": 0,
+  "Effects": {
+    "ItemAnimationId": "ShieldCapGuardCharging",
+    "WorldSoundEventId": "SFX_Bow_T2_Draw",
+    "LocalSoundEventId": "SFX_Bow_T2_Draw_Local",
+    "ClearSoundEventOnFinish": true,
+    "ClearAnimationOnFinish": true,
+    "Particles": [
+      {
+        "PositionOffset": {
+          "X": 0.6,
+          "Y": 0,
+          "Z": 0
+        },
+        "RotationOffset": {
+          "Pitch": 0,
+          "Roll": 90,
+          "Yaw": 0
+        },
+        "TargetNodeName": "Handle",
+        "SystemId": "ShieldCap_Charging",
+        "Color": "#fffacf"
+      }
+    ]
+  }
+}

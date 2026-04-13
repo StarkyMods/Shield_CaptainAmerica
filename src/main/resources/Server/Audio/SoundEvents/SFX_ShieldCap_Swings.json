@@ -1,0 +1,23 @@
+{
+  "Volume": 0,
+  "Pitch": 0,
+  "Layers": [
+    {
+      "Volume": -7,
+      "StartDelay": 0,
+      "Looping": false,
+      "RandomSettings": {
+        "MinVolume": 0,
+        "MaxVolume": 0,
+        "MinPitch": 0,
+        "MaxPitch": 0,
+        "MaxStartOffset": 0
+      },
+      "Files": [
+        "Sounds/StarkyMods/ShieldCapSwings.ogg"
+      ]
+    }
+  ],
+  "Parent": "SFX_Attn_Moderate",
+  "PreventSoundInterruption": true
+}

@@ -36,7 +36,10 @@
       "Type": "Simple",
       "RunTime": 0.15
     },
-    "HorizontalSpeedMultiplier": 0.05
+    "HorizontalSpeedMultiplier": 0.05,
+    "Effects": {
+      "WorldSoundEventId": "SFX_ShieldCap_Swings"
+    }
   },
   "Effects": {
     "ItemAnimationId": "ShieldCapLongSwingSpinRight",

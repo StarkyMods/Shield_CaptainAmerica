@@ -3,7 +3,10 @@
   "Interactions": [
     {
       "Type": "Simple",
-      "RunTime": 0.2
+      "RunTime": 0.2,
+      "Effects": {
+        "WorldSoundEventId": "SFX_ShieldCap_SmallImpact"
+      }
     },
     {
       "Type": "ShieldCap_Invulnerability_Clear_Java"

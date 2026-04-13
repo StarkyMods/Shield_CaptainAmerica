@@ -14,7 +14,8 @@
           "Roll": -90
         }
       }
-    ]
+    ],
+    "WorldSoundEventId": "SFX_ShieldCap_Swings"
   },
   "Selector": {
     "Id": "Stab",

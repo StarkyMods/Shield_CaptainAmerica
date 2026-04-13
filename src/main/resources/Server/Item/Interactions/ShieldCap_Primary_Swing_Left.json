@@ -35,6 +35,9 @@
     "Next": {
       "Type": "Simple",
       "RunTime": 0.15
+    },
+    "Effects": {
+      "WorldSoundEventId": "SFX_ShieldCap_Swings"
     }
   },
   "Effects": {

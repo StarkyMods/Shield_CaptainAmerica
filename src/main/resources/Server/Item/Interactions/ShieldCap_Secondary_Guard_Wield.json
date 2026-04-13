@@ -17,13 +17,13 @@
           },
           "Failed": {
             "Type": "ShieldCap_Secondary_Guard_Bash_Cooldown_Java",
-            "Next": {
-              "Type": "RunRootInteraction",
-              "RootInteraction": "Root_ShieldCap_Secondary_Guard_Bash"
-            },
             "Failed": {
               "Type": "Simple",
               "RunTime": 0.0
+            },
+            "Next": {
+              "Type": "RunRootInteraction",
+              "RootInteraction": "Root_Shield_Guard_Charging"
             }
           }
         }
