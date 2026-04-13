@@ -1,13 +1,36 @@
 {
   "Type": "ShieldCap_Furious_Onslaught_Target_Cooldown_Java",
   "Next": {
-    "Type": "Replace",
-    "Var": "Furious_Onslaught_Knockback",
-    "DefaultOk": true,
-    "DefaultValue": {
-      "Interactions": [
-        "ShieldCap_Signature_Furious_Onslaught_Knockback"
-      ]
-    }
+    "Type": "Serial",
+    "Interactions": [
+      {
+        "Type": "Simple",
+        "RunTime": 0.0,
+        "Effects": {
+          "CameraEffect": "Shield_Bash",
+          "Particles": [
+            {
+              "SystemId": "Shield_Bash",
+              "TargetEntityPart": "PrimaryItem",
+              "TargetNodeName": "Handle",
+              "RotationOffset": {
+                "Yaw": -180,
+                "Roll": -90
+              }
+            }
+          ]
+        }
+      },
+      {
+        "Type": "Replace",
+        "Var": "Furious_Onslaught_Knockback",
+        "DefaultOk": true,
+        "DefaultValue": {
+          "Interactions": [
+            "ShieldCap_Signature_Furious_Onslaught_Knockback"
+          ]
+        }
+      }
+    ]
   }
 }

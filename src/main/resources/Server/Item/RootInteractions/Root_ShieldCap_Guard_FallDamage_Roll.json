@@ -1,0 +1,6 @@
+{
+  "RequireNewClick": false,
+  "Interactions": [
+    "ShieldCap_Guard_FallDamage_Roll"
+  ]
+}

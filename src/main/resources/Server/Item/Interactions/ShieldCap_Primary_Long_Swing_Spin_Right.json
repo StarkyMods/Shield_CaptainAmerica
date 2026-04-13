@@ -12,8 +12,8 @@
       "ExtendTop": 0.5,
       "ExtendBottom": 0.5,
       "StartDistance": 0.1,
-      "EndDistance": 2.8,
-      "Length": 120,
+      "EndDistance": 3.4,
+      "Length": 290,
       "RollOffset": -50,
       "YawStartOffset": -45
     },
@@ -26,7 +26,7 @@
               "ShieldCap_Primary_Damage"
             ]
           },
-          "Var": "Swing_Spin_Left_Damage",
+          "Var": "Long_Swing_Spin_Right_Damage",
           "DefaultOk": true
         }
       ]
@@ -39,7 +39,7 @@
     "HorizontalSpeedMultiplier": 0.05
   },
   "Effects": {
-    "ItemAnimationId": "ShieldCapSwingSpinLeft",
+    "ItemAnimationId": "ShieldCapLongSwingSpinRight",
     "ClearAnimationOnFinish": false
   },
   "HorizontalSpeedMultiplier": 0.05

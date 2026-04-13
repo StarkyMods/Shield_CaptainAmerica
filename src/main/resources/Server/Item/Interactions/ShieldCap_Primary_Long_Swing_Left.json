@@ -1,6 +1,6 @@
 {
   "Type": "Simple",
-  "RunTime": 0.4,
+  "RunTime": 0.2,
   "Next": {
     "Type": "Selector",
     "$Comment": "Length of Combat",
@@ -12,8 +12,8 @@
       "ExtendTop": 0.5,
       "ExtendBottom": 0.5,
       "StartDistance": 0.1,
-      "EndDistance": 2.8,
-      "Length": 120,
+      "EndDistance": 3.1,
+      "Length": 160,
       "RollOffset": -50,
       "YawStartOffset": -45
     },
@@ -26,7 +26,7 @@
               "ShieldCap_Primary_Damage"
             ]
           },
-          "Var": "Swing_Spin_Left_Damage",
+          "Var": "Long_Swing_Left_Damage",
           "DefaultOk": true
         }
       ]
@@ -35,12 +35,9 @@
     "Next": {
       "Type": "Simple",
       "RunTime": 0.15
-    },
-    "HorizontalSpeedMultiplier": 0.05
+    }
   },
   "Effects": {
-    "ItemAnimationId": "ShieldCapSwingSpinLeft",
-    "ClearAnimationOnFinish": false
-  },
-  "HorizontalSpeedMultiplier": 0.05
+    "ItemAnimationId": "ShieldCapLongSwingLeft"
+  }
 }

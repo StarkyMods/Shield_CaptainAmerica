@@ -4,6 +4,14 @@
   "ChainId": "ShieldCap_Swings",
   "Next": [
     "ShieldCap_Primary_Swing_Left",
-    "ShieldCap_Primary_Swing_Spin_Left_Gated"
+    {
+      "Type": "ShieldCap_Not_Sprinting_Condition_Java",
+      "Next": "ShieldCap_Primary_Swing_Spin_Left"
+    },
+    "ShieldCap_Primary_Long_Swing_Left",
+    {
+      "Type": "ShieldCap_Not_Sprinting_Condition_Java",
+      "Next": "ShieldCap_Primary_Long_Swing_Spin_Right"
+    }
   ]
 }

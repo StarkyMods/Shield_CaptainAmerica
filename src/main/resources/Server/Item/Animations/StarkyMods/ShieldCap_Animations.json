@@ -556,7 +556,7 @@
       "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Swing_Spin_Left_FPS.blockyanim",
       "KeepPreviousFirstPersonAnimation": true,
       "Speed": 0.9,
-      "BlendingDuration": 0.1
+      "BlendingDuration": 0.2
     },
     "ShieldCapCrouchSwingSpinRight": {
       "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Crouch_Swing_Spin_Right2.blockyanim",
@@ -656,6 +656,23 @@
       "Speed": 1.1,
       "BlendingDuration": 0.2,
       "Looping": true
+    },
+    "ShieldCapLongSwingLeft": {
+      "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Long_Swing_Left.blockyanim",
+      "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Long_Swing_Left_Moving.blockyanim",
+      "ThirdPersonFace": "Characters/Animations/Expressions/Frown.blockyanim",
+      "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Long_Swing_Left_FPS.blockyanim",
+      "KeepPreviousFirstPersonAnimation": true,
+      "Speed": 0.75
+    },
+    "ShieldCapLongSwingSpinRight": {
+      "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Long_Swing_Spin_Right.blockyanim",
+      "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Long_Swing_Spin_Right.blockyanim",
+      "ThirdPersonFace": "Characters/Animations/Expressions/Angry.blockyanim",
+      "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Long_Swing_Spin_Right.blockyanim",
+      "KeepPreviousFirstPersonAnimation": true,
+      "Speed": 0.9,
+      "BlendingDuration": 0.1
     }
   },
   "Camera": {

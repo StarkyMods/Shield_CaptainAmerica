@@ -10,11 +10,11 @@
     },
     {
       "Type": "Replace",
-      "Var": "Furious_Onslaught_Damage",
+      "Var": "Guard_Bash_Damage",
       "DefaultOk": true,
       "DefaultValue": {
         "Interactions": [
-          "ShieldCap_Signature_Furious_Onslaught_Damage"
+          "ShieldCap_Secondary_Guard_Bash_Damage_Apply"
         ]
       }
     }

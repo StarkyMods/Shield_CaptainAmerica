@@ -30,7 +30,7 @@
     "Interactions": [
       {
         "Type": "Replace",
-        "Var": "Guard_Bash_Damage",
+        "Var": "Guard_Bash_Knockback",
         "DefaultOk": true,
         "DefaultValue": {
           "Interactions": [
