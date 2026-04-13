@@ -1,7 +1,19 @@
 {
   "Interactions": [
     {
-      "Type": "ShieldCap_Primary_Jump_Hit_Cooldown_Java"
+      "Type": "StarkyPluginPresentCondition",
+      "Next": {
+        "Type": "Wall_Jump_Check",
+        "Next": {
+          "Type": "Wall_Jump"
+        },
+        "Failed": {
+          "Type": "ShieldCap_Primary_Jump_Hit_Cooldown_Java"
+        }
+      },
+      "Failed": {
+        "Type": "ShieldCap_Primary_Jump_Hit_Cooldown_Java"
+      }
     }
   ]
 }
