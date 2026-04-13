@@ -94,6 +94,7 @@
       "Interactions": [
         {
           "Type": "StarkyPluginPresentCondition",
+          "Next": "Zephyr_Dodge",
           "Failed": {
             "Type": "StarkyPluginPresentCondition",
             "PluginName": "Perfect Dodges",
@@ -101,11 +102,6 @@
               "Type": "RunRootInteraction",
               "RootInteraction": "PerfectDodge"
             }
-          },
-          "Next": {
-            "Type": "Zephyr_Dodge_Config",
-            "AnimationStyle": "roll",
-            "Next": "Zephyr_Dodge"
           }
         }
       ]
@@ -272,6 +268,13 @@
       "Interactions": [
         {
           "Parent": "ShieldCap_Signature_Furious_Onslaught_Knockback"
+        }
+      ]
+    },
+    "Wall_Jump_Check_Failed": {
+      "Interactions": [
+        {
+          "Type": "ShieldCap_Primary_Jump_Hit_Cooldown_Java"
         }
       ]
     }
