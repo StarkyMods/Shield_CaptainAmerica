@@ -37,7 +37,29 @@
           "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
           "ItemAnimationId": "ShieldCapJumpFallStar",
           "ClearAnimationOnFinish": false,
-          "CameraEffect": "ShieldCap_Jump_Falling_Camera"
+          "CameraEffect": "ShieldCap_Jump_Falling_Camera",
+          "Particles": [
+            {
+              "SystemId": "Mace_Signature_Cast",
+              "DetachedFromModel": true,
+              "Scale": 0.2,
+              "RotationOffset": {}
+            }
+          ],
+          "Trails": [
+            {
+              "PositionOffset": {
+                "X": 0,
+                "Y": 0,
+                "Z": 0
+              },
+              "TargetNodeName": "Handle",
+              "TrailId": "Wind",
+              "RotationOffset": {
+                "Roll": 90.0
+              }
+            }
+          ]
         }
       }
     },

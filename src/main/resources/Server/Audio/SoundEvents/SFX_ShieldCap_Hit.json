@@ -3,18 +3,19 @@
   "Pitch": 0,
   "Layers": [
     {
-      "Volume": -15,
+      "Volume": -14,
       "StartDelay": 0,
       "Looping": false,
       "RandomSettings": {
         "MinVolume": 0,
         "MaxVolume": 0,
-        "MinPitch": 0,
-        "MaxPitch": 0,
+        "MinPitch": -4,
+        "MaxPitch": 4,
         "MaxStartOffset": 0
       },
       "Files": [
-        "Sounds/StarkyMods/ShieldCapSwings.ogg"
+        "Sounds/StarkyMods/ShieldCapImpact.ogg",
+        "Sounds/StarkyMods/ShieldCapImpact2.ogg"
       ]
     }
   ],

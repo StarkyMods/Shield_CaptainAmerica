@@ -404,17 +404,19 @@
       "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Back_To_Hand.blockyanim",
       "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Back_To_Hand.blockyanim",
       "ThirdPersonFace": "Characters/Animations/Expressions/Frown.blockyanim",
-      "BlendingDuration": 0,
+      "BlendingDuration": 0.15,
       "Speed": 1,
-      "Looping": false
+      "Looping": false,
+      "ClipsGeometry": true
     },
     "ShieldCapHandToBack": {
-      "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Hand_To_Back.blockyanim",
-      "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Hand_To_Back.blockyanim",
+      "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Hand_To_Back_Fast.blockyanim",
+      "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Hand_To_Back_Fast.blockyanim",
       "ThirdPersonFace": "Characters/Animations/Expressions/Frown.blockyanim",
-      "BlendingDuration": 0.2,
-      "Speed": 1,
-      "Looping": false
+      "BlendingDuration": 0.15,
+      "Speed": 1.4,
+      "Looping": false,
+      "ClipsGeometry": true
     },
     "Guard": {
       "BlendingDuration": 0.2,
@@ -625,7 +627,8 @@
       "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Guard_Charging.blockyanim",
       "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Guard_Charging.blockyanim",
       "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Guard_Charging_FPS.blockyanim",
-      "ClipsGeometry": true
+      "ClipsGeometry": true,
+      "BlendingDuration": 1.6
     },
     "ShieldCapGuardCharged": {
       "Looping": false,

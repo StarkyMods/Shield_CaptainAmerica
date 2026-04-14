@@ -5,7 +5,7 @@
   "Selector": {
     "Id": "Stab",
     "TestLineOfSight": true,
-    "EndDistance": 3
+    "EndDistance": 3.5
   },
   "HitEntity": {
     "Interactions": [
@@ -21,5 +21,9 @@
       }
     ]
   },
-  "HorizontalSpeedMultiplier": 0
+  "HorizontalSpeedMultiplier": 0,
+  "Effects": {
+    "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
+    "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local"
+  }
 }

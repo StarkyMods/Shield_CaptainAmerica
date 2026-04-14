@@ -11,19 +11,15 @@
       "Interactions": [
         {
           "Type": "ShieldCap_Sprint_Condition_Java",
-          "Next": {
-            "Type": "RunRootInteraction",
-            "RootInteraction": "Root_ShieldCap_Primary_Sprint_Hit_Gated"
-          },
+          "Next": "ShieldCap_Primary_Sprint_Hit",
           "Failed": {
-            "Type": "ShieldCap_Secondary_Guard_Bash_Cooldown_Java",
-            "Failed": {
-              "Type": "Simple",
-              "RunTime": 0.0
-            },
-            "Next": {
-              "Type": "RunRootInteraction",
-              "RootInteraction": "Root_Shield_Guard_Charging"
+            "Type": "Replace",
+            "Var": "ShieldCap_Guard_Bash",
+            "DefaultOk": true,
+            "DefaultValue": {
+              "Interactions": [
+                "ShieldCap_Guard_Charging"
+              ]
             }
           }
         }

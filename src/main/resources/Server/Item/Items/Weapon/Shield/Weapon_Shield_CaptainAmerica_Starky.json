@@ -23,7 +23,7 @@
               "Interactions": [
                 {
                   "Type": "Simple",
-                  "RunTime": 0.66,
+                  "RunTime": 0.55,
                   "Effects": {
                     "ItemAnimationId": "ShieldCapHandToBack",
                     "ClearAnimationOnFinish": true
@@ -39,11 +39,13 @@
                   "Interactions": [
                     {
                       "Type": "Simple",
-                      "RunTime": 0.66
+                      "RunTime": 0.3,
+                      "CancelOnItemChange": false
                     },
                     {
                       "Type": "ShieldCap_Refresh_Java",
-                      "RunTime": 0
+                      "RunTime": 0,
+                      "CancelOnItemChange": false
                     },
                     {
                       "Type": "ChangeActiveSlot"
@@ -52,7 +54,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "CancelOnItemChange": false
         }
       ]
     },
@@ -65,7 +68,8 @@
               "Interactions": [
                 {
                   "Type": "ShieldCap_Refresh_Java",
-                  "RunTime": 0
+                  "RunTime": 0,
+                  "CancelOnItemChange": false
                 }
               ]
             },
@@ -79,11 +83,12 @@
                     "ItemAnimationId": "ShieldCapBackToHand",
                     "ClearAnimationOnFinish": true
                   },
-                  "CancelOnItemChange": false
+                  "CancelOnItemChange": true
                 }
               ]
             }
-          ]
+          ],
+          "CancelOnItemChange": false
         }
       ]
     },

@@ -83,8 +83,7 @@
         "RunTime": 0.15
       },
       "Effects": {
-        "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
-        "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local"
+        "WorldSoundEventId": "SFX_Unarmed_Swing"
       },
       "HorizontalSpeedMultiplier": 0,
       "RunTime": 0.1

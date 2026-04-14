@@ -117,7 +117,19 @@
                       "ItemAnimationId": "ShieldCapJumpHit",
                       "ClearAnimationOnFinish": true,
                       "CameraEffect": "ShieldCap_Big_Hit_Camera",
-                      "WorldSoundEventId": "SFX_ShieldCap_Impact"
+                      "WorldSoundEventId": "SFX_ShieldCap_Impact",
+                      "Particles": [
+                        {
+                          "SystemId": "ShieldCap_Ground_Hit",
+                          "TargetEntityPart": "Entity",
+                          "TargetNodeName": "Hip",
+                          "PositionOffset": {
+                            "Y": 0.1,
+                            "Z": 1
+                          },
+                          "Scale": 0.25
+                        }
+                      ]
                     },
                     "RunTime": 0.25
                   }
@@ -131,7 +143,28 @@
               "RunTime": 0.15,
               "Effects": {
                 "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
-                "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local"
+                "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
+                "Trails": [
+                  {
+                    "PositionOffset": {
+                      "X": 0,
+                      "Y": 0,
+                      "Z": 0
+                    },
+                    "TargetNodeName": "Handle",
+                    "TrailId": "Wind",
+                    "RotationOffset": {
+                      "Roll": 90.0
+                    }
+                  }
+                ],
+                "Particles": [
+                  {
+                    "SystemId": "Mace_Signature_Cast",
+                    "DetachedFromModel": true,
+                    "Scale": 0.3
+                  }
+                ]
               }
             }
           ]

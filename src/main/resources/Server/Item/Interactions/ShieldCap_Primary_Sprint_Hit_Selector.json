@@ -16,7 +16,7 @@
       }
     ],
     "ItemAnimationId": "ShieldCapSprintHit",
-    "ClearAnimationOnFinish": true,
+    "ClearAnimationOnFinish": false,
     "WorldSoundEventId": "SFX_ShieldCap_Swings"
   },
   "Selector": {

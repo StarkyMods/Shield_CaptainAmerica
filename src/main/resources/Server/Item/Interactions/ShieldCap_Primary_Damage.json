@@ -17,6 +17,7 @@
         "SystemId": "Shield_Bash",
         "Scale": 1
       }
-    ]
+    ],
+    "WorldSoundEventId": "SFX_ShieldCap_Hit"
   }
 }

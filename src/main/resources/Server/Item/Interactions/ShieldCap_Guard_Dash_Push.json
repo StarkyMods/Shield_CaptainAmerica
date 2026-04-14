@@ -4,7 +4,6 @@
     "Stamina": 3
   },
   "ValueType": "Absolute",
-  "Failed": "ShieldCap_Guard_Charging",
   "Next": {
     "Type": "ChangeStat",
     "Next": {
@@ -15,21 +14,21 @@
             {
               "Type": "ApplyForce",
               "Direction": {
-                "Z": -3,
+                "Z": -10,
                 "Y": 0.4
               },
-              "Force": 60,
-              "AdjustVertical": false,
+              "Force": 50,
+              "AdjustVertical": true,
               "VelocityConfig": {
-                "GroundResistance": 0.936,
-                "GroundResistanceMax": 0.928,
-                "AirResistance": 0.924,
-                "AirResistanceMax": 0.932,
+                "AirResistance": 0.96,
+                "AirResistanceMax": 0.97,
+                "GroundResistance": 0.94,
+                "GroundResistanceMax": 0.82,
                 "Threshold": 3,
-                "Style": "Linear"
+                "Style": "Exp"
               },
               "ChangeVelocityType": "Add",
-              "WaitForGround": false,
+              "WaitForGround": true,
               "WaitForCollision": false,
               "Effects": {
                 "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
@@ -37,7 +36,10 @@
                 "ItemAnimationId": "ShieldCapGuardCharged",
                 "ClearAnimationOnFinish": true
               },
-              "RunTime": 1
+              "VerticalClamp": [
+                -80,
+                25
+              ]
             }
           ]
         },

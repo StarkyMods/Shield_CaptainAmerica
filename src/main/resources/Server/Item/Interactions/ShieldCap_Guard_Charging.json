@@ -1,14 +1,10 @@
 {
   "Type": "Charging",
   "Next": {
-    "0": {
-      "Type": "RunRootInteraction",
-      "RootInteraction": "Root_ShieldCap_Secondary_Guard_Bash"
-    },
+    "0": "ShieldCap_Secondary_Guard_Bash",
     "1": {
       "Type": "RunRootInteraction",
-      "RootInteraction": "Root_ShieldCap_Guard_Dash_Push",
-      "HorizontalSpeedMultiplier": 0
+      "RootInteraction": "Root_ShieldCap_Guard_Dash_Push"
     }
   },
   "AllowIndefiniteHold": true,
@@ -22,7 +18,6 @@
     "WorldSoundEventId": "SFX_Bow_T2_Draw",
     "LocalSoundEventId": "SFX_Bow_T2_Draw_Local",
     "ClearSoundEventOnFinish": true,
-    "ClearAnimationOnFinish": true,
     "Particles": [
       {
         "PositionOffset": {

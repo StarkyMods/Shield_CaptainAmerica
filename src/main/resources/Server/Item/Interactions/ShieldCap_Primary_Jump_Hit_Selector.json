@@ -28,6 +28,16 @@
           "Pitch": 0,
           "Roll": 0
         }
+      },
+      {
+        "SystemId": "ShieldCap_Ground_Hit",
+        "TargetEntityPart": "Entity",
+        "TargetNodeName": "Hip",
+        "PositionOffset": {
+          "Y": 0.1,
+          "Z": 0
+        },
+        "Scale": 0.4
       }
     ],
     "ItemAnimationId": "ShieldCapRoll",
