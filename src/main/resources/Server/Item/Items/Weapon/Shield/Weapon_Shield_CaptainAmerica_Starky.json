@@ -173,7 +173,7 @@
           "Parent": "ShieldCap_Primary_Damage",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 30
+              "Physical": 23
             }
           },
           "EntityStatsOnHit": [
@@ -191,7 +191,7 @@
           "Parent": "ShieldCap_Primary_Damage",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 30
+              "Physical": 25
             }
           },
           "EntityStatsOnHit": [
@@ -209,7 +209,7 @@
           "Parent": "ShieldCap_Primary_Damage",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 30
+              "Physical": 24
             }
           },
           "EntityStatsOnHit": [
@@ -227,7 +227,7 @@
           "Parent": "ShieldCap_Primary_Damage",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 30
+              "Physical": 26
             }
           },
           "EntityStatsOnHit": [
@@ -245,7 +245,7 @@
           "Parent": "ShieldCap_Primary_Damage",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 30
+              "Physical": 38
             }
           },
           "EntityStatsOnHit": [
@@ -275,7 +275,7 @@
           "Parent": "ShieldCap_Secondary_Guard_Bash_Damage_Apply",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 40
+              "Physical": 42
             }
           },
           "EntityStatsOnHit": [
@@ -287,13 +287,43 @@
         }
       ]
     },
-    "Guard_Push_Knockback": {
+    "Guard_Dash_Push_Knockback": {
       "Interactions": [
         {
-          "Parent": "ShieldCap_Secondary_Guard_Bash_Damage",
+          "Parent": "ShieldCap_Secondary_Guard_Dash_Push_Damage",
           "DamageEffects": {
             "Knockback": {
-              "Force": 45
+              "Force": 55
+            }
+          }
+        }
+      ]
+    },
+    "Guard_Dash_Push_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Secondary_Guard_Dash_Push_Damage_Apply",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 73
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 12
+            }
+          ]
+        }
+      ]
+    },
+    "Kick_Push_Knockback": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Kick_Push_Knockback",
+          "DamageEffects": {
+            "Knockback": {
+              "Force": 40
             }
           }
         }
@@ -305,7 +335,7 @@
           "Parent": "ShieldCap_Primary_Damage_NoShield",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 30
+              "Physical": 42
             }
           },
           "EntityStatsOnHit": [
@@ -323,7 +353,91 @@
           "Parent": "ShieldCap_Primary_Damage",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 30
+              "Physical": 26
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 12
+            }
+          ]
+        }
+      ]
+    },
+    "Crouch_Swing_Spin_Right_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Primary_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 28
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 12
+            }
+          ]
+        }
+      ]
+    },
+    "Crouch_UpperCut_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Primary_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 42
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 12
+            }
+          ]
+        }
+      ]
+    },
+    "Crouch_Jump_Hit_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Primary_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 54
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 12
+            }
+          ]
+        }
+      ]
+    },
+    "FallStar_Hit_Knockback": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_FallStar_Hit_Knockback",
+          "DamageEffects": {
+            "Knockback": {
+              "Force": 45
+            }
+          }
+        }
+      ]
+    },
+    "FallStar_Hit_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Primary_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 67
             }
           },
           "EntityStatsOnHit": [
@@ -341,7 +455,7 @@
           "Parent": "ShieldCap_Signature_Furious_Onslaught_Damage",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 80
+              "Physical": 100
             }
           },
           "EntityStatsOnHit": [
@@ -365,11 +479,45 @@
         }
       ]
     },
-    "Wall_Jump_Check_Failed": {
+    "ShieldCap_Throw_Damage": {
       "Interactions": [
         {
-          "Type": "ShieldCap_Primary_Jump_Hit_Cooldown_Java"
+          "Parent": "ShieldCap_Throw_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 42
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 8
+            }
+          ]
         }
+      ]
+    },
+    "ShieldCap_Throw_Kick_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Throw_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 92
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 9
+            }
+          ]
+        }
+      ]
+    },
+    "Wall_Jump_Check_Failed": {
+      "Interactions": [
+        "ShieldCap_Primary_Jump_Charging"
       ]
     }
   }

@@ -1,0 +1,25 @@
+{
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "RunTime": 0.2,
+      "Effects": {
+        "WorldSoundEventId": "SFX_ShieldCap_SmallImpact"
+      }
+    },
+    {
+      "Type": "ShieldCap_Invulnerability_Clear_Java"
+    },
+    {
+      "Type": "Replace",
+      "Var": "Kick_Push_Damage",
+      "DefaultOk": true,
+      "DefaultValue": {
+        "Interactions": [
+          "ShieldCap_Primary_Damage_NoShield"
+        ]
+      }
+    }
+  ]
+}

@@ -77,11 +77,11 @@
     "Interactions": [
       {
         "Type": "Replace",
-        "Var": "FallStar_Hit_Damage",
+        "Var": "FallStar_Hit_Knockback",
         "DefaultOk": true,
         "DefaultValue": {
           "Interactions": [
-            "ShieldCap_Primary_Damage"
+            "ShieldCap_FallStar_Hit_Knockback"
           ]
         }
       }

@@ -31,6 +31,20 @@
     "Effects": {
       "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
       "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
+      "Trails": [
+        {
+          "PositionOffset": {
+            "X": 0,
+            "Y": 0,
+            "Z": 0
+          },
+          "TargetNodeName": "Handle",
+          "TrailId": "Wind",
+          "RotationOffset": {
+            "Roll": 90.0
+          }
+        }
+      ],
       "ItemAnimationId": "ShieldCapSprintCharging",
       "ClearAnimationOnFinish": false
     },

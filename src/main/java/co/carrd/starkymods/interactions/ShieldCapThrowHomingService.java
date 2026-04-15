@@ -18,6 +18,9 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.spatial.SpatialResource;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.protocol.SoundCategory;
+import com.hypixel.hytale.protocol.packets.world.PlaySoundEvent3D;
+import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.InteractionManager;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
@@ -32,8 +35,10 @@ import com.hypixel.hytale.server.core.modules.projectile.ProjectileModule;
 import com.hypixel.hytale.server.core.modules.projectile.config.ProjectileConfig;
 import com.hypixel.hytale.server.core.modules.projectile.config.StandardPhysicsProvider;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.ParticleUtil;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.util.PositionUtil;
 
 public final class ShieldCapThrowHomingService {
     private static final boolean DEBUG = false;
@@ -87,6 +92,13 @@ public final class ShieldCapThrowHomingService {
     private static final String THROW_KICK_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Throw_Kick";
     private static final String RETURN_CALLING_ROOT_ID = "Root_ShieldCap_Return_Calling_Internal";
     private static final String RETURN_CALLING_CLEAR_ROOT_ID = "Root_ShieldCap_Return_Calling_Clear_Internal";
+    private static final String NORMAL_IMPACT_SOUND_ID = "SFX_ShieldCap_Hit";
+    private static final String THROW_KICK_IMPACT_SOUND_ID = "SFX_ShieldCap_SmallImpact";
+    private static final String IMPACT_PARTICLE_ID = "Shield_Bash";
+    private static final double IMPACT_PARTICLE_Y_OFFSET = 0.5;
+    private static final float NORMAL_IMPACT_PARTICLE_SCALE = 1.0f;
+    private static final float THROW_KICK_IMPACT_PARTICLE_SCALE = 1.4f;
+    private static final float IMPACT_SOUND_VOLUME_MODIFIER = 1.0f;
 
     private static final Map<UUID, OwnerHomingState> ACTIVE_OWNER_STATES = new ConcurrentHashMap<>();
     private static final Map<String, Long> LAST_WORLD_TICK_MS = new ConcurrentHashMap<>();
@@ -241,6 +253,7 @@ public final class ShieldCapThrowHomingService {
         trackedState.markAsThrowKick(now);
         trackedState.throwKickStuckInBlock = false;
         trackedState.recordActivity(now);
+        playProjectileImpactFx(store, projectileRef, THROW_KICK_IMPACT_SOUND_ID, IMPACT_PARTICLE_ID, THROW_KICK_IMPACT_PARTICLE_SCALE);
         debug("throwKick enemy hit passthrough | owner=" + ownerUuid
                 + " | projectile=" + getEntityUuid(store, projectileRef)
                 + " | deadline=" + getThrowKickReturnDeadline(store, projectileRef, -1L));
@@ -298,6 +311,7 @@ public final class ShieldCapThrowHomingService {
         trackedState.throwKickStuckInBlock = true;
         trackedState.ownerContactGraceUntilMs = now;
         markThrowKickStuck(store, projectileRef);
+        playThrowKickStickFx(store, projectileRef);
         debug("throwKick stuck in block | owner=" + ownerUuid
                 + " | projectile=" + getEntityUuid(store, projectileRef));
         stickThrowKickToBlock(store, projectileRef, projectileVelocity, physicsProvider);
@@ -341,6 +355,7 @@ public final class ShieldCapThrowHomingService {
                 trackedState.throwKickStuckInBlock = true;
                 trackedState.ownerContactGraceUntilMs = now;
                 markThrowKickStuck(store, projectileRef);
+                playThrowKickStickFx(store, projectileRef);
                 debug("throwKick lateral bounce converted to stick | owner=" + ownerUuid
                         + " | projectile=" + getEntityUuid(store, projectileRef));
                 Velocity projectileVelocity =
@@ -363,6 +378,11 @@ public final class ShieldCapThrowHomingService {
 
         trackedState.wallBounceCount++;
         trackedState.lastWallBounceAtMs = now;
+        if (trackedState.throwKickMode) {
+            playProjectileImpactFx(store, projectileRef, THROW_KICK_IMPACT_SOUND_ID, IMPACT_PARTICLE_ID, THROW_KICK_IMPACT_PARTICLE_SCALE);
+        } else {
+            playProjectileImpactFx(store, projectileRef, NORMAL_IMPACT_SOUND_ID, IMPACT_PARTICLE_ID, NORMAL_IMPACT_PARTICLE_SCALE);
+        }
         if (trackedState.wallBounceCount == 1) {
             applyWallBounceSpeedReduction(context.getCommandBuffer().getStore(), projectileRef, physicsProvider);
         }
@@ -802,6 +822,7 @@ public final class ShieldCapThrowHomingService {
                             look.getPosition(),
                             look.getDirection()
                     );
+                    playImpactSound(store, look.getPosition(), THROW_KICK_IMPACT_SOUND_ID);
                     if (projectileRef == null || !projectileRef.isValid()) {
                         projectileRef = resolvePendingThrowKickProjectile(commandBuffer, playerEntityRef, ownerUuid);
                     }
@@ -927,9 +948,158 @@ public final class ShieldCapThrowHomingService {
             );
         }
 
+        if (countHit && !trackedState.throwKickMode) {
+            playProjectileImpactFx(store, projectileRef, NORMAL_IMPACT_SOUND_ID, IMPACT_PARTICLE_ID, NORMAL_IMPACT_PARTICLE_SCALE);
+        }
+
         if (shouldRebound) {
             reboundProjectile(store, projectileRef, trackedState);
+        } else if (!trackedState.throwKickMode) {
+            playProjectileImpactFx(store, projectileRef, NORMAL_IMPACT_SOUND_ID, IMPACT_PARTICLE_ID, NORMAL_IMPACT_PARTICLE_SCALE);
         }
+    }
+
+    private static void playThrowKickStickFx(Store<EntityStore> store, Ref<EntityStore> projectileRef) {
+        playProjectileImpactFx(
+                store,
+                projectileRef,
+                THROW_KICK_IMPACT_SOUND_ID,
+                IMPACT_PARTICLE_ID,
+                THROW_KICK_IMPACT_PARTICLE_SCALE
+        );
+    }
+
+    private static void playProjectileImpactFx(Store<EntityStore> store,
+                                               Ref<EntityStore> projectileRef,
+                                               String soundEventId,
+                                               String particleId,
+                                               float particleScale) {
+        if (store == null || projectileRef == null || !projectileRef.isValid()) {
+            return;
+        }
+
+        Vector3d impactPos = resolveProjectilePosition(store, projectileRef);
+        if (impactPos == null) {
+            return;
+        }
+
+        playImpactSound(store, impactPos, soundEventId);
+        Vector3d particlePos = impactPos.clone();
+        if (IMPACT_PARTICLE_ID.equals(particleId)) {
+            particlePos.y += IMPACT_PARTICLE_Y_OFFSET;
+        }
+        spawnParticleFx(store, projectileRef, particleId, particleScale, 0.0f, 0.0f, 0.0f, particlePos);
+    }
+
+    private static void spawnParticleFx(Store<EntityStore> store,
+                                        Ref<EntityStore> projectileRef,
+                                        String particleId,
+                                        float particleScale,
+                                        float pitch,
+                                        float yaw,
+                                        float roll) {
+        if (store == null || projectileRef == null || !projectileRef.isValid()) {
+            return;
+        }
+
+        Vector3d impactPos = resolveProjectilePosition(store, projectileRef);
+        if (impactPos == null) {
+            return;
+        }
+
+        spawnParticleFx(store, projectileRef, particleId, particleScale, pitch, yaw, roll, impactPos);
+    }
+
+    private static void spawnParticleFx(Store<EntityStore> store,
+                                        Ref<EntityStore> projectileRef,
+                                        String particleId,
+                                        float particleScale,
+                                        float pitch,
+                                        float yaw,
+                                        float roll,
+                                        Vector3d particlePos) {
+        if (store == null || projectileRef == null || !projectileRef.isValid() || particlePos == null) {
+            return;
+        }
+
+        List<Ref<EntityStore>> viewers = getViewerRefs(store);
+        if (viewers.isEmpty()) {
+            return;
+        }
+
+        ParticleUtil.spawnParticleEffect(
+                particleId,
+                particlePos,
+                pitch,
+                yaw,
+                roll,
+                particleScale,
+                null,
+                viewers,
+                store
+        );
+    }
+
+    private static void playImpactSound(Store<EntityStore> store,
+                                        Vector3d impactPos,
+                                        String soundEventId) {
+        int soundIndex = SoundEvent.getAssetMap().getIndexOrDefault(soundEventId, SoundEvent.EMPTY_ID);
+        if (soundIndex == SoundEvent.EMPTY_ID || store == null || store.getExternalData() == null) {
+            return;
+        }
+
+        World world = store.getExternalData().getWorld();
+        if (world == null) {
+            return;
+        }
+
+        PlaySoundEvent3D packet = new PlaySoundEvent3D(
+                soundIndex,
+                SoundCategory.SFX,
+                PositionUtil.toPositionPacket(impactPos),
+                IMPACT_SOUND_VOLUME_MODIFIER,
+                1.0f
+        );
+        world.getNotificationHandler().sendPacketIfChunkLoaded(
+                packet,
+                (int) Math.floor(impactPos.x),
+                (int) Math.floor(impactPos.z)
+        );
+    }
+
+    private static Vector3d resolveProjectilePosition(Store<EntityStore> store,
+                                                      Ref<EntityStore> projectileRef) {
+        if (store == null || projectileRef == null || !projectileRef.isValid()) {
+            return null;
+        }
+
+        TransformComponent transform =
+                store.getComponent(projectileRef, EntityModule.get().getTransformComponentType());
+        return transform != null && transform.getPosition() != null ? transform.getPosition().clone() : null;
+    }
+
+    private static List<Ref<EntityStore>> getViewerRefs(Store<EntityStore> store) {
+        List<Ref<EntityStore>> refs = new ArrayList<>();
+        if (store == null || store.getExternalData() == null) {
+            return refs;
+        }
+
+        World world = store.getExternalData().getWorld();
+        if (world == null) {
+            return refs;
+        }
+
+        for (PlayerRef playerRef : world.getPlayerRefs()) {
+            if (playerRef == null) {
+                continue;
+            }
+
+            Ref<EntityStore> ref = playerRef.getReference();
+            if (ref != null && ref.isValid()) {
+                refs.add(ref);
+            }
+        }
+        return refs;
     }
 
     private static void tickWorld(World world, Store<EntityStore> store, long nowMs) {

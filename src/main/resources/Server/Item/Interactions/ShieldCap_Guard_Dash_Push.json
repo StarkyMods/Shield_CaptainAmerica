@@ -33,6 +33,20 @@
               "Effects": {
                 "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
                 "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
+                "Trails": [
+                  {
+                    "PositionOffset": {
+                      "X": 0,
+                      "Y": 0,
+                      "Z": 0
+                    },
+                    "TargetNodeName": "Handle",
+                    "TrailId": "Wind",
+                    "RotationOffset": {
+                      "Roll": 90.0
+                    }
+                  }
+                ],
                 "ItemAnimationId": "ShieldCapGuardCharged",
                 "ClearAnimationOnFinish": true
               },
@@ -56,7 +70,7 @@
                 "Interactions": [
                   {
                     "Type": "Replace",
-                    "Var": "Guard_Push_Knockback",
+                    "Var": "Guard_Dash_Push_Knockback",
                     "DefaultOk": true,
                     "DefaultValue": {
                       "Interactions": [

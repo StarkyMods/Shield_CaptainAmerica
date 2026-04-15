@@ -1,24 +1,24 @@
 {
   "Volume": 0,
-  "Pitch": -1,
+  "Pitch": 0,
   "Layers": [
     {
-      "Volume": -16,
+      "Volume": -13,
       "StartDelay": 0,
       "Looping": false,
       "RandomSettings": {
         "MinVolume": 0,
         "MaxVolume": 0,
-        "MinPitch": 0,
-        "MaxPitch": 0,
+        "MinPitch": -2,
+        "MaxPitch": 2,
         "MaxStartOffset": 0
       },
       "Files": [
-        "Sounds/StarkyMods/ShieldCapImpact.ogg",
-        "Sounds/StarkyMods/ShieldCapImpact2.ogg"
+        "Sounds/StarkyMods/ShieldCapCatch.ogg"
       ]
     }
   ],
   "Parent": "SFX_Attn_Moderate",
-  "PreventSoundInterruption": true
+  "PreventSoundInterruption": true,
+  "MaxDistance": 50
 }

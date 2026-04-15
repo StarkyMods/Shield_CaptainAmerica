@@ -1,5 +1,5 @@
 {
-  "Duration": 7.0,
+  "Duration": 10.0,
   "OverlapBehavior": "Extend",
   "ApplicationEffects": {
     "ScreenEffect": "ScreenEffects/Daggers.png"

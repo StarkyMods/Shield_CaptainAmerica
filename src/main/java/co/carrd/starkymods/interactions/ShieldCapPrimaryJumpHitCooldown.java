@@ -22,7 +22,6 @@ import com.hypixel.hytale.server.core.entity.movement.MovementStatesComponent;
 import com.hypixel.hytale.server.core.modules.entity.EntityModule;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
-import com.hypixel.hytale.server.core.modules.physics.component.Velocity;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 public final class ShieldCapPrimaryJumpHitCooldown extends SimpleInstantInteraction {
@@ -112,6 +111,11 @@ public final class ShieldCapPrimaryJumpHitCooldown extends SimpleInstantInteract
         return true;
     }
 
+    static boolean isJumpMarked(@Nonnull InteractionContext context) {
+        UUID ownerUuid = resolveEntityUuid(context);
+        return ownerUuid != null && JUMP_MARKED.containsKey(ownerUuid);
+    }
+
     private static UUID resolveEntityUuid(@Nonnull InteractionContext context) {
         if (context.getCommandBuffer() == null) {
             return null;
@@ -164,12 +168,9 @@ public final class ShieldCapPrimaryJumpHitCooldown extends SimpleInstantInteract
         MovementStatesComponent movementComponent =
                 context.getCommandBuffer().getComponent(entityRef, EntityModule.get().getMovementStatesComponentType());
         MovementStates movementStates = movementComponent == null ? null : movementComponent.getMovementStates();
-        Velocity velocity = context.getCommandBuffer().getComponent(entityRef, EntityModule.get().getVelocityComponentType());
-        double verticalVelocity = velocity != null && velocity.getVelocity() != null ? velocity.getVelocity().y : 0.0d;
-
         return movementStates != null
                 && !movementStates.onGround
-                && (movementStates.jumping || verticalVelocity > 0.1d);
+                && movementStates.jumping;
     }
 
     static void executeRoot(@Nonnull InteractionContext context, @Nonnull String rootId) {
@@ -197,10 +198,8 @@ public final class ShieldCapPrimaryJumpHitCooldown extends SimpleInstantInteract
                 MovementStatesComponent movementComponent =
                         commandBuffer.getComponent(playerRef, EntityModule.get().getMovementStatesComponentType());
                 MovementStates movementStates = movementComponent == null ? null : movementComponent.getMovementStates();
-                Velocity velocity = commandBuffer.getComponent(playerRef, EntityModule.get().getVelocityComponentType());
-                double verticalVelocity = velocity != null && velocity.getVelocity() != null ? velocity.getVelocity().y : 0.0d;
 
-                if (movementStates != null && (movementStates.jumping || (!movementStates.onGround && verticalVelocity > 0.1d))) {
+                if (movementStates != null && movementStates.jumping) {
                     JUMP_MARKED.put(playerUuid, Boolean.TRUE);
                 }
                 if (movementStates == null || movementStates.onGround) {

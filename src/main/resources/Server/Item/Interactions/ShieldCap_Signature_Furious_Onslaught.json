@@ -23,7 +23,7 @@
           "Interactions": [
             {
               "Type": "Simple",
-              "RunTime": 7.0,
+              "RunTime": 10.0,
               "Effects": {
                 "ItemAnimationId": "ShieldCapFuriousOnslaught",
                 "ClearAnimationOnFinish": true
@@ -36,7 +36,7 @@
           "Interactions": [
             {
               "Type": "ShieldCap_Signature_Furious_Onslaught_Java",
-              "DurationSeconds": 7.0,
+              "DurationSeconds": 10.0,
               "SprintSpeed": 90.0,
               "UseVelocityConfig": false,
               "GroundSpeedMultiplier": 1.0,

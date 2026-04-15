@@ -105,7 +105,7 @@ public final class ShieldCapSignatureFuriousOnslaught extends SimpleInstantInter
                     .documentation("Arms Furious Onslaught: forced forward sprint with collision damage and heavy knockback.")
                     .build();
 
-    protected float durationSeconds = 7.0f;
+    protected float durationSeconds = 10.0f;
     protected double sprintSpeed = 6.0d;
     protected boolean useVelocityConfig = false;
     protected double groundSpeedMultiplier = 1.0d;

@@ -54,7 +54,20 @@ public final class ShieldCapBackModelSystems {
                          @Nonnull CommandBuffer<EntityStore> commandBuffer) {
             ShieldCapBackStateComponent state =
                     chunk.getComponent(entityIndex, ShieldCapBackStateComponent.getComponentType());
-            if (state == null || !state.consumeDirty()) {
+            if (state == null) {
+                return;
+            }
+
+            ModelComponent currentModelComponent =
+                    chunk.getComponent(entityIndex, ModelComponent.getComponentType());
+            if (state.shouldShowBackShield()
+                    && !state.isPendingApply()
+                    && currentModelComponent != null
+                    && !hasShieldCapAttachment(currentModelComponent.getModel())) {
+                state.rebuild();
+            }
+
+            if (!state.consumeDirty()) {
                 return;
             }
 
@@ -66,7 +79,9 @@ public final class ShieldCapBackModelSystems {
 
             Player player = chunk.getComponent(entityIndex, Player.getComponentType());
 
-            Model baseModel = CosmeticsModule.get().createModel(playerSkinComponent.getPlayerSkin());
+            Model currentModel = currentModelComponent == null ? null : currentModelComponent.getModel();
+            Model appearanceModel = createAppearanceModel(player, playerSkinComponent);
+            Model baseModel = selectInjectionBaseModel(currentModel, appearanceModel);
             if (baseModel == null) {
                 return;
             }
@@ -74,7 +89,11 @@ public final class ShieldCapBackModelSystems {
             if (!state.shouldShowBackShield()) {
                 state.setPendingApply(false);
                 playerSkinComponent.setNetworkOutdated();
-                chunk.setComponent(entityIndex, ModelComponent.getComponentType(), new ModelComponent(baseModel));
+                chunk.setComponent(
+                        entityIndex,
+                        ModelComponent.getComponentType(),
+                        new ModelComponent(removeShieldCapAttachment(baseModel))
+                );
                 return;
             }
 
@@ -85,7 +104,7 @@ public final class ShieldCapBackModelSystems {
                 return;
             }
 
-            Model shieldModel = buildShieldCapModel(player, baseModel);
+            Model shieldModel = buildShieldCapModel(baseModel);
             state.setPendingApply(false);
             chunk.setComponent(entityIndex, ModelComponent.getComponentType(), new ModelComponent(shieldModel));
         }
@@ -96,12 +115,14 @@ public final class ShieldCapBackModelSystems {
             return QUERY;
         }
 
-        private Model buildShieldCapModel(Player player, Model baseModel) {
-            Model appearanceModel = rebuildHytaleAppearanceModel(player, baseModel);
+        private Model buildShieldCapModel(Model baseModel) {
             List<ModelAttachment> attachments = new ArrayList<>();
-            for (ModelAttachment attachment : appearanceModel.getAttachments()) {
-                if (!isShieldCapAttachment(attachment)) {
-                    attachments.add(attachment);
+            ModelAttachment[] baseAttachments = baseModel.getAttachments();
+            if (baseAttachments != null) {
+                for (ModelAttachment attachment : baseAttachments) {
+                    if (!isShieldCapAttachment(attachment)) {
+                        attachments.add(attachment);
+                    }
                 }
             }
 
@@ -114,29 +135,116 @@ public final class ShieldCapBackModelSystems {
             ));
 
             return new Model(
-                    appearanceModel.getModelAssetId(),
-                    appearanceModel.getScale(),
-                    appearanceModel.getRandomAttachmentIds(),
+                    baseModel.getModelAssetId(),
+                    baseModel.getScale(),
+                    baseModel.getRandomAttachmentIds(),
                     attachments.toArray(ModelAttachment[]::new),
-                    appearanceModel.getBoundingBox(),
-                    appearanceModel.getModel(),
-                    appearanceModel.getTexture(),
-                    appearanceModel.getGradientSet(),
-                    appearanceModel.getGradientId(),
-                    appearanceModel.getEyeHeight(),
-                    appearanceModel.getCrouchOffset(),
-                    getOptionalFloat(appearanceModel, "sittingOffset"),
-                    getOptionalFloat(appearanceModel, "sleepingOffset"),
-                    appearanceModel.getAnimationSetMap(),
-                    appearanceModel.getCamera(),
-                    appearanceModel.getLight(),
-                    appearanceModel.getParticles(),
-                    appearanceModel.getTrails(),
-                    appearanceModel.getPhysicsValues(),
-                    appearanceModel.getDetailBoxes(),
-                    appearanceModel.getPhobia(),
-                    appearanceModel.getPhobiaModelAssetId()
+                    baseModel.getBoundingBox(),
+                    baseModel.getModel(),
+                    baseModel.getTexture(),
+                    baseModel.getGradientSet(),
+                    baseModel.getGradientId(),
+                    baseModel.getEyeHeight(),
+                    baseModel.getCrouchOffset(),
+                    getOptionalFloat(baseModel, "sittingOffset"),
+                    getOptionalFloat(baseModel, "sleepingOffset"),
+                    baseModel.getAnimationSetMap(),
+                    baseModel.getCamera(),
+                    baseModel.getLight(),
+                    baseModel.getParticles(),
+                    baseModel.getTrails(),
+                    baseModel.getPhysicsValues(),
+                    baseModel.getDetailBoxes(),
+                    baseModel.getPhobia(),
+                    baseModel.getPhobiaModelAssetId()
             );
+        }
+
+        private Model createAppearanceModel(Player player, PlayerSkinComponent playerSkinComponent) {
+            if (playerSkinComponent == null || playerSkinComponent.getPlayerSkin() == null) {
+                return null;
+            }
+
+            Model skinBaseModel = CosmeticsModule.get().createModel(playerSkinComponent.getPlayerSkin());
+            if (skinBaseModel == null) {
+                return null;
+            }
+
+            return rebuildHytaleAppearanceModel(player, skinBaseModel);
+        }
+
+        private Model selectInjectionBaseModel(Model currentModel, Model appearanceModel) {
+            if (appearanceModel == null) {
+                return removeShieldCapAttachment(currentModel);
+            }
+            if (currentModel == null) {
+                return appearanceModel;
+            }
+
+            Model normalizedCurrent = removeShieldCapAttachment(currentModel);
+            Model normalizedAppearance = removeShieldCapAttachment(appearanceModel);
+            if (isEquivalentToAppearanceBase(normalizedCurrent, normalizedAppearance)) {
+                return appearanceModel;
+            }
+            return normalizedCurrent;
+        }
+
+        private Model removeShieldCapAttachment(Model model) {
+            if (model == null || model.getAttachments() == null || model.getAttachments().length == 0) {
+                return model;
+            }
+
+            List<ModelAttachment> attachments = new ArrayList<>();
+            boolean removedAny = false;
+            for (ModelAttachment attachment : model.getAttachments()) {
+                if (isShieldCapAttachment(attachment)) {
+                    removedAny = true;
+                    continue;
+                }
+                attachments.add(attachment);
+            }
+
+            if (!removedAny) {
+                return model;
+            }
+
+            return new Model(
+                    model.getModelAssetId(),
+                    model.getScale(),
+                    model.getRandomAttachmentIds(),
+                    attachments.toArray(ModelAttachment[]::new),
+                    model.getBoundingBox(),
+                    model.getModel(),
+                    model.getTexture(),
+                    model.getGradientSet(),
+                    model.getGradientId(),
+                    model.getEyeHeight(),
+                    model.getCrouchOffset(),
+                    getOptionalFloat(model, "sittingOffset"),
+                    getOptionalFloat(model, "sleepingOffset"),
+                    model.getAnimationSetMap(),
+                    model.getCamera(),
+                    model.getLight(),
+                    model.getParticles(),
+                    model.getTrails(),
+                    model.getPhysicsValues(),
+                    model.getDetailBoxes(),
+                    model.getPhobia(),
+                    model.getPhobiaModelAssetId()
+            );
+        }
+
+        private boolean isEquivalentToAppearanceBase(Model currentModel, Model appearanceModel) {
+            if (currentModel == null || appearanceModel == null) {
+                return false;
+            }
+
+            if (stringEquals(currentModel.getModelAssetId(), appearanceModel.getModelAssetId())
+                    && stringEquals(currentModel.getModel(), appearanceModel.getModel())) {
+                return true;
+            }
+
+            return haveEquivalentAttachments(currentModel, appearanceModel);
         }
 
         private Model rebuildHytaleAppearanceModel(Player player, Model baseModel) {
@@ -341,6 +449,70 @@ public final class ShieldCapBackModelSystems {
             return attachment != null
                     && BACK_ATTACHMENT_MODEL.equals(attachment.getModel())
                     && BACK_ATTACHMENT_TEXTURE.equals(attachment.getTexture());
+        }
+
+        private boolean hasShieldCapAttachment(Model model) {
+            if (model == null || model.getAttachments() == null || model.getAttachments().length == 0) {
+                return false;
+            }
+
+            for (ModelAttachment attachment : model.getAttachments()) {
+                if (isShieldCapAttachment(attachment)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private boolean stringEquals(String left, String right) {
+            if (left == null) {
+                return right == null;
+            }
+            return left.equals(right);
+        }
+
+        private boolean haveEquivalentAttachments(Model currentModel, Model appearanceModel) {
+            ModelAttachment[] currentAttachments = currentModel.getAttachments();
+            ModelAttachment[] appearanceAttachments = appearanceModel.getAttachments();
+
+            int currentCount = currentAttachments == null ? 0 : currentAttachments.length;
+            int appearanceCount = appearanceAttachments == null ? 0 : appearanceAttachments.length;
+            if (currentCount != appearanceCount) {
+                return false;
+            }
+
+            if (currentCount == 0) {
+                return true;
+            }
+
+            for (ModelAttachment appearanceAttachment : appearanceAttachments) {
+                if (!containsEquivalentAttachment(currentAttachments, appearanceAttachment)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private boolean containsEquivalentAttachment(ModelAttachment[] attachments, ModelAttachment target) {
+            if (attachments == null || target == null) {
+                return false;
+            }
+
+            for (ModelAttachment candidate : attachments) {
+                if (attachmentsEquivalent(candidate, target)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private boolean attachmentsEquivalent(ModelAttachment left, ModelAttachment right) {
+            return left != null
+                    && right != null
+                    && stringEquals(left.getModel(), right.getModel())
+                    && stringEquals(left.getTexture(), right.getTexture())
+                    && stringEquals(left.getGradientSet(), right.getGradientSet())
+                    && stringEquals(left.getGradientId(), right.getGradientId());
         }
 
         private float getOptionalFloat(Model model, String fieldName) {

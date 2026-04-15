@@ -37,12 +37,12 @@ public final class ShieldCapAirborneCondition extends SimpleInstantInteraction {
     protected void firstRun(@Nonnull InteractionType type,
                             @Nonnull InteractionContext context,
                             @Nonnull CooldownHandler cooldownHandler) {
-        if (!isAirborne(context)) {
+        if (!isAirborneFromJump(context)) {
             markFailed(context);
         }
     }
 
-    private static boolean isAirborne(@Nonnull InteractionContext context) {
+    private static boolean isAirborneFromJump(@Nonnull InteractionContext context) {
         if (context.getCommandBuffer() == null) {
             return false;
         }
@@ -58,7 +58,9 @@ public final class ShieldCapAirborneCondition extends SimpleInstantInteraction {
         MovementStatesComponent movementComponent =
                 context.getCommandBuffer().getComponent(entityRef, EntityModule.get().getMovementStatesComponentType());
         MovementStates movementStates = movementComponent == null ? null : movementComponent.getMovementStates();
-        return movementStates != null && !movementStates.onGround;
+        return movementStates != null
+                && !movementStates.onGround
+                && ShieldCapPrimaryJumpHitCooldown.isJumpMarked(context);
     }
 
     private static void markFailed(@Nonnull InteractionContext context) {

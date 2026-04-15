@@ -3,7 +3,7 @@
   "DamageCalculator": {
     "Class": "Charged",
     "BaseDamage": {
-      "Physical": 16
+      "Projectile": 42
     }
   },
   "Effects": {
@@ -12,28 +12,13 @@
   "EntityStatsOnHit": [
     {
       "EntityStatId": "SignatureEnergy",
-      "Amount": 15
+      "Amount": 8
     }
   ],
   "DamageEffects": {
     "Knockback": {
       "Force": 5.0,
       "VelocityType": "Set"
-    },
-    "WorldParticles": [
-      {
-        "SystemId": "Impact_Dagger_Stab_Charged"
-      }
-    ]
-  },
-  "Next": {
-    "Type": "ClearEntityEffect",
-    "Entity": "Target",
-    "EntityEffectId": "Crossbow_Combo_1",
-    "Next": {
-      "Type": "ClearEntityEffect",
-      "Entity": "Target",
-      "EntityEffectId": "Crossbow_Combo_2"
     }
   }
 }

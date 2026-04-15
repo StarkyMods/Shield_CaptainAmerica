@@ -11,7 +11,7 @@
       "Crouching": true,
       "Failed": "ShieldCap_Primary_Charging"
     },
-    "Next": "ShieldCap_Primary_Jump_Charging"
+    "Next": "ShieldCap_Primary_Jump_Wall"
   },
   "Failed": {
     "Type": "Simple",

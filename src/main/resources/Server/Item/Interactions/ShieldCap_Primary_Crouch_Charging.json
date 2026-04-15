@@ -9,7 +9,7 @@
     "ClearAnimationOnFinish": true
   },
   "Next": {
-    "0": "ShieldCap_Primary_Chain",
+    "0": "ShieldCap_Primary_Crouch_Chain",
     "0.5": "ShieldCap_Primary_Throw_Conditions"
   }
 }

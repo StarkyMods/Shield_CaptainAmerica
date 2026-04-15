@@ -12,22 +12,29 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.protocol.SoundCategory;
+import com.hypixel.hytale.protocol.packets.world.PlaySoundEvent3D;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.ProjectileComponent;
+import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
+import com.hypixel.hytale.server.core.modules.entity.EntityModule;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.modules.projectile.ProjectileModule;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.util.PositionUtil;
 
 public final class ShieldCapCatch extends SimpleInstantInteraction {
     private static final String THROWN_ITEM_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String RETURNED_ITEM_ID = "Weapon_Shield_CaptainAmerica_Starky";
+    private static final String CATCH_SOUND_ID = "SFX_ShieldCap_Catch";
     private static final long[] CALLING_ANIMATION_CLEAR_RETRY_DELAYS_MS = new long[] {500L, 650L, 800L};
 
     @Nonnull
@@ -86,6 +93,7 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
 
         if (!restored || projectileRef == null || !projectileRef.isValid()) {
             if (restored) {
+                playCatchSound(store, ownerRef);
                 scheduleCallingAnimationClearPasses(store, ownerRef);
             }
             return;
@@ -98,7 +106,38 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
                 uuidComponent == null ? null : uuidComponent.getUuid(),
                 0L
         );
+        playCatchSound(store, ownerRef);
         scheduleCallingAnimationClearPasses(store, ownerRef);
+    }
+
+    private static void playCatchSound(Store<EntityStore> store, Ref<EntityStore> ownerRef) {
+        if (store == null || ownerRef == null || !ownerRef.isValid() || store.getExternalData() == null) {
+            return;
+        }
+
+        int soundIndex = SoundEvent.getAssetMap().getIndexOrDefault(CATCH_SOUND_ID, SoundEvent.EMPTY_ID);
+        if (soundIndex == SoundEvent.EMPTY_ID) {
+            return;
+        }
+
+        TransformComponent transform = store.getComponent(ownerRef, EntityModule.get().getTransformComponentType());
+        World world = store.getExternalData().getWorld();
+        if (transform == null || transform.getPosition() == null || world == null) {
+            return;
+        }
+
+        PlaySoundEvent3D packet = new PlaySoundEvent3D(
+                soundIndex,
+                SoundCategory.SFX,
+                PositionUtil.toPositionPacket(transform.getPosition()),
+                1.0f,
+                1.0f
+        );
+        world.getNotificationHandler().sendPacketIfChunkLoaded(
+                packet,
+                (int) Math.floor(transform.getPosition().x),
+                (int) Math.floor(transform.getPosition().z)
+        );
     }
 
     private static void scheduleCallingAnimationClearPasses(Store<EntityStore> store,

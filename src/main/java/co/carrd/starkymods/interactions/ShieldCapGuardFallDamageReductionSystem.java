@@ -237,4 +237,5 @@ public final class ShieldCapGuardFallDamageReductionSystem extends DamageEventSy
             // Best-effort visual/animation response only.
         }
     }
+
 }

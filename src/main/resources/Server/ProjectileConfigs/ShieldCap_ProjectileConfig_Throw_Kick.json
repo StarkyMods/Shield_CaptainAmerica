@@ -23,17 +23,17 @@
       },
       "Interactions": [
         {
+          "Type": "ShieldCap_Throw_Kick_Impact"
+        },
+        {
           "Type": "Replace",
           "DefaultOk": true,
-          "Var": "ShieldCap_Throw_Damage",
+          "Var": "ShieldCap_Throw_Kick_Damage",
           "DefaultValue": {
             "Interactions": [
               "ShieldCap_Throw_Damage"
             ]
           }
-        },
-        {
-          "Type": "ShieldCap_Throw_Kick_Impact"
         }
       ]
     },

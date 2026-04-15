@@ -1,7 +1,10 @@
 {
   "Type": "Charging",
   "Next": {
-    "0": "ShieldCap_Secondary_Guard_Bash",
+    "0": {
+      "Type": "RunRootInteraction",
+      "RootInteraction": "Root_ShieldCap_Secondary_Guard_Bash"
+    },
     "1": {
       "Type": "RunRootInteraction",
       "RootInteraction": "Root_ShieldCap_Guard_Dash_Push"
@@ -14,24 +17,27 @@
   "CancelOnItemChange": true,
   "HorizontalSpeedMultiplier": 0,
   "Effects": {
+    "StartDelay": 0.15,
     "ItemAnimationId": "ShieldCapGuardCharging",
+    "ClearAnimationOnFinish": true,
     "WorldSoundEventId": "SFX_Bow_T2_Draw",
     "LocalSoundEventId": "SFX_Bow_T2_Draw_Local",
     "ClearSoundEventOnFinish": true,
     "Particles": [
       {
         "PositionOffset": {
-          "X": 0.6,
+          "X": 0,
           "Y": 0,
-          "Z": 0
+          "Z": -0.05
         },
         "RotationOffset": {
           "Pitch": 0,
           "Roll": 90,
-          "Yaw": 0
+          "Yaw": 90
         },
         "TargetNodeName": "Handle",
         "SystemId": "ShieldCap_Charging",
+        "Scale": 0.357,
         "Color": "#fffacf"
       }
     ]

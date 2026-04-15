@@ -2,11 +2,13 @@
   "Type": "Simple",
   "Effects": {
     "CameraEffect": "ShieldCap_Big_Hit_Camera",
+    "WorldSoundEventId": "SFX_ShieldCap_Hit",
     "Particles": [
       {
         "SystemId": "Shield_Bash",
         "TargetEntityPart": "PrimaryItem",
         "TargetNodeName": "Handle",
+        "Scale": 0.7,
         "RotationOffset": {
           "Yaw": -180,
           "Roll": -90
@@ -17,6 +19,7 @@
   },
   "Next": {
     "Type": "ApplyForce",
+    "RunTime": 0.2,
     "Direction": {
       "Z": -2
     },
@@ -32,6 +35,12 @@
     },
     "ChangeVelocityType": "Add",
     "WaitForGround": false,
-    "WaitForCollision": false
+    "WaitForCollision": false,
+    "Next": {
+      "Type": "Simple",
+      "Effects": {
+        "WorldSoundEventId": "SFX_ShieldCap_Catch"
+      }
+    }
   }
 }

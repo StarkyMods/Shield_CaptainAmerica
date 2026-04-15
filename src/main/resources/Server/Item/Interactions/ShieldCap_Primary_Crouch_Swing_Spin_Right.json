@@ -41,7 +41,21 @@
                 "RunTime": 0.35
               },
               "Effects": {
-                "WorldSoundEventId": "SFX_ShieldCap_Swings"
+                "WorldSoundEventId": "SFX_ShieldCap_Swings",
+                "Trails": [
+                  {
+                    "PositionOffset": {
+                      "X": 0,
+                      "Y": 0,
+                      "Z": 0
+                    },
+                    "TargetNodeName": "Handle",
+                    "TrailId": "Wind",
+                    "RotationOffset": {
+                      "Roll": 90.0
+                    }
+                  }
+                ]
               }
             },
             "HorizontalSpeedMultiplier": 0,

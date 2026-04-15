@@ -20,5 +20,6 @@
     }
   ],
   "Parent": "SFX_Attn_Moderate",
-  "PreventSoundInterruption": true
+  "PreventSoundInterruption": true,
+  "MaxDistance": 80
 }

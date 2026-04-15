@@ -3,9 +3,7 @@
     {
       "Type": "StarkyPluginPresentCondition",
       "Next": "Wall_Jump",
-      "Failed": {
-        "Type": "ShieldCap_Primary_Jump_Hit_Cooldown_Java"
-      },
+      "Failed": "ShieldCap_Primary_Jump_Charging",
       "PluginAuthor": "narwhals",
       "PluginName": "Zephyr"
     }

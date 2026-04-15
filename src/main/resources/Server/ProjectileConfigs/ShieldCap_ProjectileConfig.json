@@ -23,6 +23,9 @@
       },
       "Interactions": [
         {
+          "Type": "ShieldCap_Throw_Homing_Impact"
+        },
+        {
           "Type": "Replace",
           "DefaultOk": true,
           "Var": "ShieldCap_Throw_Damage",
@@ -31,9 +34,6 @@
               "ShieldCap_Throw_Damage"
             ]
           }
-        },
-        {
-          "Type": "ShieldCap_Throw_Homing_Impact"
         }
       ]
     },
