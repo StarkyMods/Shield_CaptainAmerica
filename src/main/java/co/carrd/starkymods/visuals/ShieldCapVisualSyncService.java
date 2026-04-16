@@ -1,5 +1,6 @@
 package co.carrd.starkymods.visuals;
 
+import co.carrd.starkymods.config.ShieldCapConfigManager;
 import co.carrd.starkymods.interactions.ShieldCapThrowHomingService;
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
@@ -281,7 +282,12 @@ public final class ShieldCapVisualSyncService {
                             || containsShield(backpack)
                             || containsShield(tools);
 
-            syncBackAttachment(player, shieldInInventory && !shieldInHands, forceBackRebuild);
+            boolean shouldShowBackShield =
+                    ShieldCapConfigManager.isBackShieldVisualEnabled()
+                            && shieldInInventory
+                            && !shieldInHands;
+
+            syncBackAttachment(player, shouldShowBackShield, forceBackRebuild);
 
         } finally {
             syncingPlayers.remove(playerUuid);

@@ -45,7 +45,7 @@
         {
           "CalculationType": "Additive",
           "Target": "Max",
-          "Amount": 100
+          "Amount": 75
         }
       ]
     },

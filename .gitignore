@@ -44,3 +44,5 @@ bin/
 
 ### Project Files ###
 libs/
+.aiignore
+README.md

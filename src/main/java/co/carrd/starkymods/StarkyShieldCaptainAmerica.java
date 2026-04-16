@@ -1,6 +1,14 @@
 package co.carrd.starkymods;
 
+import co.carrd.starkymods.commands.ShieldCapCraftCommand;
+import co.carrd.starkymods.config.ShieldCapConfigManager;
+import co.carrd.starkymods.config.ShieldCapCraftConfigManager;
+import co.carrd.starkymods.config.ShieldCapCraftHotReloadService;
+import co.carrd.starkymods.config.ShieldCapDurabilityAssetOverrideManager;
+import co.carrd.starkymods.config.ShieldCapDurabilityLiveUpdater;
 import co.carrd.starkymods.interactions.ShieldCapRefreshVisualsInteraction;
+import co.carrd.starkymods.interactions.ShieldCapSignatureEnergySave;
+import co.carrd.starkymods.interactions.ShieldCapSignatureEnergyLoad;
 import co.carrd.starkymods.interactions.ShieldCapPrimarySelector;
 import co.carrd.starkymods.interactions.ShieldCapAirborneCondition;
 import co.carrd.starkymods.interactions.ShieldCapPrimaryJumpHitCooldown;
@@ -37,6 +45,8 @@ import co.carrd.starkymods.interactions.ShieldCapFuriousOnslaughtTargetCooldown;
 import co.carrd.starkymods.interactions.ShieldCapInvulnerabilityClear;
 import co.carrd.starkymods.interactions.ShieldCapThrowHomingTickSystem;
 import co.carrd.starkymods.interactions.StarkyPluginPresentCondition;
+import co.carrd.starkymods.listeners.ShieldCapPacketListener;
+import co.carrd.starkymods.recipe.ShieldCapRecipeOverrideManager;
 import co.carrd.starkymods.visuals.ShieldCapBackModelSystems;
 import co.carrd.starkymods.visuals.ShieldCapBackShieldDamageReductionSystem;
 import co.carrd.starkymods.visuals.ShieldCapBackStateComponent;
@@ -57,6 +67,7 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
     private final ShieldCapVisualSyncService visualSyncService = new ShieldCapVisualSyncService();
     private final ShieldCapReturnKickInputService returnKickInputService = new ShieldCapReturnKickInputService();
     private final ShieldCapReturnReticleInjector returnReticleInjector = new ShieldCapReturnReticleInjector();
+    private final ShieldCapCraftHotReloadService craftHotReloadService = new ShieldCapCraftHotReloadService();
     private ComponentType<EntityStore, ShieldCapBackStateComponent> shieldCapBackStateComponentType;
 
     public static StarkyShieldCaptainAmerica getInstance() {
@@ -65,6 +76,22 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
 
     public ShieldCapVisualSyncService getVisualSyncService() {
         return visualSyncService;
+    }
+
+    public void toggleShieldCraftBlocked() {
+        ShieldCapConfigManager.saveCraftState(isShieldCraftBlocked());
+    }
+
+    public boolean isShieldCraftBlocked() {
+        return !ShieldCapConfigManager.isCraftingAllowed();
+    }
+
+    public String getCraftToggleStatusMessage() {
+        return isShieldCraftBlocked() ? "Cap's Shield Craft Disabled" : "Cap's Shield Craft Enabled";
+    }
+
+    public void pollCraftHotReload(com.hypixel.hytale.server.core.universe.PlayerRef player, boolean isOp) {
+        craftHotReloadService.pollAndApplyIfPending(player, isOp);
     }
 
     public ComponentType<EntityStore, ShieldCapBackStateComponent> getShieldCapBackStateComponentType() {
@@ -79,6 +106,11 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
     @Override
     protected void setup() {
         super.setup();
+        ShieldCapConfigManager.init();
+        ShieldCapCraftConfigManager.init();
+        ShieldCapPacketListener.register();
+        ShieldCapRecipeOverrideManager.register(this);
+        this.getCommandRegistry().registerCommand(new ShieldCapCraftCommand());
         shieldCapBackStateComponentType =
                 getEntityStoreRegistry().registerComponent(
                         ShieldCapBackStateComponent.class,
@@ -90,6 +122,16 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
                 "ShieldCap_Refresh_Java",
                 ShieldCapRefreshVisualsInteraction.class,
                 ShieldCapRefreshVisualsInteraction.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_SignatureEnergy_Save_Java",
+                ShieldCapSignatureEnergySave.class,
+                ShieldCapSignatureEnergySave.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_SignatureEnergy_Load_Java",
+                ShieldCapSignatureEnergyLoad.class,
+                ShieldCapSignatureEnergyLoad.CODEC
         );
         getCodecRegistry(Interaction.CODEC).register(
                 "ShieldCap_Signature_Furious_Onslaught_Java",
@@ -259,7 +301,19 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
     }
 
     @Override
+    protected void start() {
+        super.start();
+        ShieldCapRecipeOverrideManager.applyConfiguredRecipe();
+        ShieldCapDurabilityAssetOverrideManager.applyConfiguredDurabilityAssets();
+        Integer configuredMaxDurability =
+                ShieldCapCraftConfigManager.getConfig() != null ? ShieldCapCraftConfigManager.getConfig().weaponMaxDurability : null;
+        ShieldCapDurabilityLiveUpdater.applyEverywhereLoaded(configuredMaxDurability);
+        craftHotReloadService.start();
+    }
+
+    @Override
     protected void shutdown() {
+        craftHotReloadService.stop();
         returnReticleInjector.shutdown();
         returnKickInputService.shutdown();
         visualSyncService.shutdown();
