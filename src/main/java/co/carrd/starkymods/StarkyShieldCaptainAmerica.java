@@ -46,6 +46,7 @@ import co.carrd.starkymods.interactions.ShieldCapInvulnerabilityClear;
 import co.carrd.starkymods.interactions.ShieldCapThrowHomingTickSystem;
 import co.carrd.starkymods.interactions.StarkyPluginPresentCondition;
 import co.carrd.starkymods.listeners.ShieldCapPacketListener;
+import co.carrd.starkymods.listeners.ShieldCapUpdateCheckListener;
 import co.carrd.starkymods.recipe.ShieldCapRecipeOverrideManager;
 import co.carrd.starkymods.visuals.ShieldCapBackModelSystems;
 import co.carrd.starkymods.visuals.ShieldCapBackShieldDamageReductionSystem;
@@ -54,6 +55,7 @@ import co.carrd.starkymods.visuals.ShieldCapReturnReticleInjector;
 import co.carrd.starkymods.visuals.ShieldCapVisualSyncService;
 import co.carrd.starkymods.interactions.ShieldCapReturnKickInputService;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
@@ -109,6 +111,7 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         ShieldCapConfigManager.init();
         ShieldCapCraftConfigManager.init();
         ShieldCapPacketListener.register();
+        getEventRegistry().registerGlobal(PlayerReadyEvent.class, ShieldCapUpdateCheckListener::onPlayerReady);
         ShieldCapRecipeOverrideManager.register(this);
         this.getCommandRegistry().registerCommand(new ShieldCapCraftCommand());
         shieldCapBackStateComponentType =
