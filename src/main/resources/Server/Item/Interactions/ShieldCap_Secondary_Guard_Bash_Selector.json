@@ -2,8 +2,28 @@
   "Type": "Selector",
   "$Comment": "Length of Combat",
   "RunTime": 0.083,
+  "Rules": {
+    "Blocking": [
+      "Wielding",
+      "Primary",
+      "Secondary",
+      "Ability1",
+      "Ability2",
+      "Ability3"
+    ]
+  },
   "Effects": {
     "CameraEffect": "Shield_Bash",
+    "MovementEffects": {
+      "DisableAll": true,
+      "DisableForward": true,
+      "DisableBackward": true,
+      "DisableLeft": true,
+      "DisableRight": true,
+      "DisableSprint": true,
+      "DisableJump": true,
+      "DisableCrouch": true
+    },
     "Particles": [
       {
         "SystemId": "Shield_Bash",
@@ -44,6 +64,28 @@
   "Next": {
     "Type": "Simple",
     "RunTime": 0.5,
+    "Rules": {
+      "Blocking": [
+        "Wielding",
+        "Primary",
+        "Secondary",
+        "Ability1",
+        "Ability2",
+        "Ability3"
+      ]
+    },
+    "Effects": {
+      "MovementEffects": {
+        "DisableAll": true,
+        "DisableForward": true,
+        "DisableBackward": true,
+        "DisableLeft": true,
+        "DisableRight": true,
+        "DisableSprint": true,
+        "DisableJump": true,
+        "DisableCrouch": true
+      }
+    },
     "HorizontalSpeedMultiplier": 0
   },
   "HorizontalSpeedMultiplier": 0

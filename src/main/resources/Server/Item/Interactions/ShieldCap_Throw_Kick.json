@@ -39,8 +39,29 @@
             "ChangeVelocityType": "Add",
             "WaitForGround": false,
             "WaitForCollision": false,
-            "RunTime": 0.15
-          }
+            "RunTime": 0.4,
+            "Next": {
+              "Type": "Simple",
+              "RunTime": 0.4,
+              "Effects": {
+                "CameraEffect": "ShieldCap_Hit_Camera",
+                "Particles": [
+                  {
+                    "SystemId": "Hedera_Scream",
+                    "Scale": 0.1,
+                    "TargetEntityPart": "Entity",
+                    "TargetNodeName": "Hip",
+                    "PositionOffset": {
+                      "Z": 1,
+                      "Y": 1.9,
+                      "X": 0
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "HorizontalSpeedMultiplier": 0
         },
         "HorizontalSpeedMultiplier": 0,
         "RunTime": 0
@@ -51,8 +72,7 @@
       "Stamina": 1
     },
     "ValueType": "Absolute",
-    "HorizontalSpeedMultiplier": 0,
-    "RunTime": 0
+    "HorizontalSpeedMultiplier": 0
   },
   "Failed": {
     "Type": "Simple",

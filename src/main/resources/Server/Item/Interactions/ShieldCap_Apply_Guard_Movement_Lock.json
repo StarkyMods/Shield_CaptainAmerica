@@ -1,0 +1,6 @@
+{
+  "Type": "ApplyEffect",
+  "Entity": "User",
+  "EffectId": "ShieldCap_Guard_Movement_Lock",
+  "HorizontalSpeedMultiplier": 0
+}

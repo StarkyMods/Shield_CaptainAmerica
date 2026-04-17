@@ -13,12 +13,32 @@
   },
   "AllowIndefiniteHold": true,
   "DisplayProgress": true,
+  "Rules": {
+    "Blocking": [
+      "Wielding",
+      "Primary",
+      "Secondary",
+      "Ability1",
+      "Ability2",
+      "Ability3"
+    ]
+  },
   "MouseSensitivityAdjustmentTarget": 0.5,
   "MouseSensitivityAdjustmentDuration": 0.2,
   "CancelOnItemChange": true,
   "HorizontalSpeedMultiplier": 0,
   "Effects": {
     "StartDelay": 0.15,
+    "MovementEffects": {
+      "DisableAll": true,
+      "DisableForward": true,
+      "DisableBackward": true,
+      "DisableLeft": true,
+      "DisableRight": true,
+      "DisableSprint": true,
+      "DisableJump": true,
+      "DisableCrouch": true
+    },
     "ItemAnimationId": "ShieldCapGuardCharging",
     "ClearAnimationOnFinish": true,
     "WorldSoundEventId": "SFX_Bow_T2_Draw",

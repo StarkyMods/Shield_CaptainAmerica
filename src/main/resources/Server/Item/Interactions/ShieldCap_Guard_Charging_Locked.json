@@ -1,0 +1,7 @@
+{
+  "Type": "Serial",
+  "Interactions": [
+    "ShieldCap_Apply_Guard_Movement_Lock",
+    "ShieldCap_Guard_Charging"
+  ]
+}

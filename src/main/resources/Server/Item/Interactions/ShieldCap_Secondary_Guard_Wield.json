@@ -18,7 +18,7 @@
             "DefaultOk": true,
             "DefaultValue": {
               "Interactions": [
-                "ShieldCap_Guard_Charging"
+                "ShieldCap_Guard_Charging_Locked"
               ]
             },
             "HorizontalSpeedMultiplier": 0
@@ -51,16 +51,22 @@
   },
   "CancelOnOtherClick": true,
   "Failed": {
-    "Type": "Simple",
-    "Effects": {
-      "Particles": [
-        {
-          "SystemId": "Shield_Shatter"
+    "Type": "Serial",
+    "Interactions": [
+      {
+        "Type": "Simple",
+        "Effects": {
+          "Particles": [
+            {
+              "SystemId": "Shield_Shatter"
+            }
+          ],
+          "WorldSoundEventId": "SFX_Shield_T1_Break",
+          "LocalSoundEventId": "SFX_Shield_T1_Break"
         }
-      ],
-      "WorldSoundEventId": "SFX_Shield_T1_Break",
-      "LocalSoundEventId": "SFX_Shield_T1_Break"
-    }
+      },
+      "ShieldCap_Clear_Guard_Movement_Lock"
+    ]
   },
   "BlockedEffects": {
     "WorldSoundEventId": "SFX_Shield_T2_Impact",
@@ -71,11 +77,17 @@
     ]
   },
   "Next": {
-    "$Comment": "Standard regen delay upon ending guarding on all weapons",
-    "Type": "ChangeStat",
-    "Behaviour": "Set",
-    "StatModifiers": {
-      "StaminaRegenDelay": -0.8
-    }
+    "Type": "Serial",
+    "Interactions": [
+      {
+        "$Comment": "Standard regen delay upon ending guarding on all weapons",
+        "Type": "ChangeStat",
+        "Behaviour": "Set",
+        "StatModifiers": {
+          "StaminaRegenDelay": -0.8
+        }
+      },
+      "ShieldCap_Clear_Guard_Movement_Lock"
+    ]
   }
 }

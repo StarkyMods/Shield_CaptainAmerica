@@ -1,6 +1,7 @@
 {
   "Interactions": [
-    "ShieldCap_Secondary_Guard_Bash"
+    "ShieldCap_Secondary_Guard_Bash",
+    "ShieldCap_Clear_Guard_Movement_Lock"
   ],
   "RequireNewClick": false
 }

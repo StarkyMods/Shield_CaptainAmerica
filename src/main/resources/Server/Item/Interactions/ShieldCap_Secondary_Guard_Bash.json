@@ -3,7 +3,17 @@
   "RunTime": 0.0,
   "Effects": {
     "ItemAnimationId": "ShieldCapGuardBashSpin",
-    "ClearAnimationOnFinish": false
+    "ClearAnimationOnFinish": false,
+    "MovementEffects": {
+      "DisableAll": true,
+      "DisableForward": true,
+      "DisableBackward": true,
+      "DisableLeft": true,
+      "DisableRight": true,
+      "DisableSprint": true,
+      "DisableJump": true,
+      "DisableCrouch": true
+    }
   },
   "Next": {
     "Type": "ChangeStat",
@@ -14,6 +24,28 @@
     "Next": {
       "Type": "Simple",
       "RunTime": 0.5,
+      "Rules": {
+        "Blocking": [
+          "Wielding",
+          "Primary",
+          "Secondary",
+          "Ability1",
+          "Ability2",
+          "Ability3"
+        ]
+      },
+      "Effects": {
+        "MovementEffects": {
+          "DisableAll": true,
+          "DisableForward": true,
+          "DisableBackward": true,
+          "DisableLeft": true,
+          "DisableRight": true,
+          "DisableSprint": true,
+          "DisableJump": true,
+          "DisableCrouch": true
+        }
+      },
       "Next": {
         "Type": "ChangeStat",
         "Behaviour": "Set",
@@ -39,11 +71,33 @@
           "ChangeVelocityType": "Add",
           "WaitForGround": false,
           "WaitForCollision": false,
+          "Effects": {
+            "MovementEffects": {
+              "DisableAll": true,
+              "DisableForward": true,
+              "DisableBackward": true,
+              "DisableLeft": true,
+              "DisableRight": true,
+              "DisableSprint": true,
+              "DisableJump": true,
+              "DisableCrouch": true
+            }
+          },
           "HorizontalSpeedMultiplier": 0
         },
         "Effects": {
           "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
-          "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local"
+          "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
+          "MovementEffects": {
+            "DisableAll": true,
+            "DisableForward": true,
+            "DisableBackward": true,
+            "DisableLeft": true,
+            "DisableRight": true,
+            "DisableSprint": true,
+            "DisableJump": true,
+            "DisableCrouch": true
+          }
         },
         "HorizontalSpeedMultiplier": 0
       },

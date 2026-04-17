@@ -1,0 +1,5 @@
+{
+  "Type": "ClearEntityEffect",
+  "EntityEffectId": "ShieldCap_Guard_Movement_Lock",
+  "HorizontalSpeedMultiplier": 0
+}
