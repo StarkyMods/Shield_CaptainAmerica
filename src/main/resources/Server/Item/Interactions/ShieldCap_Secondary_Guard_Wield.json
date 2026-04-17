@@ -20,7 +20,8 @@
               "Interactions": [
                 "ShieldCap_Guard_Charging"
               ]
-            }
+            },
+            "HorizontalSpeedMultiplier": 0
           }
         }
       ],

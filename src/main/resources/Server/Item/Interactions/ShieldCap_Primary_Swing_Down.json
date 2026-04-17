@@ -1,0 +1,79 @@
+{
+  "Type": "Simple",
+  "RunTime": 0.2,
+  "Next": {
+    "Type": "Selector",
+    "$Comment": "Length of Combat",
+    "RunTime": 0.1,
+    "Selector": {
+      "Id": "AOECircle",
+      "Range": 3.5
+    },
+    "HitEntity": {
+      "Interactions": [
+        {
+          "Type": "Replace",
+          "DefaultValue": {
+            "Interactions": [
+              "ShieldCap_Primary_Damage"
+            ]
+          },
+          "Var": "Swing_Down_Damage",
+          "DefaultOk": true
+        }
+      ]
+    },
+    "IgnoreOwner": true,
+    "Next": {
+      "Type": "Simple",
+      "RunTime": 0.15,
+      "HorizontalSpeedMultiplier": 0,
+      "Effects": {
+        "MovementEffects": {
+          "DisableAll": true
+        }
+      }
+    },
+    "Effects": {
+      "WorldSoundEventId": "SFX_ShieldCap_SmallImpact",
+      "MovementEffects": {
+        "DisableAll": true
+      },
+      "Particles": [
+        {
+          "SystemId": "ShieldCap_Ground_Hit",
+          "TargetEntityPart": "Entity",
+          "TargetNodeName": "Hip",
+          "PositionOffset": {
+            "Y": 0.02,
+            "Z": 0.75
+          },
+          "Scale": 0.15
+        },
+        {
+          "SystemId": "Hedera_Scream",
+          "TargetEntityPart": "PrimaryItem",
+          "Color": "#ffe8a9",
+          "Scale": 0.04,
+          "TargetNodeName": "Handle",
+          "PositionOffset": {
+            "Z": 0,
+            "Y": 0,
+            "X": 0
+          }
+        }
+      ],
+      "CameraEffect": {
+        "Type": "CameraShake",
+        "CameraShake": "ShieldCap_Big_Hit_CameraShake",
+        "Intensity": {
+          "Value": 0.65
+        }
+      }
+    },
+    "HorizontalSpeedMultiplier": 0
+  },
+  "Effects": {
+    "ItemAnimationId": "ShieldCapSwingDown"
+  }
+}

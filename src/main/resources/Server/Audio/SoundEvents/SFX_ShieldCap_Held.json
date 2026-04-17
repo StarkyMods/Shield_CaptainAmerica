@@ -1,0 +1,25 @@
+{
+  "AudioCategory": "AudioCat_Inventory",
+  "Volume": 0,
+  "Layers": [
+    {
+      "Volume": -7,
+      "RandomSettings": {
+        "MinPitch": -1,
+        "MaxPitch": 1,
+        "MaxStartOffset": 0,
+        "MinVolume": 0,
+        "MaxVolume": 0
+      },
+      "StartDelay": 0,
+      "Looping": false,
+      "Files": [
+        "Sounds/Weapons/Mace/Mace_T1_Shove_01.ogg",
+        "Sounds/Weapons/Mace/Mace_T1_Shove_02.ogg",
+        "Sounds/Weapons/Mace/Mace_T1_Shove_03.ogg"
+      ]
+    }
+  ],
+  "PreventSoundInterruption": true,
+  "Pitch": -10
+}

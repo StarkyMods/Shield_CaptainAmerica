@@ -10,7 +10,7 @@
     "StatModifiers": {
       "Stamina": -2
     },
-    "HorizontalSpeedMultiplier": 0.05,
+    "HorizontalSpeedMultiplier": 0,
     "Next": {
       "Type": "Simple",
       "RunTime": 0.5,
@@ -38,14 +38,17 @@
           },
           "ChangeVelocityType": "Add",
           "WaitForGround": false,
-          "WaitForCollision": false
+          "WaitForCollision": false,
+          "HorizontalSpeedMultiplier": 0
         },
         "Effects": {
           "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
           "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local"
         },
-        "HorizontalSpeedMultiplier": 0.05
-      }
+        "HorizontalSpeedMultiplier": 0
+      },
+      "HorizontalSpeedMultiplier": 0
     }
-  }
+  },
+  "HorizontalSpeedMultiplier": 0
 }

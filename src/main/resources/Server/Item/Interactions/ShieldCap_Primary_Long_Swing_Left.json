@@ -51,7 +51,8 @@
             "Roll": 90.0
           }
         }
-      ]
+      ],
+      "CameraEffect": "Sword_Swing_Diagonal_Right"
     }
   },
   "Effects": {

@@ -3,9 +3,11 @@
   "$Comment": "Length of Combat",
   "RunTime": 0.5,
   "Selector": {
-    "Id": "Stab",
-    "TestLineOfSight": true,
-    "EndDistance": 3.5
+    "Id": "Horizontal",
+    "EndDistance": 3,
+    "Length": 180,
+    "Direction": "ToLeft",
+    "TestLineOfSight": true
   },
   "HitEntity": {
     "Interactions": [

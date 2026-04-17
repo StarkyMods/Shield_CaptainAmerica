@@ -35,9 +35,26 @@
               },
               "IgnoreOwner": true,
               "HorizontalSpeedMultiplier": 0,
-              "RunTime": 0.35,
+              "RunTime": 0.9,
               "Effects": {
                 "WorldSoundEventId": "SFX_ShieldCap_Swings"
+              },
+              "Camera": {
+                "ThirdPerson": [
+                  {
+                    "Time": 0.4,
+                    "Position": {
+                      "Z": -1.3,
+                      "Y": 0.3,
+                      "X": 2
+                    },
+                    "Rotation": {
+                      "Roll": 0,
+                      "Pitch": -20,
+                      "Yaw": 30
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -124,15 +141,51 @@
                           "TargetEntityPart": "Entity",
                           "TargetNodeName": "Hip",
                           "PositionOffset": {
-                            "Y": 0.1,
+                            "Y": 0.02,
                             "Z": 1
                           },
                           "Scale": 0.25
+                        },
+                        {
+                          "SystemId": "Hedera_Scream",
+                          "TargetEntityPart": "PrimaryItem",
+                          "Color": "#ffe8a9",
+                          "Scale": 0.08,
+                          "TargetNodeName": "Handle",
+                          "PositionOffset": {
+                            "Z": 0,
+                            "Y": 0,
+                            "X": 0
+                          }
                         }
-                      ]
+                      ],
+                      "MovementEffects": {
+                        "DisableJump": true,
+                        "DisableForward": true,
+                        "DisableBackward": true,
+                        "DisableLeft": true,
+                        "DisableRight": true,
+                        "DisableSprint": true
+                      }
                     },
-                    "RunTime": 0.25
-                  }
+                    "RunTime": 0.25,
+                    "Next": {
+                      "Type": "Simple",
+                      "HorizontalSpeedMultiplier": 0,
+                      "Effects": {
+                        "MovementEffects": {
+                          "DisableJump": true,
+                          "DisableForward": true,
+                          "DisableBackward": true,
+                          "DisableLeft": true,
+                          "DisableRight": true,
+                          "DisableSprint": true
+                        }
+                      },
+                      "RunTime": 0.25
+                    }
+                  },
+                  "HorizontalSpeedMultiplier": 1
                 },
                 "Effects": {
                   "ItemAnimationId": "ShieldCapJumpFall",

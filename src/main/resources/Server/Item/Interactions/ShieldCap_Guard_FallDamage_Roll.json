@@ -40,7 +40,11 @@
       "Type": "Simple",
       "Effects": {
         "WorldSoundEventId": "SFX_ShieldCap_Catch"
-      }
-    }
-  }
+      },
+      "HorizontalSpeedMultiplier": 0,
+      "RunTime": 0.2
+    },
+    "HorizontalSpeedMultiplier": 0
+  },
+  "HorizontalSpeedMultiplier": 0
 }

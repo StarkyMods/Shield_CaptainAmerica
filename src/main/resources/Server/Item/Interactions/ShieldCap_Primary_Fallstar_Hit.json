@@ -10,57 +10,91 @@
     "Next": {
       "Type": "ShieldCap_Temporary_Fall_Protection_Arm_Java",
       "Next": {
-        "Type": "ApplyForce",
-        "Direction": {
-          "Z": -1,
-          "Y": -2
-        },
-        "Force": 25,
-        "AdjustVertical": false,
-        "VelocityConfig": {
-          "GroundResistance": 0.936,
-          "GroundResistanceMax": 0.928,
-          "AirResistance": 0.924,
-          "AirResistanceMax": 0.932,
-          "Threshold": 3,
-          "Style": "Linear"
-        },
-        "ChangeVelocityType": "Add",
-        "WaitForGround": true,
-        "WaitForCollision": false,
-        "Next": {
-          "Type": "ShieldCap_Temporary_Fall_Protection_Clear_Java",
-          "Next": "ShieldCap_Primary_Jump_Hit_Selector"
-        },
-        "Effects": {
-          "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
-          "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
-          "ItemAnimationId": "ShieldCapJumpFallStar",
-          "ClearAnimationOnFinish": false,
-          "CameraEffect": "ShieldCap_Jump_Falling_Camera",
-          "Particles": [
-            {
-              "SystemId": "Mace_Signature_Cast",
-              "DetachedFromModel": true,
-              "Scale": 0.2,
-              "RotationOffset": {}
-            }
-          ],
-          "Trails": [
-            {
-              "PositionOffset": {
-                "X": 0,
-                "Y": 0,
-                "Z": 0
-              },
-              "TargetNodeName": "Handle",
-              "TrailId": "Wind",
-              "RotationOffset": {
-                "Roll": 90.0
+        "Type": "Parallel",
+        "Interactions": [
+          {
+            "Interactions": [
+              {
+                "Type": "ApplyForce",
+                "Direction": {
+                  "Z": -1,
+                  "Y": -2
+                },
+                "Force": 25,
+                "AdjustVertical": false,
+                "VelocityConfig": {
+                  "GroundResistance": 0.936,
+                  "GroundResistanceMax": 0.928,
+                  "AirResistance": 0.924,
+                  "AirResistanceMax": 0.932,
+                  "Threshold": 3,
+                  "Style": "Linear"
+                },
+                "ChangeVelocityType": "Add",
+                "WaitForGround": true,
+                "WaitForCollision": false,
+                "Next": {
+                  "Type": "ShieldCap_Temporary_Fall_Protection_Clear_Java",
+                  "Next": "ShieldCap_Primary_Jump_Hit_Selector"
+                },
+                "Effects": {
+                  "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
+                  "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
+                  "ItemAnimationId": "ShieldCapJumpFallStar",
+                  "ClearAnimationOnFinish": false,
+                  "CameraEffect": "ShieldCap_Jump_Falling_Camera",
+                  "Particles": [
+                    {
+                      "SystemId": "Mace_Signature_Cast",
+                      "DetachedFromModel": true,
+                      "Scale": 0.2,
+                      "RotationOffset": {}
+                    }
+                  ],
+                  "Trails": [
+                    {
+                      "PositionOffset": {
+                        "X": 0,
+                        "Y": 0,
+                        "Z": 0
+                      },
+                      "TargetNodeName": "Handle",
+                      "TrailId": "Wind",
+                      "RotationOffset": {
+                        "Roll": 90.0
+                      }
+                    }
+                  ]
+                }
               }
-            }
-          ]
-        }
+            ]
+          },
+          {
+            "Interactions": [
+              {
+                "Type": "ApplyForce",
+                "WaitForGround": true,
+                "Camera": {
+                  "ThirdPerson": [
+                    {
+                      "Time": 2,
+                      "Position": {
+                        "Z": 3,
+                        "Y": 0.3,
+                        "X": 4
+                      },
+                      "Rotation": {
+                        "Roll": 0,
+                        "Pitch": -30,
+                        "Yaw": 30
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
       }
     },
     "StatModifiers": {

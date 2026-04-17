@@ -34,7 +34,7 @@
         "TargetEntityPart": "Entity",
         "TargetNodeName": "Hip",
         "PositionOffset": {
-          "Y": 0.1,
+          "Y": 0.02,
           "Z": 0
         },
         "Scale": 0.4
@@ -67,7 +67,10 @@
           "Roll": 0
         }
       }
-    ]
+    ],
+    "MovementEffects": {
+      "DisableAll": true
+    }
   },
   "Selector": {
     "Id": "AOECircle",
@@ -88,22 +91,49 @@
     ]
   },
   "Next": {
-    "Type": "ApplyForce",
-    "Direction": {
-      "Z": -2
-    },
-    "Force": 12,
-    "AdjustVertical": false,
-    "VelocityConfig": {
-      "GroundResistance": 0.936,
-      "GroundResistanceMax": 0.928,
-      "AirResistance": 0.924,
-      "AirResistanceMax": 0.932,
-      "Threshold": 3,
-      "Style": "Linear"
-    },
-    "ChangeVelocityType": "Add",
-    "WaitForGround": false,
-    "WaitForCollision": false
-  }
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "HorizontalSpeedMultiplier": 0,
+            "Effects": {},
+            "RunTime": 0.4
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "ApplyForce",
+            "Direction": {
+              "Z": -2
+            },
+            "Force": 12,
+            "AdjustVertical": false,
+            "VelocityConfig": {
+              "GroundResistance": 0.936,
+              "GroundResistanceMax": 0.928,
+              "AirResistance": 0.924,
+              "AirResistanceMax": 0.932,
+              "Threshold": 3,
+              "Style": "Linear"
+            },
+            "ChangeVelocityType": "Add",
+            "WaitForGround": false,
+            "WaitForCollision": false,
+            "HorizontalSpeedMultiplier": 0
+          }
+        ]
+      }
+    ],
+    "HorizontalSpeedMultiplier": 0,
+    "Effects": {
+      "MovementEffects": {
+        "DisableAll": true
+      }
+    }
+  },
+  "HorizontalSpeedMultiplier": 0
 }

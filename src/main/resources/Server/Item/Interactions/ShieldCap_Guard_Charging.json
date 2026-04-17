@@ -3,7 +3,8 @@
   "Next": {
     "0": {
       "Type": "RunRootInteraction",
-      "RootInteraction": "Root_ShieldCap_Secondary_Guard_Bash"
+      "RootInteraction": "Root_ShieldCap_Secondary_Guard_Bash",
+      "HorizontalSpeedMultiplier": 0
     },
     "1": {
       "Type": "RunRootInteraction",

@@ -12,6 +12,10 @@
     {
       "Type": "ShieldCap_Not_Sprinting_Condition_Java",
       "Next": "ShieldCap_Primary_Long_Swing_Spin_Right"
+    },
+    {
+      "Type": "ShieldCap_Not_Sprinting_Condition_Java",
+      "Next": "ShieldCap_Primary_Swing_Down"
     }
   ]
 }

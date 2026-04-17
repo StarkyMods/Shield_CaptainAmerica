@@ -9,8 +9,8 @@
       "RandomSettings": {
         "MinVolume": 0,
         "MaxVolume": 0,
-        "MinPitch": 0,
-        "MaxPitch": 0,
+        "MinPitch": -3,
+        "MaxPitch": 3,
         "MaxStartOffset": 0
       },
       "Files": [

@@ -44,6 +44,7 @@
   "Next": {
     "Type": "Simple",
     "RunTime": 0.5,
-    "HorizontalSpeedMultiplier": 0.05
-  }
+    "HorizontalSpeedMultiplier": 0
+  },
+  "HorizontalSpeedMultiplier": 0
 }

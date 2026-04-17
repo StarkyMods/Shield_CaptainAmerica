@@ -639,6 +639,15 @@
       "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Guard_Charged.blockyanim",
       "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Guard_Charged_FPS.blockyanim",
       "ClipsGeometry": true
+    },
+    "ShieldCapSwingDown": {
+      "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Swing_Down.blockyanim",
+      "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Swing_Down.blockyanim",
+      "ThirdPersonFace": "Characters/Animations/Expressions/Frown.blockyanim",
+      "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Swing_Down.blockyanim",
+      "KeepPreviousFirstPersonAnimation": true,
+      "Speed": 0.75,
+      "BlendingDuration": 0.1
     }
   },
   "Camera": {

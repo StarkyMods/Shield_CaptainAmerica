@@ -37,7 +37,8 @@
       "RunTime": 0.15
     },
     "Effects": {
-      "WorldSoundEventId": "SFX_ShieldCap_Swings"
+      "WorldSoundEventId": "SFX_ShieldCap_Swings",
+      "CameraEffect": "Sword_Swing_Diagonal_Right"
     }
   },
   "Effects": {

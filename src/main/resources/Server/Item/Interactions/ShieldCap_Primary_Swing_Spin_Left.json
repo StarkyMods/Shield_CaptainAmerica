@@ -38,12 +38,14 @@
     },
     "HorizontalSpeedMultiplier": 0.05,
     "Effects": {
-      "WorldSoundEventId": "SFX_ShieldCap_Swings"
+      "WorldSoundEventId": "SFX_ShieldCap_Swings",
+      "CameraEffect": "Sword_Swing_Diagonal_Right"
     }
   },
   "Effects": {
     "ItemAnimationId": "ShieldCapSwingSpinLeft",
-    "ClearAnimationOnFinish": false
+    "ClearAnimationOnFinish": false,
+    "CameraEffect": "Battleaxe_Swing_Diagonal_Left"
   },
   "HorizontalSpeedMultiplier": 0.05
 }
