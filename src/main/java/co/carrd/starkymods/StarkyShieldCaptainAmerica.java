@@ -38,12 +38,15 @@ import co.carrd.starkymods.interactions.ShieldCapThrowKickBlockImpact;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickImpact;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickRecentMarker;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickWindowCondition;
+import co.carrd.starkymods.interactions.ShieldCapReturnCallingAnimation;
 import co.carrd.starkymods.interactions.ShieldCapSignatureFuriousOnslaught;
 import co.carrd.starkymods.interactions.ShieldCapSignatureFuriousOnslaughtActiveCondition;
 import co.carrd.starkymods.interactions.ShieldCapSignatureFuriousOnslaughtTickSystem;
 import co.carrd.starkymods.interactions.ShieldCapFuriousOnslaughtTargetCooldown;
 import co.carrd.starkymods.interactions.ShieldCapInvulnerabilityClear;
 import co.carrd.starkymods.interactions.ShieldCapThrowHomingTickSystem;
+import co.carrd.starkymods.interactions.StarkyMjolnirDownstrikeBridge;
+import co.carrd.starkymods.interactions.StarkyMainHandCondition;
 import co.carrd.starkymods.interactions.StarkyPluginPresentCondition;
 import co.carrd.starkymods.listeners.ShieldCapPacketListener;
 import co.carrd.starkymods.listeners.ShieldCapUpdateCheckListener;
@@ -172,6 +175,11 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
                 ShieldCapPrimaryJumpHitCooldown.CODEC
         );
         getCodecRegistry(Interaction.CODEC).register(
+                "StarkyMjolnirDownstrikeBridge",
+                StarkyMjolnirDownstrikeBridge.class,
+                StarkyMjolnirDownstrikeBridge.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
                 "ShieldCap_Primary_Crouch_Chain_Cooldown_Java",
                 ShieldCapPrimaryCrouchChainCooldown.class,
                 ShieldCapPrimaryCrouchChainCooldown.CODEC
@@ -285,6 +293,16 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
                 "ShieldCap_Throw_Kick_Window_Java",
                 ShieldCapThrowKickWindowCondition.class,
                 ShieldCapThrowKickWindowCondition.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_Return_Calling_Animation_Java",
+                ShieldCapReturnCallingAnimation.class,
+                ShieldCapReturnCallingAnimation.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "StarkyMainHandCondition",
+                StarkyMainHandCondition.class,
+                StarkyMainHandCondition.CODEC
         );
         getCodecRegistry(Interaction.CODEC).register(
                 "StarkyPluginPresentCondition",

@@ -53,6 +53,7 @@
       "MjolnirThrowTrigger"
     ]
   },
+  "Reticle": "DefaultMelee",
   "Variant": true,
   "Utility": {
     "Usable": true

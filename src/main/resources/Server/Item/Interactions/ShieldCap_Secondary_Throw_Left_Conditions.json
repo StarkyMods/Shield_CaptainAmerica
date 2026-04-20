@@ -1,0 +1,22 @@
+{
+  "Type": "StatsCondition",
+  "Costs": {
+    "Stamina": 4
+  },
+  "ValueType": "Absolute",
+  "Next": {
+    "Type": "ChangeStat",
+    "StatModifiers": {
+      "Stamina": -4
+    },
+    "ValueType": "Absolute",
+    "Behaviour": "Add",
+    "Next": {
+      "Type": "ChangeStat",
+      "Next": "ShieldCap_Secondary_Throw_Left",
+      "StatModifiers": {
+        "StaminaRegenDelay": -1.5
+      }
+    }
+  }
+}

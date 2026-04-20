@@ -11,6 +11,12 @@
     },
     "ValueType": "Absolute",
     "Behaviour": "Add",
-    "Next": "ShieldCap_Primary_Throw"
+    "Next": {
+      "Type": "ChangeStat",
+      "Next": "ShieldCap_Primary_Throw",
+      "StatModifiers": {
+        "StaminaRegenDelay": -1.5
+      }
+    }
   }
 }

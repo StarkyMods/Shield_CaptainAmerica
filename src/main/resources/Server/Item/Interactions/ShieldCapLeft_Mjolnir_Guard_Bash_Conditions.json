@@ -1,0 +1,11 @@
+{
+  "Type": "StarkyMjolnirDownstrikeBridge",
+  "Failed": {
+    "Type": "StatsCondition",
+    "Next": "ShieldCapLeft_Mjolnir_Guard_Bash",
+    "Costs": {
+      "Stamina": 7
+    },
+    "Failed": "ShieldCapLeft_Chain"
+  }
+}

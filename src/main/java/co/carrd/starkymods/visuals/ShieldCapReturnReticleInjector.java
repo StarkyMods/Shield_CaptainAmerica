@@ -19,7 +19,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public final class ShieldCapReturnReticleInjector {
     private static final String RETURN_WINDOW_EVENT_TAG = "ShieldCap_ReturnWindow";
-    private static final String RETURN_WINDOW_RETICLE_PART = "UI/Reticles/Melee.png";
+    private static final String RETURN_WINDOW_RETICLE_PART = "UI/Reticles/StarkySquare.png";
     private static final float RETURN_WINDOW_DURATION_SECONDS = 0.14f;
 
     private static Field serverEventsField;

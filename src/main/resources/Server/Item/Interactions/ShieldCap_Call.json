@@ -6,11 +6,7 @@
     "Interactions": [
       "ShieldCap_Thrown_Force_Return",
       {
-        "Type": "Simple",
-        "Effects": {
-          "ItemAnimationId": "ShieldCapCalling"
-        },
-        "CancelOnItemChange": true
+        "Type": "ShieldCap_Return_Calling_Animation_Java"
       }
     ]
   },

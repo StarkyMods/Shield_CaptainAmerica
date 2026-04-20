@@ -51,6 +51,15 @@
       "Speed": 1.3,
       "BlendingDuration": 0.13,
       "Looping": false
+    },
+    "ShieldCapCallingLeft": {
+      "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Call_Left.blockyanim",
+      "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Call_Left.blockyanim",
+      "Speed": 1,
+      "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Call_Left_FPS.blockyanim",
+      "ThirdPersonFace": "Characters/Animations/Expressions/Frown.blockyanim",
+      "Looping": true,
+      "KeepPreviousFirstPersonAnimation": true
     }
   }
 }

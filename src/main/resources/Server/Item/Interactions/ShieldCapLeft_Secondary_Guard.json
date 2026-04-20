@@ -1,0 +1,31 @@
+{
+  "Type": "StatsCondition",
+  "Costs": {
+    "Stamina": 0.3
+  },
+  "Next": {
+    "Type": "EffectCondition",
+    "EntityEffectIds": [
+      "Stamina_Broken"
+    ],
+    "Match": "None",
+    "Next": {
+      "Type": "Serial",
+      "Interactions": [
+        {
+          "Type": "ChangeStat",
+          "StatModifiers": {
+            "Stamina": -0.3
+          }
+        },
+        {
+          "Type": "StarkyMainHandCondition",
+          "Item in Main Hand": "Weapon_Mjolnir_Starky",
+          "Failed": "ShieldCapLeft_Secondary_Guard_Wield",
+          "Next": "ShieldCapLeft_Mjolnir_Secondary_Guard_Wield"
+        }
+      ]
+    },
+    "Failed": "Common_Stamina_Insufficient"
+  }
+}

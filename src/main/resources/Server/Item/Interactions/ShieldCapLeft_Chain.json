@@ -1,0 +1,9 @@
+{
+  "Type": "Chaining",
+  "ChainingAllowance": 2,
+  "ChainId": "ShieldCapLeft_Swings",
+  "HorizontalSpeedMultiplier": 0,
+  "Next": [
+    "ShieldCapLeft_Secondary_Long_Swing_Spin_Left_Conditions"
+  ]
+}

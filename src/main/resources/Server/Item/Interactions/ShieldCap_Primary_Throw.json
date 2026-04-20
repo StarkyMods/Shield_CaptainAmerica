@@ -17,34 +17,7 @@
         "WorldSoundEventId": "SFX_ShieldCap_Swings"
       },
       "Next": {
-        "Type": "ShieldCap_Throw_Homing_Launch_Config_Projectile",
-        "Config": "ShieldCap_ProjectileConfig",
-        "Next": {
-          "Type": "Simple",
-          "RunTime": 0.02,
-          "Next": {
-            "Type": "ShieldCap_Throw_Homing_Mark_Projectile",
-            "Next": {
-              "Type": "Simple",
-              "RunTime": 0.03,
-              "Next": {
-                "Type": "ShieldCap_Throw_Homing_Mark_Projectile",
-                "Next": {
-                  "Type": "ShieldCap_Throw",
-                  "Next": {
-                    "Type": "ApplyEffect",
-                    "EffectId": "ShieldCap_Call_Cooldown",
-                    "Next": {
-                      "Type": "ModifyInventory",
-                      "AdjustHeldItemDurability": -0.21,
-                      "RequiredGameMode": "Adventure"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        "Type": "ShieldCap_Throw"
       }
     }
   ]

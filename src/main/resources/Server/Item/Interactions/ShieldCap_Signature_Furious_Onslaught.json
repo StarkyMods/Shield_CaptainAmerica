@@ -17,65 +17,92 @@
     "Behaviour": "Add",
     "RunTime": 0,
     "Next": {
-      "Type": "Parallel",
-      "Interactions": [
-        {
-          "Interactions": [
-            {
-              "Type": "Simple",
-              "RunTime": 10.0,
-              "Effects": {
-                "ItemAnimationId": "ShieldCapFuriousOnslaught",
-                "ClearAnimationOnFinish": true
-              },
-              "CancelOnItemChange": true,
-              "Camera": {
-                "ThirdPerson": [
-                  {
-                    "Position": {
-                      "Z": -1.2,
-                      "Y": -0.1,
-                      "X": -0.3
-                    },
-                    "Rotation": {
-                      "Roll": 0,
-                      "Yaw": 0,
-                      "Pitch": 0
+      "Type": "ChangeStat",
+      "StatModifiers": {
+        "Stamina": 10
+      },
+      "Next": {
+        "Type": "Parallel",
+        "Interactions": [
+          {
+            "Interactions": [
+              {
+                "Type": "Simple",
+                "RunTime": 10.0,
+                "Effects": {
+                  "ItemAnimationId": "ShieldCapFuriousOnslaught",
+                  "ClearAnimationOnFinish": true
+                },
+                "CancelOnItemChange": true,
+                "Camera": {
+                  "ThirdPerson": [
+                    {
+                      "Position": {
+                        "Z": -1.2,
+                        "Y": -0.1,
+                        "X": -0.3
+                      },
+                      "Rotation": {
+                        "Roll": 0,
+                        "Yaw": 0,
+                        "Pitch": 0
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "Interactions": [
+              {
+                "Type": "ShieldCap_Signature_Furious_Onslaught_Java",
+                "DurationSeconds": 10.0,
+                "SprintSpeed": 90.0,
+                "UseVelocityConfig": false,
+                "GroundSpeedMultiplier": 1.0,
+                "AirSpeedMultiplier": 0.01,
+                "GroundResistance": 0.936,
+                "GroundResistanceMax": 0.928,
+                "AirResistance": 0.924,
+                "AirResistanceMax": 0.932,
+                "Threshold": 3.0,
+                "ResistanceStyle": "Linear"
+              }
+            ]
+          },
+          {
+            "Interactions": [
+              {
+                "Type": "ApplyEffect",
+                "EffectId": "ShieldCap_Furious_Onslaught_Screen",
+                "RunTime": 0
+              }
+            ]
+          },
+          {
+            "Interactions": [
+              {
+                "Type": "Simple",
+                "RunTime": 5,
+                "Next": {
+                  "Type": "ChangeStat",
+                  "StatModifiers": {
+                    "Stamina": 10
+                  },
+                  "RunTime": 5,
+                  "Next": {
+                    "Type": "ChangeStat",
+                    "StatModifiers": {
+                      "Stamina": 10
                     }
                   }
-                ]
+                }
               }
-            }
-          ]
-        },
-        {
-          "Interactions": [
-            {
-              "Type": "ShieldCap_Signature_Furious_Onslaught_Java",
-              "DurationSeconds": 10.0,
-              "SprintSpeed": 90.0,
-              "UseVelocityConfig": false,
-              "GroundSpeedMultiplier": 1.0,
-              "AirSpeedMultiplier": 0.01,
-              "GroundResistance": 0.936,
-              "GroundResistanceMax": 0.928,
-              "AirResistance": 0.924,
-              "AirResistanceMax": 0.932,
-              "Threshold": 3.0,
-              "ResistanceStyle": "Linear"
-            }
-          ]
-        },
-        {
-          "Interactions": [
-            {
-              "Type": "ApplyEffect",
-              "EffectId": "ShieldCap_Furious_Onslaught_Screen",
-              "RunTime": 0
-            }
-          ]
-        }
-      ]
+            ]
+          }
+        ]
+      }
     }
   }
 }

@@ -18,60 +18,78 @@
   "Next": {
     "Type": "ChangeStat",
     "StatModifiers": {
-      "Stamina": -2
+      "Stamina": -3.6
     },
     "HorizontalSpeedMultiplier": 0,
     "Next": {
-      "Type": "Simple",
-      "RunTime": 0.5,
-      "Rules": {
-        "Blocking": [
-          "Wielding",
-          "Primary",
-          "Secondary",
-          "Ability1",
-          "Ability2",
-          "Ability3"
-        ]
-      },
-      "Effects": {
-        "MovementEffects": {
-          "DisableAll": true,
-          "DisableForward": true,
-          "DisableBackward": true,
-          "DisableLeft": true,
-          "DisableRight": true,
-          "DisableSprint": true,
-          "DisableJump": true,
-          "DisableCrouch": true
-        }
-      },
+      "Type": "ChangeStat",
       "Next": {
-        "Type": "ChangeStat",
-        "Behaviour": "Set",
-        "StatModifiers": {
-          "StaminaRegenDelay": -1.5
+        "Type": "Simple",
+        "RunTime": 0.5,
+        "Rules": {
+          "Blocking": [
+            "Wielding",
+            "Primary",
+            "Secondary",
+            "Ability1",
+            "Ability2",
+            "Ability3"
+          ]
+        },
+        "Effects": {
+          "MovementEffects": {
+            "DisableAll": true,
+            "DisableForward": true,
+            "DisableBackward": true,
+            "DisableLeft": true,
+            "DisableRight": true,
+            "DisableSprint": true,
+            "DisableJump": true,
+            "DisableCrouch": true
+          }
         },
         "Next": {
-          "Type": "ApplyForce",
-          "Next": "ShieldCap_Secondary_Guard_Bash_Selector",
-          "Direction": {
-            "Z": -1
+          "Type": "ChangeStat",
+          "Behaviour": "Set",
+          "StatModifiers": {
+            "StaminaRegenDelay": -1.5
           },
-          "Force": 20,
-          "AdjustVertical": true,
-          "VelocityConfig": {
-            "GroundResistance": 0.936,
-            "GroundResistanceMax": 0.928,
-            "AirResistance": 0.924,
-            "AirResistanceMax": 0.932,
-            "Threshold": 3,
-            "Style": "Linear"
+          "Next": {
+            "Type": "ApplyForce",
+            "Next": "ShieldCap_Secondary_Guard_Bash_Selector",
+            "Direction": {
+              "Z": -1
+            },
+            "Force": 20,
+            "AdjustVertical": true,
+            "VelocityConfig": {
+              "GroundResistance": 0.936,
+              "GroundResistanceMax": 0.928,
+              "AirResistance": 0.924,
+              "AirResistanceMax": 0.932,
+              "Threshold": 3,
+              "Style": "Linear"
+            },
+            "ChangeVelocityType": "Add",
+            "WaitForGround": false,
+            "WaitForCollision": false,
+            "Effects": {
+              "MovementEffects": {
+                "DisableAll": true,
+                "DisableForward": true,
+                "DisableBackward": true,
+                "DisableLeft": true,
+                "DisableRight": true,
+                "DisableSprint": true,
+                "DisableJump": true,
+                "DisableCrouch": true
+              }
+            },
+            "HorizontalSpeedMultiplier": 0
           },
-          "ChangeVelocityType": "Add",
-          "WaitForGround": false,
-          "WaitForCollision": false,
           "Effects": {
+            "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
+            "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
             "MovementEffects": {
               "DisableAll": true,
               "DisableForward": true,
@@ -85,23 +103,12 @@
           },
           "HorizontalSpeedMultiplier": 0
         },
-        "Effects": {
-          "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
-          "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
-          "MovementEffects": {
-            "DisableAll": true,
-            "DisableForward": true,
-            "DisableBackward": true,
-            "DisableLeft": true,
-            "DisableRight": true,
-            "DisableSprint": true,
-            "DisableJump": true,
-            "DisableCrouch": true
-          }
-        },
         "HorizontalSpeedMultiplier": 0
       },
-      "HorizontalSpeedMultiplier": 0
+      "StatModifiers": {
+        "StaminaRegenDelay": -1
+      },
+      "Behaviour": "Set"
     }
   },
   "HorizontalSpeedMultiplier": 0

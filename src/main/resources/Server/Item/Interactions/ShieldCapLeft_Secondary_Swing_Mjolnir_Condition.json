@@ -1,0 +1,6 @@
+{
+  "Type": "StarkyMainHandCondition",
+  "Item in Main Hand": "Weapon_Mjolnir_Starky",
+  "Next": "Mjolnir_Downstrike_OSC",
+  "Failed": "ShieldCapLeft_Secondary_Long_Swing_Spin_Left"
+}

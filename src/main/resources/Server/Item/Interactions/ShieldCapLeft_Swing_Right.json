@@ -1,0 +1,42 @@
+{
+  "Type": "Simple",
+  "RunTime": 0.1,
+  "Next": {
+    "Type": "Selector",
+    "$Comment": "Length of Combat",
+    "RunTime": 0.15,
+    "Selector": {
+      "Id": "Horizontal",
+      "Direction": "ToRight",
+      "TestLineOfSight": true,
+      "ExtendTop": 0.5,
+      "ExtendBottom": 0.5,
+      "StartDistance": 0.1,
+      "EndDistance": 2.5,
+      "Length": 120,
+      "RollOffset": -50,
+      "YawStartOffset": -45
+    },
+    "HitEntity": {
+      "Interactions": [
+        {
+          "Type": "Replace",
+          "DefaultValue": {
+            "Interactions": [
+              "ShieldCapLeft_Swing_Damage"
+            ]
+          },
+          "Var": "Left_Swing_Right_Damage",
+          "DefaultOk": true
+        }
+      ]
+    },
+    "IgnoreOwner": true,
+    "Effects": {
+      "WorldSoundEventId": "SFX_ShieldCap_Swings"
+    }
+  },
+  "Effects": {
+    "ItemAnimationId": "ShieldCapLeftSwingRight"
+  }
+}

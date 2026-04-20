@@ -3,7 +3,7 @@
   "Next": {
     "Type": "ChangeStat",
     "StatModifiers": {
-      "Stamina": -3
+      "Stamina": -3.3
     },
     "Effects": {
       "ItemAnimationId": "ShieldCapKickPush",
@@ -91,7 +91,7 @@
     "HorizontalSpeedMultiplier": 0
   },
   "Costs": {
-    "Stamina": 3
+    "Stamina": 3.3
   },
   "ValueType": "Absolute",
   "HorizontalSpeedMultiplier": 0

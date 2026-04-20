@@ -69,7 +69,7 @@
     ]
   },
   "BlockedEffects": {
-    "WorldSoundEventId": "SFX_Shield_T2_Impact",
+    "WorldSoundEventId": "SFX_ShieldCap_BackShieldHit",
     "WorldParticles": [
       {
         "SystemId": "Shield_Block"

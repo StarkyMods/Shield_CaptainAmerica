@@ -1,0 +1,12 @@
+{
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemAnimationId": "ShieldCapCallingLeft"
+      },
+      "CancelOnItemChange": true
+    }
+  ],
+  "RequireNewClick": false
+}

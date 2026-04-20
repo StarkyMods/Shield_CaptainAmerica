@@ -29,6 +29,7 @@ public class ShieldCapThrowHomingMarkProjectile extends SimpleInstantInteraction
     private static final double FALLBACK_SCAN_RANGE = 6.0;
     private static final double FALLBACK_SCAN_HEIGHT = 18.0;
     private static final double FALLBACK_MIN_SPEED = 8.0;
+    private static final String SHIELDCAP_PROJECTILE_ASSET_ID = "ShieldCap_Projectile";
 
     @Nonnull
     public static final BuilderCodec<ShieldCapThrowHomingMarkProjectile> CODEC =
@@ -177,6 +178,18 @@ public class ShieldCapThrowHomingMarkProjectile extends SimpleInstantInteraction
                                        Ref<EntityStore> ref) {
         if (ref == null || !ref.isValid()) {
             return false;
+        }
+
+        ProjectileComponent projectileComponent =
+                commandBuffer.getComponent(ref, ProjectileComponent.getComponentType());
+        if (projectileComponent != null) {
+            String projectileAssetName = projectileComponent.getProjectileAssetName();
+            if (SHIELDCAP_PROJECTILE_ASSET_ID.equals(projectileAssetName)) {
+                return true;
+            }
+            if (projectileAssetName != null && !projectileAssetName.isBlank()) {
+                return false;
+            }
         }
 
         StandardPhysicsProvider provider =

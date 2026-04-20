@@ -1,0 +1,24 @@
+{
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "RunTime": 0.02,
+      "Next": {
+        "Type": "ShieldCap_Throw_Homing_Enable"
+      }
+    },
+    {
+      "Type": "Simple",
+      "RunTime": 0.01,
+      "Effects": {
+        "ItemAnimationId": "ShieldCapChargedLeft",
+        "ClearAnimationOnFinish": false,
+        "WorldSoundEventId": "SFX_ShieldCap_Swings"
+      },
+      "Next": {
+        "Type": "ShieldCap_Throw"
+      }
+    }
+  ]
+}

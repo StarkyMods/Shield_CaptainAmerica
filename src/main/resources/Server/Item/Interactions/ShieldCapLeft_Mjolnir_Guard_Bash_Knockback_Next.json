@@ -1,0 +1,19 @@
+{
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "RunTime": 0.2
+    },
+    {
+      "Type": "Replace",
+      "Var": "Guard_Dash_Mjolnir_Damage",
+      "DefaultOk": true,
+      "DefaultValue": {
+        "Interactions": [
+          "ShieldCapLeft_Mjolnir_Guard_Bash_Damage"
+        ]
+      }
+    }
+  ]
+}

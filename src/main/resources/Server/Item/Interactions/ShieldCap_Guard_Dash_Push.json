@@ -1,95 +1,101 @@
 {
   "Type": "StatsCondition",
   "Costs": {
-    "Stamina": 3
+    "Stamina": 5.5
   },
   "ValueType": "Absolute",
   "Next": {
     "Type": "ChangeStat",
-    "Next": {
-      "Type": "Parallel",
-      "Interactions": [
-        {
-          "Interactions": [
-            {
-              "Type": "ApplyForce",
-              "Direction": {
-                "Z": -10,
-                "Y": 0.4
-              },
-              "Force": 50,
-              "AdjustVertical": true,
-              "VelocityConfig": {
-                "AirResistance": 0.96,
-                "AirResistanceMax": 0.97,
-                "GroundResistance": 0.94,
-                "GroundResistanceMax": 0.82,
-                "Threshold": 3,
-                "Style": "Exp"
-              },
-              "ChangeVelocityType": "Add",
-              "WaitForGround": true,
-              "WaitForCollision": false,
-              "Effects": {
-                "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
-                "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
-                "Trails": [
-                  {
-                    "PositionOffset": {
-                      "X": 0,
-                      "Y": 0,
-                      "Z": 0
-                    },
-                    "TargetNodeName": "Handle",
-                    "TrailId": "Wind",
-                    "RotationOffset": {
-                      "Roll": 90.0
-                    }
-                  }
-                ],
-                "ItemAnimationId": "ShieldCapGuardCharged",
-                "ClearAnimationOnFinish": true
-              },
-              "VerticalClamp": [
-                -80,
-                25
-              ]
-            }
-          ]
-        },
-        {
-          "Interactions": [
-            {
-              "Type": "Selector",
-              "Selector": {
-                "Id": "Stab",
-                "TestLineOfSight": true,
-                "EndDistance": 3.2
-              },
-              "HitEntity": {
-                "Interactions": [
-                  {
-                    "Type": "Replace",
-                    "Var": "Guard_Dash_Push_Knockback",
-                    "DefaultOk": true,
-                    "DefaultValue": {
-                      "Interactions": [
-                        "ShieldCap_Secondary_Guard_Bash_Damage"
-                      ]
-                    }
-                  }
-                ]
-              },
-              "RunTime": 0.4
-            }
-          ]
-        }
-      ]
-    },
     "StatModifiers": {
-      "Stamina": -3
+      "Stamina": -5.5
     },
     "Behaviour": "Add",
-    "ValueType": "Absolute"
+    "ValueType": "Absolute",
+    "Next": {
+      "Type": "ChangeStat",
+      "Next": {
+        "Type": "Parallel",
+        "Interactions": [
+          {
+            "Interactions": [
+              {
+                "Type": "ApplyForce",
+                "Direction": {
+                  "Z": -10,
+                  "Y": 0.4
+                },
+                "Force": 50,
+                "AdjustVertical": true,
+                "VelocityConfig": {
+                  "AirResistance": 0.96,
+                  "AirResistanceMax": 0.97,
+                  "GroundResistance": 0.94,
+                  "GroundResistanceMax": 0.82,
+                  "Threshold": 3,
+                  "Style": "Exp"
+                },
+                "ChangeVelocityType": "Add",
+                "WaitForGround": true,
+                "WaitForCollision": false,
+                "Effects": {
+                  "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
+                  "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
+                  "Trails": [
+                    {
+                      "PositionOffset": {
+                        "X": 0,
+                        "Y": 0,
+                        "Z": 0
+                      },
+                      "TargetNodeName": "Handle",
+                      "TrailId": "Wind",
+                      "RotationOffset": {
+                        "Roll": 90.0
+                      }
+                    }
+                  ],
+                  "ItemAnimationId": "ShieldCapGuardCharged",
+                  "ClearAnimationOnFinish": true
+                },
+                "VerticalClamp": [
+                  -80,
+                  25
+                ]
+              }
+            ]
+          },
+          {
+            "Interactions": [
+              {
+                "Type": "Selector",
+                "Selector": {
+                  "Id": "Stab",
+                  "TestLineOfSight": true,
+                  "EndDistance": 3.2
+                },
+                "HitEntity": {
+                  "Interactions": [
+                    {
+                      "Type": "Replace",
+                      "Var": "Guard_Dash_Push_Knockback",
+                      "DefaultOk": true,
+                      "DefaultValue": {
+                        "Interactions": [
+                          "ShieldCap_Secondary_Guard_Bash_Damage"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "RunTime": 0.4
+              }
+            ]
+          }
+        ]
+      },
+      "StatModifiers": {
+        "StaminaRegenDelay": -2
+      }
+    }
   }
 }

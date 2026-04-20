@@ -1,0 +1,23 @@
+{
+  "Type": "Charging",
+  "DisplayProgress": true,
+  "AllowIndefiniteHold": true,
+  "Effects": {
+    "ItemAnimationId": "ShieldCapChargingLeft",
+    "ClearAnimationOnFinish": true
+  },
+  "Next": {
+    "0": {
+      "Type": "Condition",
+      "Crouching": true,
+      "Failed": {
+        "Type": "StarkyMainHandCondition",
+        "Item in Main Hand": "Weapon_Mjolnir_Starky",
+        "Failed": "ShieldCapLeft_Chain",
+        "Next": "ShieldCapLeft_Mjolnir_Guard_Bash_Conditions"
+      },
+      "Next": "ShieldCapLeft_Chain"
+    },
+    "0.5": "ShieldCap_Secondary_Throw_Left_Conditions"
+  }
+}

@@ -11,6 +11,7 @@
       "RelativeX": 0,
       "RelativeZ": -5,
       "VelocityY": 5
-    }
+    },
+    "WorldSoundEventId": "SFX_Light_Melee_T2_Guard_Break"
   }
 }

@@ -529,6 +529,24 @@
       "Interactions": [
         "ShieldCap_Primary_Jump_Charging"
       ]
+    },
+    "Long_Swing_Spin_Left_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCapLeft_Swing_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 26
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 12
+            }
+          ]
+        }
+      ]
     }
   },
   "SoundEventId": "SFX_ShieldCap_Held"

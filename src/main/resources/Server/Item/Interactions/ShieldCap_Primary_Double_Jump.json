@@ -1,40 +1,47 @@
 {
   "Type": "StatsCondition",
   "Costs": {
-    "Stamina": 2
+    "Stamina": 3.3
   },
   "ValueType": "Absolute",
   "Failed": "ShieldCap_Primary_Swing_Left",
   "Next": {
     "Type": "ChangeStat",
     "Next": {
-      "Type": "ApplyForce",
-      "Direction": {
-        "Z": -2,
-        "Y": 4
+      "Type": "ChangeStat",
+      "Next": {
+        "Type": "ApplyForce",
+        "Direction": {
+          "Z": -2,
+          "Y": 4
+        },
+        "Force": 20,
+        "AdjustVertical": false,
+        "VelocityConfig": {
+          "GroundResistance": 0.936,
+          "GroundResistanceMax": 0.928,
+          "AirResistance": 0.924,
+          "AirResistanceMax": 0.932,
+          "Threshold": 3,
+          "Style": "Linear"
+        },
+        "ChangeVelocityType": "Add",
+        "WaitForGround": false,
+        "WaitForCollision": false,
+        "Effects": {
+          "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
+          "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
+          "ItemAnimationId": "ShieldCapFrontFlip",
+          "ClearAnimationOnFinish": false
+        }
       },
-      "Force": 20,
-      "AdjustVertical": false,
-      "VelocityConfig": {
-        "GroundResistance": 0.936,
-        "GroundResistanceMax": 0.928,
-        "AirResistance": 0.924,
-        "AirResistanceMax": 0.932,
-        "Threshold": 3,
-        "Style": "Linear"
+      "StatModifiers": {
+        "StaminaRegenDelay": -1.5
       },
-      "ChangeVelocityType": "Add",
-      "WaitForGround": false,
-      "WaitForCollision": false,
-      "Effects": {
-        "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
-        "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local",
-        "ItemAnimationId": "ShieldCapFrontFlip",
-        "ClearAnimationOnFinish": false
-      }
+      "Behaviour": "Set"
     },
     "StatModifiers": {
-      "Stamina": -2
+      "Stamina": -3.3
     },
     "Behaviour": "Add",
     "ValueType": "Absolute"

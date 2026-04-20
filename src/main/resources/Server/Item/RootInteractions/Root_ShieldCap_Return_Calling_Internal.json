@@ -1,11 +1,7 @@
 {
   "Interactions": [
     {
-      "Type": "Simple",
-      "Effects": {
-        "ItemAnimationId": "ShieldCapCalling"
-      },
-      "CancelOnItemChange": true
+      "Type": "ShieldCap_Return_Calling_Animation_Java"
     }
   ],
   "RequireNewClick": false

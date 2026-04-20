@@ -6,7 +6,7 @@
     {
       "Type": "StatsCondition",
       "Costs": {
-        "Stamina": 2
+        "Stamina": 3
       },
       "ValueType": "Absolute",
       "Next": "ShieldCap_Primary_Crouch_Swing_Spin_Right",
@@ -15,7 +15,7 @@
     {
       "Type": "StatsCondition",
       "Costs": {
-        "Stamina": 2
+        "Stamina": 5
       },
       "ValueType": "Absolute",
       "Next": "ShieldCap_Primary_Crouch_UpperCut",

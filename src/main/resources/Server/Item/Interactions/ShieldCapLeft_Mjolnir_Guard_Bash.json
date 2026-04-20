@@ -1,0 +1,188 @@
+{
+  "Type": "Simple",
+  "Effects": {
+    "ItemAnimationId": "ShieldCapLeftMjolnirGuardBashCharging",
+    "Particles": [
+      {
+        "PositionOffset": {
+          "X": 0.6,
+          "Y": 0,
+          "Z": 0
+        },
+        "RotationOffset": {
+          "Pitch": 0,
+          "Roll": 90,
+          "Yaw": 0
+        },
+        "TargetNodeName": "Handle",
+        "SystemId": "Mjolnir_Charging",
+        "Color": "#cff8ff"
+      },
+      {
+        "PositionOffset": {
+          "X": 0.075,
+          "Y": -0.4,
+          "Z": 0.075
+        },
+        "RotationOffset": {
+          "Pitch": 0,
+          "Roll": 0,
+          "Yaw": 90
+        },
+        "Scale": 0.5,
+        "TargetNodeName": "Handle",
+        "SystemId": "Bow_Charging"
+      }
+    ],
+    "WorldSoundEventId": "SFX_Bow_T2_Draw",
+    "LocalSoundEventId": "SFX_Bow_T2_Draw_Local",
+    "Trails": [
+      {
+        "PositionOffset": {
+          "X": 0.6,
+          "Z": 0,
+          "Y": 0
+        },
+        "TargetNodeName": "Handle",
+        "TrailId": "Wind",
+        "RotationOffset": {
+          "Roll": 90.0
+        }
+      }
+    ],
+    "ClearSoundEventOnFinish": true,
+    "ClearAnimationOnFinish": true
+  },
+  "HorizontalSpeedMultiplier": 0.8,
+  "CancelOnItemChange": true,
+  "RunTime": 0.8,
+  "Next": {
+    "Type": "ChangeStat",
+    "StatModifiers": {
+      "Stamina": -7
+    },
+    "Next": {
+      "Type": "Parallel",
+      "Interactions": [
+        {
+          "Interactions": [
+            {
+              "Type": "Selector",
+              "Selector": {
+                "Id": "Horizontal",
+                "TestLineOfSight": true,
+                "Length": 240,
+                "Direction": "ToLeft",
+                "EndDistance": 25,
+                "ExtendTop": 8,
+                "ExtendBottom": 8,
+                "StartDistance": -1
+              },
+              "RunTime": 0.15,
+              "HitEntity": {
+                "Interactions": [
+                  {
+                    "Type": "Replace",
+                    "Var": "Guard_Bash_Mjolnir_Knockback",
+                    "DefaultOk": true,
+                    "DefaultValue": {
+                      "Interactions": [
+                        "ShieldCapLeft_Mjolnir_Guard_Bash_Knockback"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "Next": {
+                "Type": "ChangeStat",
+                "StatModifiers": {
+                  "StaminaRegenDelay": -1.5
+                },
+                "Behaviour": "Set",
+                "ValueType": "Absolute"
+              },
+              "Effects": {
+                "Particles": [
+                  {
+                    "SystemId": "ShieldCap_Mjolnir_Explosion2",
+                    "TargetEntityPart": "PrimaryItem"
+                  },
+                  {
+                    "SystemId": "Hedera_Scream",
+                    "TargetEntityPart": "PrimaryItem",
+                    "Scale": 2
+                  },
+                  {
+                    "SystemId": "Daggers_Bash",
+                    "TargetEntityPart": "PrimaryItem",
+                    "TargetNodeName": "Handle",
+                    "RotationOffset": {
+                      "Yaw": 180,
+                      "Pitch": 0,
+                      "Roll": 0
+                    }
+                  },
+                  {
+                    "SystemId": "Daggers_Bash",
+                    "TargetEntityPart": "SecondaryItem",
+                    "TargetNodeName": "Handle",
+                    "RotationOffset": {
+                      "Yaw": -180,
+                      "Pitch": 0,
+                      "Roll": 0
+                    }
+                  }
+                ],
+                "FirstPersonParticles": [
+                  {
+                    "SystemId": "ShieldCap_Mjolnir_Explosion2",
+                    "Scale": 1
+                  },
+                  {
+                    "SystemId": "Hedera_Scream",
+                    "TargetEntityPart": "PrimaryItem"
+                  },
+                  {
+                    "SystemId": "Daggers_Bash",
+                    "TargetEntityPart": "PrimaryItem",
+                    "TargetNodeName": "Handle",
+                    "RotationOffset": {
+                      "Yaw": 180,
+                      "Pitch": 0,
+                      "Roll": 0
+                    }
+                  },
+                  {
+                    "SystemId": "Daggers_Bash",
+                    "TargetEntityPart": "SecondaryItem",
+                    "TargetNodeName": "Handle",
+                    "RotationOffset": {
+                      "Yaw": -180,
+                      "Pitch": 0,
+                      "Roll": 0
+                    }
+                  }
+                ],
+                "CameraEffect": "ShieldCap_Big_Hit_Camera",
+                "WorldSoundEventId": "SFX_ShieldCapLeft_Mjolnir_Guard_Bash"
+              }
+            }
+          ]
+        },
+        {
+          "Interactions": [
+            {
+              "Type": "LaunchProjectile",
+              "ProjectileId": "ShieldCap_Mjolnir_Guard_Bash_Effect"
+            }
+          ]
+        }
+      ]
+    },
+    "Effects": {
+      "ItemAnimationId": "ShieldCapLeftMjolnirGuardBashCharged",
+      "ClearAnimationOnFinish": false
+    },
+    "RunTime": 0.06
+  }
+}

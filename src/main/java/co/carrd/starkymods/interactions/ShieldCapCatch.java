@@ -32,10 +32,13 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.PositionUtil;
 
 public final class ShieldCapCatch extends SimpleInstantInteraction {
+    private static final boolean DEBUG = true;
+    private static final String LOG_PREFIX = "[ShieldCapCatchDebug] ";
     private static final String THROWN_ITEM_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String RETURNED_ITEM_ID = "Weapon_Shield_CaptainAmerica_Starky";
     private static final String CATCH_SOUND_ID = "SFX_ShieldCap_Catch";
-    private static final long[] CALLING_ANIMATION_CLEAR_RETRY_DELAYS_MS = new long[] {500L, 650L, 800L};
+    private static final long[] CALLING_ANIMATION_CLEAR_RETRY_DELAYS_MS =
+            new long[] {0L, 100L, 250L, 500L, 650L, 800L, 1000L, 1250L};
 
     @Nonnull
     public static final BuilderCodec<ShieldCapCatch> CODEC =
@@ -77,19 +80,24 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
         }
 
         Inventory inventory = player.getInventory();
-        boolean restored = restoreInContainer(inventory.getHotbar());
-        if (!restored) {
-            restored = restoreInContainer(inventory.getUtility());
+        String restoredContainer = restoreInContainer(inventory.getHotbar(), "hotbar");
+        if (restoredContainer == null) {
+            restoredContainer = restoreInContainer(inventory.getUtility(), "utility");
         }
-        if (!restored) {
-            restored = restoreInContainer(inventory.getStorage());
+        if (restoredContainer == null) {
+            restoredContainer = restoreInContainer(inventory.getStorage(), "storage");
         }
-        if (!restored) {
-            restored = restoreInContainer(inventory.getBackpack());
+        if (restoredContainer == null) {
+            restoredContainer = restoreInContainer(inventory.getBackpack(), "backpack");
         }
-        if (!restored) {
-            restored = restoreInContainer(inventory.getTools());
+        if (restoredContainer == null) {
+            restoredContainer = restoreInContainer(inventory.getTools(), "tools");
         }
+        boolean restored = restoredContainer != null;
+        debug("restoreToOwnerAndRemoveProjectile | owner=" + getEntityUuid(store, ownerRef)
+                + " | projectile=" + getEntityUuid(store, projectileRef)
+                + " | restored=" + restored
+                + " | container=" + restoredContainer);
 
         if (!restored || projectileRef == null || !projectileRef.isValid()) {
             if (restored) {
@@ -187,9 +195,9 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
         return uuidComponent == null ? null : uuidComponent.getUuid();
     }
 
-    private static boolean restoreInContainer(ItemContainer container) {
+    private static String restoreInContainer(ItemContainer container, String containerName) {
         if (container == null) {
-            return false;
+            return null;
         }
 
         for (short slot = 0; slot < container.getCapacity(); slot++) {
@@ -199,10 +207,10 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
             }
 
             container.setItemStackForSlot(slot, remapItem(current, RETURNED_ITEM_ID));
-            return true;
+            return containerName + "[" + slot + "]";
         }
 
-        return false;
+        return null;
     }
 
     private static ItemStack remapItem(ItemStack current, String targetItemId) {
@@ -252,5 +260,11 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
         return store.getComponent(ref, ProjectileComponent.getComponentType()) != null
                 || store.getComponent(ref, ProjectileModule.get().getProjectileComponentType()) != null
                 || store.getComponent(ref, ProjectileModule.get().getStandardPhysicsProviderComponentType()) != null;
+    }
+
+    private static void debug(String message) {
+        if (DEBUG) {
+            System.out.println(LOG_PREFIX + message);
+        }
     }
 }

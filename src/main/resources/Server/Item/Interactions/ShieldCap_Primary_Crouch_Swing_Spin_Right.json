@@ -8,55 +8,69 @@
           {
             "Type": "ChangeStat",
             "StatModifiers": {
-              "Stamina": -2
+              "Stamina": -3
             },
             "Behaviour": "Add",
             "ValueType": "Absolute",
             "Next": {
-              "Type": "Simple",
-              "RunTime": 0.15,
+              "Type": "ChangeStat",
               "Next": {
-                "Type": "Selector",
-                "$Comment": "Length of Combat",
-                "Selector": {
-                  "Id": "AOECircle",
-                  "Range": 2.5
+                "Type": "Simple",
+                "RunTime": 0.15,
+                "Next": {
+                  "Type": "Selector",
+                  "$Comment": "Length of Combat",
+                  "Selector": {
+                    "Id": "AOECircle",
+                    "Range": 3
+                  },
+                  "HitEntity": {
+                    "Interactions": [
+                      {
+                        "Type": "Replace",
+                        "DefaultValue": {
+                          "Interactions": [
+                            "ShieldCap_Primary_Damage"
+                          ]
+                        },
+                        "Var": "Crouch_Swing_Spin_Right_Damage",
+                        "DefaultOk": true
+                      }
+                    ]
+                  },
+                  "IgnoreOwner": true,
+                  "HorizontalSpeedMultiplier": 0,
+                  "RunTime": 0.35,
+                  "Next": {
+                    "Type": "ChangeStat",
+                    "StatModifiers": {
+                      "StaminaRegenDelay": -1.2
+                    },
+                    "Behaviour": "Set"
+                  }
                 },
-                "HitEntity": {
-                  "Interactions": [
+                "Effects": {
+                  "WorldSoundEventId": "SFX_ShieldCap_Swings",
+                  "Trails": [
                     {
-                      "Type": "Replace",
-                      "DefaultValue": {
-                        "Interactions": [
-                          "ShieldCap_Primary_Damage"
-                        ]
+                      "PositionOffset": {
+                        "X": 0,
+                        "Y": 0,
+                        "Z": 0
                       },
-                      "Var": "Crouch_Swing_Spin_Right_Damage",
-                      "DefaultOk": true
+                      "TargetNodeName": "Handle",
+                      "TrailId": "Wind",
+                      "RotationOffset": {
+                        "Roll": 90.0
+                      }
                     }
                   ]
-                },
-                "IgnoreOwner": true,
-                "HorizontalSpeedMultiplier": 0,
-                "RunTime": 0.35
+                }
               },
-              "Effects": {
-                "WorldSoundEventId": "SFX_ShieldCap_Swings",
-                "Trails": [
-                  {
-                    "PositionOffset": {
-                      "X": 0,
-                      "Y": 0,
-                      "Z": 0
-                    },
-                    "TargetNodeName": "Handle",
-                    "TrailId": "Wind",
-                    "RotationOffset": {
-                      "Roll": 90.0
-                    }
-                  }
-                ]
-              }
+              "StatModifiers": {
+                "StaminaRegenDelay": -1
+              },
+              "Behaviour": "Set"
             },
             "HorizontalSpeedMultiplier": 0,
             "RunTime": 0.35,

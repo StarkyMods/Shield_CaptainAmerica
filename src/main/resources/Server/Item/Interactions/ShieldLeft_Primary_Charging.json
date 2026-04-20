@@ -1,0 +1,12 @@
+{
+  "Type": "Charging",
+  "Next": {
+    "0": {
+      "Type": "RunRootInteraction",
+      "RootInteraction": "Root_Unarmed_Attack_Swing_Left"
+    },
+    "0.4": "ShieldCapLeft_Secondary_Long_Swing_Spin_Left_Conditions"
+  },
+  "AllowIndefiniteHold": true,
+  "DisplayProgress": true
+}

@@ -4,10 +4,12 @@
   "RunTime": 0.5,
   "Selector": {
     "Id": "Horizontal",
-    "EndDistance": 3,
-    "Length": 180,
-    "Direction": "ToLeft",
-    "TestLineOfSight": true
+    "EndDistance": 3.5,
+    "Length": 160,
+    "Direction": "ToRight",
+    "TestLineOfSight": true,
+    "ExtendTop": 2,
+    "ExtendBottom": 2
   },
   "HitEntity": {
     "Interactions": [

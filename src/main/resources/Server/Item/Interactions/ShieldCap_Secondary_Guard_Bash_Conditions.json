@@ -1,0 +1,7 @@
+{
+  "Type": "StatsCondition",
+  "Costs": {
+    "Stamina": 3.6
+  },
+  "Next": "ShieldCap_Secondary_Guard_Bash"
+}

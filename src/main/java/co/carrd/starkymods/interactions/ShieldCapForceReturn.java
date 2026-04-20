@@ -8,12 +8,14 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 public final class ShieldCapForceReturn extends SimpleInstantInteraction {
+    private static final boolean DEBUG = true;
+    private static final String LOG_PREFIX = "[ShieldCapForceReturnDebug] ";
 
     @Nonnull
     public static final BuilderCodec<ShieldCapForceReturn> CODEC =
@@ -42,6 +44,8 @@ public final class ShieldCapForceReturn extends SimpleInstantInteraction {
 
         boolean foundProjectile =
                 ShieldCapThrowHomingService.forceReturnToOwner(playerRef.getUuid(), playerRef.getReference());
+        debug("force return interaction | owner=" + playerRef.getUuid()
+                + " | foundProjectile=" + foundProjectile);
         if (!foundProjectile) {
             ShieldCapCatch.restoreToOwner(context.getCommandBuffer().getStore(), playerRef.getReference());
         }
@@ -69,5 +73,11 @@ public final class ShieldCapForceReturn extends SimpleInstantInteraction {
         }
 
         return null;
+    }
+
+    private void debug(String message) {
+        if (DEBUG) {
+            System.out.println(LOG_PREFIX + message);
+        }
     }
 }

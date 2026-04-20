@@ -1,0 +1,7 @@
+{
+  "Type": "StatsCondition",
+  "Costs": {
+    "Stamina": 3.5
+  },
+  "Next": "ShieldCapLeft_Secondary_Long_Swing_Spin_Left"
+}
