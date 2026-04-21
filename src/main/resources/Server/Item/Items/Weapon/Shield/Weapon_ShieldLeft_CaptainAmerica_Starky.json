@@ -39,7 +39,7 @@
   "Utility": {
     "Usable": true
   },
-  "DroppedItemAnimation": "Items/Animations/Dropped/Dropped_Diagonal_Left.blockyanim",
+  "DroppedItemAnimation": "Items/Animations/Dropped/StarkyMods/ShieldCap_Drop.blockyanim",
   "Tags": {
     "Type": [
       "Weapon"

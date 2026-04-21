@@ -1,7 +1,7 @@
 {
   "Type": "Selector",
   "RunTime": 0.1,
-  "IgnoreOwner": true,
+  "IgnoreOwner": false,
   "Selector": {
     "Id": "AOECircle",
     "Range": 7

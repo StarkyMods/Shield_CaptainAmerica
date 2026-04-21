@@ -1,0 +1,26 @@
+{
+  "formatVersion": 1,
+  "duration": 9,
+  "holdLastKeyframe": false,
+  "nodeAnimations": {
+    "ShieldCap": {
+      "position": [
+        {
+          "time": 0,
+          "delta": {"x": 2, "y": -12, "z": 0},
+          "interpolationType": "linear"
+        }
+      ],
+      "orientation": [
+        {
+          "time": 0,
+          "delta": {"x": 0.71358, "y": 0.69513, "z": -0.06243, "w": -0.06082},
+          "interpolationType": "linear"
+        }
+      ],
+      "shapeStretch": [],
+      "shapeVisible": [],
+      "shapeUvOffset": []
+    }
+  }
+}

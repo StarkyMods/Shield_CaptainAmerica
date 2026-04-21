@@ -11,6 +11,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.InteractionManager;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
@@ -21,12 +22,17 @@ import com.hypixel.hytale.server.core.modules.interaction.InteractionModule;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.RootInteraction;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class ShieldCapMjolnirGuardWieldImpactSystem extends DamageEventSystem {
     private static final String MJOLNIR_ITEM_ID = "Weapon_Mjolnir_Starky";
     private static final String ROOT_ID = "Root_ShieldCap_Mjolnir_Guard_Wield_Impact_Shockwave";
     private static final InteractionType SHOCKWAVE_LANE = InteractionType.Ability2;
+    private static final long COOLDOWN_MS = 20_000L;
+    private static final Map<UUID, Long> LAST_TRIGGERED_AT_MS = new ConcurrentHashMap<>();
 
     @Override
     public Query<EntityStore> getQuery() {
@@ -59,6 +65,20 @@ public final class ShieldCapMjolnirGuardWieldImpactSystem extends DamageEventSys
             return;
         }
 
+        UUID defenderUuid = resolveEntityUuid(defenderRef, commandBuffer);
+        if (ShieldCapPerfectParryBridgeService.isPerfectParrySupportActive()
+                && ShieldCapPerfectParryBridgeService.isPerfectParryWindowActive(defenderUuid)) {
+            return;
+        }
+
+        long now = System.currentTimeMillis();
+        if (defenderUuid != null) {
+            long lastTriggeredAt = LAST_TRIGGERED_AT_MS.getOrDefault(defenderUuid, 0L);
+            if (now - lastTriggeredAt < COOLDOWN_MS) {
+                return;
+            }
+        }
+
         Ref<EntityStore> attackerRef = resolveDamageSourceRef(damage);
         if (attackerRef == null || !attackerRef.isValid() || attackerRef.getStore() != store) {
             return;
@@ -76,6 +96,9 @@ public final class ShieldCapMjolnirGuardWieldImpactSystem extends DamageEventSys
             InteractionContext context =
                     InteractionContext.forInteraction(defenderInteractionManager, defenderRef, SHOCKWAVE_LANE, commandBuffer);
             defenderInteractionManager.startChain(defenderRef, commandBuffer, SHOCKWAVE_LANE, context, rootInteraction);
+            if (defenderUuid != null) {
+                LAST_TRIGGERED_AT_MS.put(defenderUuid, now);
+            }
         } catch (Throwable ignored) {
             // Best-effort only. Damage should still proceed normally.
         }
@@ -102,5 +125,15 @@ public final class ShieldCapMjolnirGuardWieldImpactSystem extends DamageEventSys
             return ref != null && ref.isValid() ? ref : null;
         }
         return null;
+    }
+
+    private static UUID resolveEntityUuid(Ref<EntityStore> ref,
+                                          CommandBuffer<EntityStore> commandBuffer) {
+        if (ref == null || !ref.isValid() || commandBuffer == null) {
+            return null;
+        }
+
+        UUIDComponent uuidComponent = commandBuffer.getComponent(ref, UUIDComponent.getComponentType());
+        return uuidComponent == null ? null : uuidComponent.getUuid();
     }
 }

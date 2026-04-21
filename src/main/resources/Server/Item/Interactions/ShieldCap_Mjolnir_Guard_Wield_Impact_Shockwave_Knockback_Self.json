@@ -1,0 +1,27 @@
+{
+  "Type": "ApplyForce",
+  "Direction": {
+    "X": 0.0,
+    "Y": 1.0,
+    "Z": 2.0
+  },
+  "Force": 30,
+  "AdjustVertical": true,
+  "VelocityConfig": {
+    "AirResistance": 0.99,
+    "AirResistanceMax": 0.98,
+    "GroundResistance": 0.94,
+    "GroundResistanceMax": 0.3,
+    "Threshold": 3.0,
+    "Style": "Linear"
+  },
+  "ChangeVelocityType": "Set",
+  "WaitForGround": false,
+  "WaitForCollision": false,
+  "Next": {
+    "Type": "Simple",
+    "Effects": {
+      "CameraEffect": "ShieldCap_Big_Hit_Camera"
+    }
+  }
+}

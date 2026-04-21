@@ -1,7 +1,8 @@
 {
   "Type": "Selector",
   "Effects": {
-  "WorldSoundEventId": "SFX_ShieldCap_BigImpact"
+  "WorldSoundEventId": "SFX_ShieldCap_BigImpact",
+  "CameraEffect": "ShieldCap_Big_Hit_Camera"
   },
   "RunTime": 0.1,
   "IgnoreOwner": true,

@@ -17,6 +17,9 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public final class ShieldCapPerfectParryBridgeService {
@@ -26,6 +29,7 @@ public final class ShieldCapPerfectParryBridgeService {
     private static final String MAIN_SHIELD_ID = "Weapon_Shield_CaptainAmerica_Starky";
     private static final String LEFT_SHIELD_ID = "Weapon_ShieldLeft_CaptainAmerica_Starky";
     private static final String PERFECT_PARRY_ROOT_ID = "Root_ShieldCap_Perfect_Parry_Shockwave";
+    private static final long PERFECT_PARRY_IMPACT_SUPPRESSION_WINDOW_MS = 1500L;
     private static final InteractionType[] FORCED_LANES = {
             InteractionType.Ability2,
             InteractionType.Secondary,
@@ -38,12 +42,15 @@ public final class ShieldCapPerfectParryBridgeService {
             InteractionType.Ability2,
             InteractionType.Ability3
     };
+    private static final Map<UUID, Long> PERFECT_PARRY_ACTIVE_UNTIL_MS = new ConcurrentHashMap<>();
+    private static volatile boolean PERFECT_PARRY_SUPPORT_ACTIVE = false;
 
     private EventRegistration<?, ?> perfectParryRegistration;
 
     public void register(JavaPlugin plugin) {
         Class<?> eventClass = resolvePerfectParryEventClass();
         if (eventClass == null) {
+            PERFECT_PARRY_SUPPORT_ACTIVE = false;
             log("register skipped | reason=event class not found");
             return;
         }
@@ -52,6 +59,7 @@ public final class ShieldCapPerfectParryBridgeService {
         EventRegistration<?, ?> registration =
                 plugin.getEventRegistry().registerGlobal((Class) eventClass, (Consumer) this::handlePerfectParryEvent);
         perfectParryRegistration = registration;
+        PERFECT_PARRY_SUPPORT_ACTIVE = true;
         log("registered | eventClass=" + eventClass.getName());
     }
 
@@ -60,6 +68,12 @@ public final class ShieldCapPerfectParryBridgeService {
             perfectParryRegistration.unregister();
             perfectParryRegistration = null;
         }
+        PERFECT_PARRY_SUPPORT_ACTIVE = false;
+        PERFECT_PARRY_ACTIVE_UNTIL_MS.clear();
+    }
+
+    public static boolean isPerfectParrySupportActive() {
+        return PERFECT_PARRY_SUPPORT_ACTIVE;
     }
 
     private void handlePerfectParryEvent(Object event) {
@@ -78,8 +92,26 @@ public final class ShieldCapPerfectParryBridgeService {
             return;
         }
 
+        markPerfectParryWindow(defenderRef);
         log("event accepted");
         triggerPerfectParryShockwave(defenderRef);
+    }
+
+    public static boolean isPerfectParryWindowActive(UUID playerUuid) {
+        if (playerUuid == null) {
+            return false;
+        }
+
+        long now = System.currentTimeMillis();
+        Long untilMs = PERFECT_PARRY_ACTIVE_UNTIL_MS.get(playerUuid);
+        if (untilMs == null) {
+            return false;
+        }
+        if (untilMs < now) {
+            PERFECT_PARRY_ACTIVE_UNTIL_MS.remove(playerUuid, untilMs);
+            return false;
+        }
+        return true;
     }
 
     private void triggerPerfectParryShockwave(Ref<EntityStore> defenderRef) {
@@ -140,6 +172,21 @@ public final class ShieldCapPerfectParryBridgeService {
                 return;
             }
         });
+    }
+
+    private void markPerfectParryWindow(Ref<EntityStore> defenderRef) {
+        if (defenderRef == null || !defenderRef.isValid() || defenderRef.getStore() == null) {
+            return;
+        }
+
+        Player player = defenderRef.getStore().getComponent(defenderRef, Player.getComponentType());
+        UUID playerUuid = player != null && player.getPlayerRef() != null ? player.getPlayerRef().getUuid() : null;
+        if (playerUuid != null) {
+            PERFECT_PARRY_ACTIVE_UNTIL_MS.put(
+                    playerUuid,
+                    System.currentTimeMillis() + PERFECT_PARRY_IMPACT_SUPPRESSION_WINDOW_MS
+            );
+        }
     }
 
     private boolean hasShieldEquipped(Ref<EntityStore> defenderRef) {
