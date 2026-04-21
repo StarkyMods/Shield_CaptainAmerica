@@ -1,5 +1,5 @@
 {
-  "Type": "StatsCondition",
+  "Type": "StarkyShieldStatsCondition",
   "Costs": {
     "Stamina": 0.3
   },
@@ -13,7 +13,7 @@
       "Type": "Serial",
       "Interactions": [
         {
-          "Type": "ChangeStat",
+          "Type": "StarkyShieldChangeStat",
           "StatModifiers": {
             "Stamina": -0.3
           }

@@ -7,7 +7,7 @@
   },
   "DamageEffects": {
     "Knockback": {
-      "Force": 14,
+      "Force": 3,
       "RelativeX": 0,
       "RelativeZ": -5,
       "VelocityY": 5

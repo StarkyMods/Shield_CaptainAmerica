@@ -1,0 +1,23 @@
+{
+  "Type": "Selector",
+  "RunTime": 0.1,
+  "IgnoreOwner": true,
+  "Selector": {
+    "Id": "AOECircle",
+    "Range": 7
+  },
+  "HitEntity": {
+    "Interactions": [
+      {
+        "Type": "Replace",
+        "Var": "MjolnirShieldWieldImpactKnockback",
+        "DefaultOk": true,
+        "DefaultValue": {
+          "Interactions": [
+            "ShieldCap_Mjolnir_Guard_Wield_Impact_Shockwave_Knockback"
+          ]
+        }
+      }
+    ]
+  }
+}

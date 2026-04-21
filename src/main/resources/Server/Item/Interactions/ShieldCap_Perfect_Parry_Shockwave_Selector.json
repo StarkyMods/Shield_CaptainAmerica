@@ -1,0 +1,26 @@
+{
+  "Type": "Selector",
+  "Effects": {
+  "WorldSoundEventId": "SFX_ShieldCap_BigImpact"
+  },
+  "RunTime": 0.1,
+  "IgnoreOwner": true,
+  "Selector": {
+    "Id": "AOECircle",
+    "Range": 5
+  },
+  "HitEntity": {
+    "Interactions": [
+      {
+        "Type": "Replace",
+        "Var": "PerfectParryShockwaveKnockback",
+        "DefaultOk": true,
+        "DefaultValue": {
+          "Interactions": [
+            "ShieldCap_Perfect_Parry_Shockwave_Knockback"
+          ]
+        }
+      }
+    ]
+  }
+}

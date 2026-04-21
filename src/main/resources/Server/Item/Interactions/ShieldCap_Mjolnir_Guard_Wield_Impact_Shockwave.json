@@ -1,0 +1,56 @@
+{
+  "Type": "Simple",
+  "RunTime": 0.01,
+  "Effects": {
+    "Particles": [
+      {
+        "SystemId": "Hedera_Scream",
+        "TargetEntityPart": "PrimaryItem",
+        "TargetNodeName": "Handle",
+        "Scale": 2.5
+      }
+    ],
+    "FirstPersonParticles": [
+      {
+        "SystemId": "Hedera_Scream",
+        "TargetEntityPart": "PrimaryItem",
+        "TargetNodeName": "Handle",
+        "Scale": 2.5
+      }
+    ],
+    "WorldSoundEventId": "SFX_ShieldCapLeft_Mjolnir_Guard_Bash"
+  },
+  "Next": {
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "Interactions": [
+          {
+            "Type": "ApplyForce",
+            "Direction": {
+              "Z": -1
+            },
+            "Force": 45,
+            "AdjustVertical": true,
+            "VelocityConfig": {
+              "GroundResistance": 0.936,
+              "GroundResistanceMax": 0.928,
+              "AirResistance": 0.924,
+              "AirResistanceMax": 0.932,
+              "Threshold": 3,
+              "Style": "Linear"
+            },
+            "ChangeVelocityType": "Add",
+            "WaitForGround": false,
+            "WaitForCollision": false
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          "ShieldCap_Mjolnir_Guard_Wield_Impact_Shockwave_Selector"
+        ]
+      }
+    ]
+  }
+}

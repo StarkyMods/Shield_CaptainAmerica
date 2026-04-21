@@ -45,7 +45,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.PositionUtil;
 
 public final class ShieldCapThrowHomingService {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final String LOG_PREFIX = "[ShieldCapHomingDebug] ";
     private static final String MJOLNIR_ITEM_ID = "Weapon_Mjolnir_Starky";
 
@@ -372,6 +372,66 @@ public final class ShieldCapThrowHomingService {
         return true;
     }
 
+    static boolean shouldApplyThrownShieldDamageToTarget(InteractionContext context) {
+        if (context == null || context.getCommandBuffer() == null) {
+            return false;
+        }
+
+        Store<EntityStore> store = context.getCommandBuffer().getStore();
+        Ref<EntityStore> projectileRef = resolveProjectileRef(context);
+        Ref<EntityStore> targetRef = context.getTargetEntity();
+        if (store == null || projectileRef == null || !projectileRef.isValid()
+                || targetRef == null || !targetRef.isValid()) {
+            return false;
+        }
+
+        StandardPhysicsProvider physicsProvider =
+                context.getCommandBuffer().getComponent(projectileRef, ProjectileModule.get().getStandardPhysicsProviderComponentType());
+        if (physicsProvider == null) {
+            return false;
+        }
+
+        UUID ownerUuid = physicsProvider.getCreatorUuid();
+        if (ownerUuid == null) {
+            return false;
+        }
+
+        long now = System.currentTimeMillis();
+        OwnerHomingState ownerState =
+                ACTIVE_OWNER_STATES.computeIfAbsent(ownerUuid, ignored -> new OwnerHomingState(ownerUuid));
+        ownerState.armedStore = store;
+        ownerState.expiresAtMs = Math.max(ownerState.expiresAtMs, now + HOMING_WINDOW_MS);
+
+        Ref<EntityStore> ownerRef = resolveOwnerRef(
+                store.getExternalData() == null ? null : store.getExternalData().getWorld(),
+                store,
+                ownerState
+        );
+        if (ownerRef != null && ownerRef.isValid() && ownerRef.equals(targetRef)) {
+            return false;
+        }
+        if (isProjectileEntity(store, targetRef)) {
+            return false;
+        }
+
+        TrackedProjectileState trackedState =
+                ownerState.trackedProjectiles.computeIfAbsent(projectileRef, ignored -> new TrackedProjectileState(now));
+        trackedState.recordActivity(now);
+
+        UUID targetUuid = getEntityUuid(store, targetRef);
+        if ((targetUuid != null && trackedState.hitTargetUuids.contains(targetUuid))
+                || trackedState.hitTargetRefs.contains(targetRef)) {
+            debug("throw repeat damage blocked | owner=" + ownerUuid
+                    + " | projectile=" + getEntityUuid(store, projectileRef)
+                    + " | target=" + targetUuid
+                    + " | returning=" + trackedState.isReturningToOwner());
+            return false;
+        }
+
+        registerHitTarget(store, trackedState, ownerRef, targetRef);
+        return true;
+    }
+
     public static void handleProjectileMiss(InteractionContext context) {
         handleImpact(context, false);
     }
@@ -654,6 +714,9 @@ public final class ShieldCapThrowHomingService {
             for (Map.Entry<Ref<EntityStore>, TrackedProjectileState> entry : state.trackedProjectiles.entrySet()) {
                 Ref<EntityStore> projectileRef = entry.getKey();
                 TrackedProjectileState trackedState = entry.getValue();
+                if (isMjolnirProjectileReturningForClash(store, mjolnirProjectileRef)) {
+                    continue;
+                }
                 if (!isEligibleForMjolnirProjectileClash(store, projectileRef, trackedState, mjolnirProjectileRef)) {
                     continue;
                 }
@@ -1922,8 +1985,13 @@ public final class ShieldCapThrowHomingService {
             return;
         }
 
+        trackedState.hitTargetRefs.add(targetRef);
         UUID targetUuid = getEntityUuid(store, targetRef);
         if (targetUuid != null && trackedState.hitTargetUuids.add(targetUuid)) {
+            trackedState.chainHitCount++;
+            return;
+        }
+        if (targetUuid == null) {
             trackedState.chainHitCount++;
         }
     }
@@ -3059,6 +3127,9 @@ public final class ShieldCapThrowHomingService {
         if (trackedState.fallingAfterProjectileClash || trackedState.groundedAfterProjectileClash) {
             return false;
         }
+        if (mjolnirProjectileRef != null && isMjolnirProjectileReturningForClash(store, mjolnirProjectileRef)) {
+            return false;
+        }
 
         Ref<EntityStore> currentTarget = trackedState.mjolnirClashTargetRef;
         return currentTarget == null || !currentTarget.isValid() || currentTarget.equals(mjolnirProjectileRef);
@@ -3866,6 +3937,7 @@ public final class ShieldCapThrowHomingService {
         private boolean returnCallingAnimationTriggered;
         private long returnCallingCatchReadyAtMs;
         private final Set<UUID> hitTargetUuids = ConcurrentHashMap.newKeySet();
+        private final Set<Ref<EntityStore>> hitTargetRefs = ConcurrentHashMap.newKeySet();
 
         private TrackedProjectileState(long addedAtMs) {
             this.addedAtMs = addedAtMs;
@@ -3883,9 +3955,8 @@ public final class ShieldCapThrowHomingService {
             this.throwKickStuckInBlock = false;
             this.clearMjolnirProjectileClash();
             this.clearProjectileClashGroundState();
-            if (this.throwKickMode || returnMode == ReturnMode.THROW_KICK) {
-                this.hitTargetUuids.clear();
-            }
+            this.hitTargetUuids.clear();
+            this.hitTargetRefs.clear();
             this.lastActivityAtMs = now;
             this.throwKickReturnDeadlineAtMs = Long.MAX_VALUE;
             this.returnCallingAnimationTriggered = false;
@@ -3913,6 +3984,7 @@ public final class ShieldCapThrowHomingService {
             this.persistWhenStationary = true;
             if (!wasThrowKick) {
                 this.hitTargetUuids.clear();
+                this.hitTargetRefs.clear();
                 this.lastThrowKickBlockImpactAtMs = now;
                 this.throwKickReturnDeadlineAtMs = now + FLIGHT_RETURN_TIMEOUT_MS;
                 this.ownerContactGraceUntilMs = Math.max(this.ownerContactGraceUntilMs, now + THROW_KICK_OWNER_CONTACT_GRACE_MS);

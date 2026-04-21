@@ -16,7 +16,7 @@
     }
   },
   "Next": {
-    "Type": "ChangeStat",
+    "Type": "StarkyShieldChangeStat",
     "StatModifiers": {
       "Stamina": -3.6
     },

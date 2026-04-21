@@ -34,7 +34,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 public final class ShieldCapSignatureFuriousOnslaughtService {
     private static final HytaleLogger LOGGER = StarkyShieldCaptainAmerica.getInstance().getLogger();
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final String LOG_PREFIX = "[ShieldCapOnslaughtDebug] ";
     private static final Map<UUID, OnslaughtState> ACTIVE = new ConcurrentHashMap<>();
     private static final String SELECTOR_ROOT_ID = "Root_ShieldCap_Signature_Furious_Onslaught_Selector_Internal";

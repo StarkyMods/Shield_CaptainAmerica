@@ -25,7 +25,7 @@
     },
     "IgnoreOwner": true,
     "Next": {
-      "Type": "ChangeStat",
+      "Type": "StarkyShieldChangeStat",
       "RunTime": 0.1,
       "StatModifiers": {
         "Stamina": -3.5

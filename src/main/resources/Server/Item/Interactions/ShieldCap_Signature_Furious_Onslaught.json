@@ -17,7 +17,7 @@
     "Behaviour": "Add",
     "RunTime": 0,
     "Next": {
-      "Type": "ChangeStat",
+      "Type": "StarkyShieldChangeStat",
       "StatModifiers": {
         "Stamina": 10
       },
@@ -86,13 +86,13 @@
                 "Type": "Simple",
                 "RunTime": 5,
                 "Next": {
-                  "Type": "ChangeStat",
+                  "Type": "StarkyShieldChangeStat",
                   "StatModifiers": {
                     "Stamina": 10
                   },
                   "RunTime": 5,
                   "Next": {
-                    "Type": "ChangeStat",
+                    "Type": "StarkyShieldChangeStat",
                     "StatModifiers": {
                       "Stamina": 10
                     }

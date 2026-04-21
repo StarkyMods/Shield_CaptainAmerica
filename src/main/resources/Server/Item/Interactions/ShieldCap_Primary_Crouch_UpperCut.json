@@ -1,7 +1,7 @@
 {
   "Type": "Simple",
   "Next": {
-    "Type": "ChangeStat",
+    "Type": "StarkyShieldChangeStat",
     "StatModifiers": {
       "Stamina": -5
     },

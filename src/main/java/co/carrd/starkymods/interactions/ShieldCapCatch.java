@@ -32,7 +32,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.PositionUtil;
 
 public final class ShieldCapCatch extends SimpleInstantInteraction {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final String LOG_PREFIX = "[ShieldCapCatchDebug] ";
     private static final String THROWN_ITEM_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String RETURNED_ITEM_ID = "Weapon_Shield_CaptainAmerica_Starky";

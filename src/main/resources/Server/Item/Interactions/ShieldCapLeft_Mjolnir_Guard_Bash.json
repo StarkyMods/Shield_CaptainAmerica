@@ -57,7 +57,7 @@
   "CancelOnItemChange": true,
   "RunTime": 0.8,
   "Next": {
-    "Type": "ChangeStat",
+    "Type": "StarkyShieldChangeStat",
     "StatModifiers": {
       "Stamina": -7
     },

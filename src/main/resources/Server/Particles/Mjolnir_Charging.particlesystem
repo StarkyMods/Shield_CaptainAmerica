@@ -1,0 +1,20 @@
+{
+  "Spawners": [
+    {
+      "SpawnerId": "Mjolnir_Charge_Circles",
+      "SpawnRate": {
+        "Min": 2.0,
+        "Max": 3.0
+      },
+      "MaxConcurrent": 4,
+      "StartDelay": 0.1
+    },
+    {
+      "SpawnerId": "Mjolnir_Charge_Sparks",
+      "StartDelay": 0.2
+    }
+  ],
+  "LifeSpan": 999999,
+  "CullDistance": 999999,
+  "BoundingRadius": 999999
+}

@@ -272,20 +272,20 @@ public final class ShieldCapVisualSyncService {
             inventoryChanged |= normalizeContainerItems(backpack);
             inventoryChanged |= normalizeContainerItems(tools);
 
-            boolean shieldInHands =
-                    isShieldInEquippedSlot(hotbar, activeHotbarSlot)
-                            || isShieldInEquippedSlot(utility, activeUtilitySlot);
-            boolean shieldInInventory =
-                    containsShield(hotbar)
-                            || containsShield(utility)
-                            || containsShield(storage)
-                            || containsShield(backpack)
-                            || containsShield(tools);
+            int totalShieldCount =
+                    countShields(hotbar)
+                            + countShields(utility)
+                            + countShields(storage)
+                            + countShields(backpack)
+                            + countShields(tools);
+            int equippedShieldCount =
+                    countShieldInEquippedSlot(hotbar, activeHotbarSlot)
+                            + countShieldInEquippedSlot(utility, activeUtilitySlot);
+            boolean hasSpareShieldOutsideActiveHands = totalShieldCount > equippedShieldCount;
 
             boolean shouldShowBackShield =
                     ShieldCapConfigManager.isBackShieldVisualEnabled()
-                            && shieldInInventory
-                            && !shieldInHands;
+                            && hasSpareShieldOutsideActiveHands;
 
             syncBackAttachment(player, shouldShowBackShield, forceBackRebuild);
 
@@ -348,25 +348,26 @@ public final class ShieldCapVisualSyncService {
         return changed;
     }
 
-    private boolean containsShield(ItemContainer container) {
+    private int countShields(ItemContainer container) {
         if (container == null) {
-            return false;
+            return 0;
         }
 
+        int count = 0;
         for (short slot = 0; slot < container.getCapacity(); slot++) {
             if (isShield(container.getItemStack(slot))) {
-                return true;
+                count++;
             }
         }
-        return false;
+        return count;
     }
 
-    private boolean isShieldInEquippedSlot(ItemContainer container, byte activeSlot) {
+    private int countShieldInEquippedSlot(ItemContainer container, byte activeSlot) {
         if (container == null || activeSlot == Inventory.INACTIVE_SLOT_INDEX || activeSlot < 0 || activeSlot >= container.getCapacity()) {
-            return false;
+            return 0;
         }
 
-        return isShield(container.getItemStack((short) activeSlot));
+        return isShield(container.getItemStack((short) activeSlot)) ? 1 : 0;
     }
 
     private void syncBackAttachment(Player player, boolean shouldShowBackShield, boolean forceBackRebuild) {

@@ -15,10 +15,12 @@ import co.carrd.starkymods.interactions.ShieldCapPrimaryJumpHitCooldown;
 import co.carrd.starkymods.interactions.ShieldCapPrimaryJumpStateTickSystem;
 import co.carrd.starkymods.interactions.ShieldCapPrimaryCrouchChainCooldown;
 import co.carrd.starkymods.interactions.ShieldCapPrimarySprintHitCooldown;
+import co.carrd.starkymods.interactions.ShieldCapPerfectParryBridgeService;
 import co.carrd.starkymods.interactions.ShieldCapSprintCondition;
 import co.carrd.starkymods.interactions.ShieldCapNotSprintingCondition;
 import co.carrd.starkymods.interactions.ShieldCapGuardInactiveCondition;
 import co.carrd.starkymods.interactions.ShieldCapGuardFallDamageReductionSystem;
+import co.carrd.starkymods.interactions.ShieldCapMjolnirGuardWieldImpactSystem;
 import co.carrd.starkymods.interactions.ShieldCapGuardCreativeFallRollTickSystem;
 import co.carrd.starkymods.interactions.ShieldCapTemporaryFallProtectionArm;
 import co.carrd.starkymods.interactions.ShieldCapTemporaryFallProtectionClear;
@@ -37,6 +39,7 @@ import co.carrd.starkymods.interactions.ShieldCapThrowHomingReturnOnMiss;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickBlockImpact;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickImpact;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickTargetGate;
+import co.carrd.starkymods.interactions.ShieldCapThrowTargetGate;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickRecentMarker;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickRootRouter;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickWindowCondition;
@@ -48,6 +51,8 @@ import co.carrd.starkymods.interactions.ShieldCapFuriousOnslaughtTargetCooldown;
 import co.carrd.starkymods.interactions.ShieldCapInvulnerabilityClear;
 import co.carrd.starkymods.interactions.ShieldCapThrowHomingTickSystem;
 import co.carrd.starkymods.interactions.StarkyMjolnirDownstrikeBridge;
+import co.carrd.starkymods.interactions.StarkyShieldChangeStat;
+import co.carrd.starkymods.interactions.StarkyShieldStatsCondition;
 import co.carrd.starkymods.interactions.StarkyMainHandCondition;
 import co.carrd.starkymods.interactions.StarkyPluginPresentCondition;
 import co.carrd.starkymods.listeners.ShieldCapPacketListener;
@@ -74,6 +79,7 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
     private final ShieldCapVisualSyncService visualSyncService = new ShieldCapVisualSyncService();
     private final ShieldCapReturnKickInputService returnKickInputService = new ShieldCapReturnKickInputService();
     private final ShieldCapReturnReticleInjector returnReticleInjector = new ShieldCapReturnReticleInjector();
+    private final ShieldCapPerfectParryBridgeService perfectParryBridgeService = new ShieldCapPerfectParryBridgeService();
     private final ShieldCapCraftHotReloadService craftHotReloadService = new ShieldCapCraftHotReloadService();
     private ComponentType<EntityStore, ShieldCapBackStateComponent> shieldCapBackStateComponentType;
 
@@ -182,6 +188,16 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
                 StarkyMjolnirDownstrikeBridge.CODEC
         );
         getCodecRegistry(Interaction.CODEC).register(
+                "StarkyShieldChangeStat",
+                StarkyShieldChangeStat.class,
+                StarkyShieldChangeStat.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "StarkyShieldStatsCondition",
+                StarkyShieldStatsCondition.class,
+                StarkyShieldStatsCondition.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
                 "ShieldCap_Primary_Crouch_Chain_Cooldown_Java",
                 ShieldCapPrimaryCrouchChainCooldown.class,
                 ShieldCapPrimaryCrouchChainCooldown.CODEC
@@ -282,6 +298,11 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
                 ShieldCapThrowKickImpact.CODEC
         );
         getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_Throw_Target_Gate_Java",
+                ShieldCapThrowTargetGate.class,
+                ShieldCapThrowTargetGate.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
                 "ShieldCap_Throw_Kick_Target_Gate_Java",
                 ShieldCapThrowKickTargetGate.class,
                 ShieldCapThrowKickTargetGate.CODEC
@@ -325,11 +346,13 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new ShieldCapPrimaryJumpStateTickSystem());
         getEntityStoreRegistry().registerSystem(new ShieldCapSignatureFuriousOnslaughtTickSystem());
         getEntityStoreRegistry().registerSystem(new ShieldCapGuardFallDamageReductionSystem());
+        getEntityStoreRegistry().registerSystem(new ShieldCapMjolnirGuardWieldImpactSystem());
         getEntityStoreRegistry().registerSystem(new ShieldCapGuardCreativeFallRollTickSystem());
         getEntityStoreRegistry().registerSystem(new ShieldCapBackShieldDamageReductionSystem());
         visualSyncService.register(this);
         returnKickInputService.register(this);
         returnReticleInjector.register(this);
+        perfectParryBridgeService.register(this);
         new HStats("3b08e6b8-d2cc-4c30-8b35-1dc475393fad", "1.0.0");
     }
 
@@ -347,6 +370,7 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
     @Override
     protected void shutdown() {
         craftHotReloadService.stop();
+        perfectParryBridgeService.shutdown();
         returnReticleInjector.shutdown();
         returnKickInputService.shutdown();
         visualSyncService.shutdown();

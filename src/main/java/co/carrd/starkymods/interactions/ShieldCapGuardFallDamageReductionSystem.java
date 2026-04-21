@@ -29,7 +29,11 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class ShieldCapGuardFallDamageReductionSystem extends DamageEventSystem {
-    private static final String GUARD_WIELD_INTERACTION_ID = "ShieldCap_Secondary_Guard_Wield";
+    private static final Set<String> GUARD_WIELD_INTERACTION_IDS = Set.of(
+            "ShieldCap_Secondary_Guard_Wield",
+            "ShieldCapLeft_Secondary_Guard_Wield",
+            "ShieldCapLeft_Mjolnir_Secondary_Guard_Wield"
+    );
     private static final String FALL_DAMAGE_ROLL_ROOT_ID = "Root_ShieldCap_Guard_FallDamage_Roll";
     private static final float REQUIRED_STAMINA_RATIO = 0.20f;
     private static final float FALL_DAMAGE_MULTIPLIER = 0.05f;
@@ -140,8 +144,15 @@ public final class ShieldCapGuardFallDamageReductionSystem extends DamageEventSy
                         return true;
                     }
                     String id = interaction.getId();
-                    return id != null
-                            && (GUARD_WIELD_INTERACTION_ID.equals(id) || id.contains(GUARD_WIELD_INTERACTION_ID));
+                    if (id == null) {
+                        return false;
+                    }
+                    for (String guardWieldInteractionId : GUARD_WIELD_INTERACTION_IDS) {
+                        if (guardWieldInteractionId.equals(id) || id.contains(guardWieldInteractionId)) {
+                            return true;
+                        }
+                    }
+                    return false;
                 },
                 Boolean.FALSE
         );

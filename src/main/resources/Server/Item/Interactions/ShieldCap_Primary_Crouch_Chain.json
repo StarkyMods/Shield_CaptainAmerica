@@ -4,7 +4,7 @@
   "ChainId": "ShieldCap_Crouch",
   "Next": [
     {
-      "Type": "StatsCondition",
+      "Type": "StarkyShieldStatsCondition",
       "Costs": {
         "Stamina": 3
       },
@@ -13,7 +13,7 @@
       "Failed": "ShieldCap_Primary_Chain"
     },
     {
-      "Type": "StatsCondition",
+      "Type": "StarkyShieldStatsCondition",
       "Costs": {
         "Stamina": 5
       },

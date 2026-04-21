@@ -1,0 +1,19 @@
+{
+  "Type": "ApplyForce",
+  "Direction": {
+    "Z": -1
+  },
+  "Force": 35,
+  "AdjustVertical": true,
+  "VelocityConfig": {
+    "GroundResistance": 0.936,
+    "GroundResistanceMax": 0.928,
+    "AirResistance": 0.924,
+    "AirResistanceMax": 0.932,
+    "Threshold": 3,
+    "Style": "Linear"
+  },
+  "ChangeVelocityType": "Add",
+  "WaitForGround": false,
+  "WaitForCollision": false
+}

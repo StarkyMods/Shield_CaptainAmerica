@@ -1,9 +1,9 @@
 {
   "Type": "ShieldCap_Throw_Kick_Window_Java",
   "Next": {
-    "Type": "StatsCondition",
+    "Type": "StarkyShieldStatsCondition",
     "Next": {
-      "Type": "ChangeStat",
+      "Type": "StarkyShieldChangeStat",
       "StatModifiers": {
         "Stamina": -1
       },

@@ -403,8 +403,9 @@
     "ShieldCapBackToHand": {
       "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Back_To_Hand.blockyanim",
       "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Back_To_Hand.blockyanim",
+      "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Back_To_Hand_FPS.blockyanim",
       "ThirdPersonFace": "Characters/Animations/Expressions/Frown.blockyanim",
-      "BlendingDuration": 0.15,
+      "BlendingDuration": 0,
       "Speed": 1,
       "Looping": false,
       "ClipsGeometry": true
@@ -412,6 +413,7 @@
     "ShieldCapHandToBack": {
       "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Hand_To_Back_Fast.blockyanim",
       "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Hand_To_Back_Fast.blockyanim",
+      "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Hand_To_Back_Fast_FPS.blockyanim",
       "ThirdPersonFace": "Characters/Animations/Expressions/Frown.blockyanim",
       "BlendingDuration": 0.15,
       "Speed": 1.4,

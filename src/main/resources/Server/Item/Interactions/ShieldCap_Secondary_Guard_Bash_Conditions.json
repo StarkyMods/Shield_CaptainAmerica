@@ -1,5 +1,5 @@
 {
-  "Type": "StatsCondition",
+  "Type": "StarkyShieldStatsCondition",
   "Costs": {
     "Stamina": 3.6
   },

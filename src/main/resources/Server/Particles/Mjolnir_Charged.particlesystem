@@ -1,0 +1,24 @@
+{
+  "Spawners": [
+    {
+      "SpawnerId": "Mjolnir_Charged_Status_Sparkles",
+      "PositionOffset": {
+        "X": -0.2,
+        "Z": 0
+      },
+      "FixedRotation": false
+    },
+    {
+      "SpawnerId": "Mjolnir_Charged_Status_Lines",
+      "FixedRotation": false,
+      "PositionOffset": {
+        "X": -0.1,
+        "Y": 0,
+        "Z": 0
+      }
+    }
+  ],
+  "LifeSpan": 999999,
+  "CullDistance": 999999,
+  "BoundingRadius": 999999
+}

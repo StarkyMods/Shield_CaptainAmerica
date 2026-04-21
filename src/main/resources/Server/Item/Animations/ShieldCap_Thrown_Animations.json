@@ -60,6 +60,15 @@
       "ThirdPersonFace": "Characters/Animations/Expressions/Frown.blockyanim",
       "Looping": true,
       "KeepPreviousFirstPersonAnimation": true
+    },
+    "ShieldCapRoll": {
+      "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Roll.blockyanim",
+      "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Roll.blockyanim",
+      "ThirdPersonFace": "Characters/Animations/Expressions/Frown.blockyanim",
+      "KeepPreviousFirstPersonAnimation": true,
+      "Speed": 1.8,
+      "BlendingDuration": 0.2,
+      "Looping": false
     }
   }
 }

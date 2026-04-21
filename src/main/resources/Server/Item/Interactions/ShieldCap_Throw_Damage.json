@@ -17,7 +17,7 @@
   ],
   "DamageEffects": {
     "Knockback": {
-      "Force": 5.0,
+      "Force": 1.0,
       "VelocityType": "Set"
     }
   }

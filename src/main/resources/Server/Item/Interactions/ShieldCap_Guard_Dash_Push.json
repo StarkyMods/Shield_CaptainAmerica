@@ -1,11 +1,11 @@
 {
-  "Type": "StatsCondition",
+  "Type": "StarkyShieldStatsCondition",
   "Costs": {
     "Stamina": 5.5
   },
   "ValueType": "Absolute",
   "Next": {
-    "Type": "ChangeStat",
+    "Type": "StarkyShieldChangeStat",
     "StatModifiers": {
       "Stamina": -5.5
     },

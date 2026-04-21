@@ -1,12 +1,12 @@
 {
-  "Type": "StatsCondition",
+  "Type": "StarkyShieldStatsCondition",
   "Costs": {
     "Stamina": 3.3
   },
   "ValueType": "Absolute",
   "Failed": "ShieldCap_Primary_Chain",
   "Next": {
-    "Type": "ChangeStat",
+    "Type": "StarkyShieldChangeStat",
     "Next": {
       "Type": "ChangeStat",
       "Next": {
