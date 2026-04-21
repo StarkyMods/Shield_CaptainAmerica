@@ -26,6 +26,9 @@
           "Type": "ShieldCap_Throw_Kick_Impact"
         },
         {
+          "Type": "ShieldCap_Throw_Kick_Target_Gate_Java"
+        },
+        {
           "Type": "Replace",
           "DefaultOk": true,
           "Var": "ShieldCap_Throw_Kick_Damage",

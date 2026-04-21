@@ -36,7 +36,9 @@ import co.carrd.starkymods.interactions.ShieldCapThrowHomingMarkProjectile;
 import co.carrd.starkymods.interactions.ShieldCapThrowHomingReturnOnMiss;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickBlockImpact;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickImpact;
+import co.carrd.starkymods.interactions.ShieldCapThrowKickTargetGate;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickRecentMarker;
+import co.carrd.starkymods.interactions.ShieldCapThrowKickRootRouter;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickWindowCondition;
 import co.carrd.starkymods.interactions.ShieldCapReturnCallingAnimation;
 import co.carrd.starkymods.interactions.ShieldCapSignatureFuriousOnslaught;
@@ -280,6 +282,11 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
                 ShieldCapThrowKickImpact.CODEC
         );
         getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_Throw_Kick_Target_Gate_Java",
+                ShieldCapThrowKickTargetGate.class,
+                ShieldCapThrowKickTargetGate.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
                 "ShieldCap_Throw_Kick_Block_Impact",
                 ShieldCapThrowKickBlockImpact.class,
                 ShieldCapThrowKickBlockImpact.CODEC
@@ -293,6 +300,11 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
                 "ShieldCap_Throw_Kick_Window_Java",
                 ShieldCapThrowKickWindowCondition.class,
                 ShieldCapThrowKickWindowCondition.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_Throw_Kick_Root_Router_Java",
+                ShieldCapThrowKickRootRouter.class,
+                ShieldCapThrowKickRootRouter.CODEC
         );
         getCodecRegistry(Interaction.CODEC).register(
                 "ShieldCap_Return_Calling_Animation_Java",

@@ -38,7 +38,7 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
     private static final String RETURNED_ITEM_ID = "Weapon_Shield_CaptainAmerica_Starky";
     private static final String CATCH_SOUND_ID = "SFX_ShieldCap_Catch";
     private static final long[] CALLING_ANIMATION_CLEAR_RETRY_DELAYS_MS =
-            new long[] {0L, 100L, 250L, 500L, 650L, 800L, 1000L, 1250L};
+            new long[] {0L, 100L};
 
     @Nonnull
     public static final BuilderCodec<ShieldCapCatch> CODEC =

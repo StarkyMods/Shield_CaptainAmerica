@@ -2,7 +2,9 @@
   "Interactions": [
     {
       "Type": "ShieldCap_Throw_Kick_Window_Java",
-      "Next": "ShieldCap_Throw_Kick"
+      "Next": {
+        "Type": "ShieldCap_Throw_Kick_Root_Router_Java"
+      }
     }
   ],
   "RequireNewClick": true

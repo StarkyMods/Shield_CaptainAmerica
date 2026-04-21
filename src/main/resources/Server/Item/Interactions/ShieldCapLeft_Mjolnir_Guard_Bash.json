@@ -69,14 +69,14 @@
             {
               "Type": "Selector",
               "Selector": {
-                "Id": "Horizontal",
+                "Id": "Stab",
                 "TestLineOfSight": true,
-                "Length": 240,
-                "Direction": "ToLeft",
-                "EndDistance": 25,
-                "ExtendTop": 8,
-                "ExtendBottom": 8,
-                "StartDistance": -1
+                "ExtendTop": 4,
+                "ExtendLeft": 4,
+                "ExtendRight": 4,
+                "ExtendBottom": 4,
+                "StartDistance": 0,
+                "EndDistance": 25
               },
               "RunTime": 0.15,
               "HitEntity": {
