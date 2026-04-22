@@ -24,9 +24,14 @@
     "Type": "Parallel",
     "Interactions": [
       {
-        "Interactions": [
-          "ShieldCap_Mjolnir_Guard_Wield_Impact_Shockwave_Knockback_Self"
-        ]
+        "Type": "Replace",
+        "Var": "MjolnirShieldWieldImpactKnockback",
+        "DefaultOk": true,
+        "DefaultValue": {
+          "Interactions": [
+            "ShieldCap_Mjolnir_Guard_Wield_Impact_Shockwave_Knockback_Self"
+          ]
+        }
       },
       {
         "Interactions": [

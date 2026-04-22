@@ -1,0 +1,8 @@
+{
+  "Type": "DamageEntity",
+  "DamageCalculator": {
+    "BaseDamage": {
+      "Projectile": 42
+    }
+  }
+}

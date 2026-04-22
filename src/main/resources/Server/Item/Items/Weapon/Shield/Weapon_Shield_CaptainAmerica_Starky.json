@@ -243,7 +243,25 @@
           "EntityStatsOnHit": [
             {
               "EntityStatId": "SignatureEnergy",
-              "Amount": 12
+              "Amount": 10
+            }
+          ]
+        }
+      ]
+    },
+    "Swing_Down_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Primary_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 30
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 6
             }
           ]
         }
@@ -273,7 +291,7 @@
           "Parent": "ShieldCap_Secondary_Guard_Bash_Damage",
           "DamageEffects": {
             "Knockback": {
-              "Force": 45
+              "Force": 25
             }
           }
         }
@@ -285,13 +303,13 @@
           "Parent": "ShieldCap_Secondary_Guard_Bash_Damage_Apply",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 42
+              "Physical": 45
             }
           },
           "EntityStatsOnHit": [
             {
               "EntityStatId": "SignatureEnergy",
-              "Amount": 12
+              "Amount": 10
             }
           ]
         }
@@ -303,7 +321,7 @@
           "Parent": "ShieldCap_Secondary_Guard_Dash_Push_Damage",
           "DamageEffects": {
             "Knockback": {
-              "Force": 55
+              "Force": 30
             }
           }
         }
@@ -333,7 +351,7 @@
           "Parent": "ShieldCap_Kick_Push_Knockback",
           "DamageEffects": {
             "Knockback": {
-              "Force": 40
+              "Force": 20
             }
           }
         }
@@ -345,7 +363,7 @@
           "Parent": "ShieldCap_Primary_Damage_NoShield",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 42
+              "Physical": 45
             }
           },
           "EntityStatsOnHit": [
@@ -363,13 +381,13 @@
           "Parent": "ShieldCap_Primary_Damage",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 26
+              "Physical": 28
             }
           },
           "EntityStatsOnHit": [
             {
               "EntityStatId": "SignatureEnergy",
-              "Amount": 12
+              "Amount": 8
             }
           ]
         }
@@ -387,7 +405,7 @@
           "EntityStatsOnHit": [
             {
               "EntityStatId": "SignatureEnergy",
-              "Amount": 12
+              "Amount": 8
             }
           ]
         }
@@ -405,7 +423,7 @@
           "EntityStatsOnHit": [
             {
               "EntityStatId": "SignatureEnergy",
-              "Amount": 12
+              "Amount": 6
             }
           ]
         }
@@ -423,7 +441,7 @@
           "EntityStatsOnHit": [
             {
               "EntityStatId": "SignatureEnergy",
-              "Amount": 12
+              "Amount": 6
             }
           ]
         }
@@ -435,7 +453,7 @@
           "Parent": "ShieldCap_FallStar_Hit_Knockback",
           "DamageEffects": {
             "Knockback": {
-              "Force": 45
+              "Force": 25
             }
           }
         }
@@ -453,7 +471,7 @@
           "EntityStatsOnHit": [
             {
               "EntityStatId": "SignatureEnergy",
-              "Amount": 12
+              "Amount": 8
             }
           ]
         }
@@ -483,45 +501,9 @@
           "Parent": "ShieldCap_Signature_Furious_Onslaught_Knockback",
           "DamageEffects": {
             "Knockback": {
-              "Force": 60
+              "Force": 45
             }
           }
-        }
-      ]
-    },
-    "ShieldCap_Throw_Damage": {
-      "Interactions": [
-        {
-          "Parent": "ShieldCap_Throw_Damage",
-          "DamageCalculator": {
-            "BaseDamage": {
-              "Physical": 42
-            }
-          },
-          "EntityStatsOnHit": [
-            {
-              "EntityStatId": "SignatureEnergy",
-              "Amount": 8
-            }
-          ]
-        }
-      ]
-    },
-    "ShieldCap_Throw_Kick_Damage": {
-      "Interactions": [
-        {
-          "Parent": "ShieldCap_Throw_Damage",
-          "DamageCalculator": {
-            "BaseDamage": {
-              "Physical": 92
-            }
-          },
-          "EntityStatsOnHit": [
-            {
-              "EntityStatId": "SignatureEnergy",
-              "Amount": 9
-            }
-          ]
         }
       ]
     },
@@ -536,7 +518,49 @@
           "Parent": "ShieldCapLeft_Swing_Damage",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 26
+              "Physical": 29
+            }
+          },
+          "EntityStatsOnHit": [
+            {
+              "EntityStatId": "SignatureEnergy",
+              "Amount": 10
+            }
+          ]
+        }
+      ]
+    },
+    "PerfectParryShockwaveKnockback": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Perfect_Parry_Shockwave_Knockback",
+          "DamageEffects": {
+            "Knockback": {
+              "Force": 25
+            }
+          }
+        }
+      ]
+    },
+    "MjolnirShieldWieldImpactKnockback": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Mjolnir_Guard_Wield_Impact_Shockwave_Knockback",
+          "DamageEffects": {
+            "Knockback": {
+              "Force": 30
+            }
+          }
+        }
+      ]
+    },
+    "Guard_Dash_Mjolnir_Damage": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCapLeft_Swing_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 65
             }
           },
           "EntityStatsOnHit": [
@@ -545,6 +569,18 @@
               "Amount": 12
             }
           ]
+        }
+      ]
+    },
+    "Guard_Bash_Mjolnir_Knockback": {
+      "Interactions": [
+        {
+          "Parent": "ShieldCap_Perfect_Parry_Shockwave_Knockback",
+          "DamageEffects": {
+            "Knockback": {
+              "Force": 30
+            }
+          }
         }
       ]
     }

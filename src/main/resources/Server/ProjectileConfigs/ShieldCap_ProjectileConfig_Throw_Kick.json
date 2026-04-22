@@ -34,7 +34,7 @@
           "Var": "ShieldCap_Throw_Kick_Damage",
           "DefaultValue": {
             "Interactions": [
-              "ShieldCap_Throw_Damage"
+              "ShieldCap_Throw_Kick_Damage"
             ]
           }
         }

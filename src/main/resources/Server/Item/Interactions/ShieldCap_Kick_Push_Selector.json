@@ -15,11 +15,11 @@
     "Interactions": [
       {
         "Type": "Replace",
-        "Var": "Kick_Push_Damage",
+        "Var": "Kick_Push_Knockback",
         "DefaultOk": true,
         "DefaultValue": {
           "Interactions": [
-            "ShieldCap_Primary_Damage_NoShield"
+            "ShieldCap_Kick_Push_Knockback"
           ]
         }
       }

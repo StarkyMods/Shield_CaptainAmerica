@@ -2,7 +2,7 @@
   "Parent": "DamageEntityParent",
   "DamageCalculator": {
     "BaseDamage": {
-      "Physical": 88
+      "Physical": 100
     }
   },
   "DamageEffects": {
@@ -13,6 +13,5 @@
         "SystemId": "Impact_Shield_Bash"
       }
     ]
-  },
-  "Next": "ShieldCap_Signature_Furious_Onslaught_Damage_Next"
+  }
 }
