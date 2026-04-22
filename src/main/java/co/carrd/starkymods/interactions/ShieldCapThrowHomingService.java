@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
@@ -21,6 +22,7 @@ import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.protocol.SoundCategory;
 import com.hypixel.hytale.protocol.packets.world.PlaySoundEvent3D;
+import com.hypixel.hytale.builtin.mounts.MountedComponent;
 import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.InteractionManager;
@@ -90,6 +92,9 @@ public final class ShieldCapThrowHomingService {
     private static final double MIN_TRACKED_SPEED = 0.5;
     private static final double STOP_STEER_DISTANCE = 0.1;
     private static final double IMPACT_UNSTICK_DISTANCE = 0.35;
+    private static final double PASS_THROUGH_UNSTICK_DISTANCE = 1.25;
+    private static final double SAME_TARGET_POSITION_TOLERANCE = 0.9;
+    private static final int TARGET_ROOT_RESOLVE_MAX_DEPTH = 8;
     private static final double OWNER_RETURN_CATCH_DISTANCE = 1.8;
     private static final double OWNER_RETURN_CALLING_TRIGGER_DISTANCE = 10.0;
     private static final double OWNER_RETURN_SLOW_RADIUS = 12.0;
@@ -128,6 +133,12 @@ public final class ShieldCapThrowHomingService {
     private static final Set<Ref<EntityStore>> KNOWN_SHIELDCAP_PROJECTILE_REFS = ConcurrentHashMap.newKeySet();
     private static final Set<UUID> KNOWN_THROW_KICK_PROJECTILE_UUIDS = ConcurrentHashMap.newKeySet();
     private static final Set<Ref<EntityStore>> KNOWN_THROW_KICK_PROJECTILE_REFS = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, Set<UUID>> PROJECTILE_PHASE_HIT_TARGET_UUIDS = new ConcurrentHashMap<>();
+    private static final Map<UUID, Set<Ref<EntityStore>>> PROJECTILE_PHASE_HIT_TARGET_REFS = new ConcurrentHashMap<>();
+    private static final Map<UUID, List<Vector3d>> PROJECTILE_PHASE_HIT_TARGET_POSITIONS = new ConcurrentHashMap<>();
+    private static final Map<Ref<EntityStore>, Set<UUID>> PROJECTILE_PHASE_HIT_TARGET_UUIDS_BY_REF = new ConcurrentHashMap<>();
+    private static final Map<Ref<EntityStore>, Set<Ref<EntityStore>>> PROJECTILE_PHASE_HIT_TARGET_REFS_BY_REF = new ConcurrentHashMap<>();
+    private static final Map<Ref<EntityStore>, List<Vector3d>> PROJECTILE_PHASE_HIT_TARGET_POSITIONS_BY_REF = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> THROW_KICK_RETURN_DEADLINES = new ConcurrentHashMap<>();
     private static final Map<Ref<EntityStore>, Long> THROW_KICK_RETURN_DEADLINES_BY_REF = new ConcurrentHashMap<>();
     private static final Set<UUID> RETURNING_THROW_KICK_PROJECTILE_UUIDS = ConcurrentHashMap.newKeySet();
@@ -279,7 +290,7 @@ public final class ShieldCapThrowHomingService {
                 ownerState
         );
 
-        Ref<EntityStore> targetRef = context.getTargetEntity();
+        Ref<EntityStore> targetRef = normalizeTargetRef(store, context.getTargetEntity());
         if (ownerRef != null && ownerRef.isValid() && ownerRef.equals(targetRef)) {
             ShieldCapCatch.restoreToOwnerAndRemoveProjectile(store, ownerRef, projectileRef);
             scheduleTrackedProjectileRemoval(store, ownerState, projectileRef);
@@ -305,7 +316,7 @@ public final class ShieldCapThrowHomingService {
                 + " | projectile=" + getEntityUuid(store, projectileRef)
                 + " | deadline=" + getThrowKickReturnDeadline(store, projectileRef, -1L));
 
-        passThroughProjectile(store, projectileRef);
+        passThroughProjectile(store, projectileRef, PASS_THROUGH_UNSTICK_DISTANCE);
     }
 
     static boolean shouldApplyThrowKickDamageToTarget(InteractionContext context) {
@@ -315,7 +326,7 @@ public final class ShieldCapThrowHomingService {
 
         Store<EntityStore> store = context.getCommandBuffer().getStore();
         Ref<EntityStore> projectileRef = resolveProjectileRef(context);
-        Ref<EntityStore> targetRef = context.getTargetEntity();
+        Ref<EntityStore> targetRef = normalizeTargetRef(store, context.getTargetEntity());
         if (store == null || projectileRef == null || !projectileRef.isValid()
                 || targetRef == null || !targetRef.isValid()) {
             return false;
@@ -360,7 +371,9 @@ public final class ShieldCapThrowHomingService {
         }
 
         UUID targetUuid = getEntityUuid(store, targetRef);
-        if (targetUuid != null && trackedState.hitTargetUuids.contains(targetUuid)) {
+        if ((targetUuid != null && trackedState.hitTargetUuids.contains(targetUuid))
+                || trackedState.hitTargetRefs.contains(targetRef)
+                || hasProjectilePhaseHitTarget(store, projectileRef, targetRef, targetUuid)) {
             debug("throwKick repeat damage blocked | owner=" + ownerUuid
                     + " | projectile=" + getEntityUuid(store, projectileRef)
                     + " | target=" + targetUuid
@@ -368,7 +381,7 @@ public final class ShieldCapThrowHomingService {
             return false;
         }
 
-        registerHitTarget(store, trackedState, ownerRef, targetRef);
+        registerHitTarget(store, projectileRef, trackedState, ownerRef, targetRef);
         return true;
     }
 
@@ -379,7 +392,7 @@ public final class ShieldCapThrowHomingService {
 
         Store<EntityStore> store = context.getCommandBuffer().getStore();
         Ref<EntityStore> projectileRef = resolveProjectileRef(context);
-        Ref<EntityStore> targetRef = context.getTargetEntity();
+        Ref<EntityStore> targetRef = normalizeTargetRef(store, context.getTargetEntity());
         if (store == null || projectileRef == null || !projectileRef.isValid()
                 || targetRef == null || !targetRef.isValid()) {
             return false;
@@ -420,7 +433,8 @@ public final class ShieldCapThrowHomingService {
 
         UUID targetUuid = getEntityUuid(store, targetRef);
         if ((targetUuid != null && trackedState.hitTargetUuids.contains(targetUuid))
-                || trackedState.hitTargetRefs.contains(targetRef)) {
+                || trackedState.hitTargetRefs.contains(targetRef)
+                || hasProjectilePhaseHitTarget(store, projectileRef, targetRef, targetUuid)) {
             debug("throw repeat damage blocked | owner=" + ownerUuid
                     + " | projectile=" + getEntityUuid(store, projectileRef)
                     + " | target=" + targetUuid
@@ -428,7 +442,7 @@ public final class ShieldCapThrowHomingService {
             return false;
         }
 
-        registerHitTarget(store, trackedState, ownerRef, targetRef);
+        registerHitTarget(store, projectileRef, trackedState, ownerRef, targetRef);
         return true;
     }
 
@@ -665,6 +679,7 @@ public final class ShieldCapThrowHomingService {
                             || trackedProjectileState.groundedAfterProjectileClash;
             trackedProjectileState.clearMjolnirProjectileClash();
             trackedProjectileState.clearProjectileClashGroundState();
+            clearProjectilePhaseHitTargets(store, projectileRef);
             trackedProjectileState.startReturn(
                     trackedProjectileState.throwKickMode ? ReturnMode.THROW_KICK : ReturnMode.NORMAL,
                     now
@@ -1228,7 +1243,7 @@ public final class ShieldCapThrowHomingService {
                 ownerState
         );
 
-        Ref<EntityStore> targetRef = context.getTargetEntity();
+        Ref<EntityStore> targetRef = normalizeTargetRef(store, context.getTargetEntity());
         if (countHit && ownerRef != null && ownerRef.isValid() && ownerRef.equals(targetRef)) {
             ShieldCapCatch.restoreToOwnerAndRemoveProjectile(store, ownerRef, projectileRef);
             scheduleTrackedProjectileRemoval(store, ownerState, projectileRef);
@@ -1289,6 +1304,7 @@ public final class ShieldCapThrowHomingService {
                             ownerAimPosition,
                             1.0
                     );
+                    passThroughProjectile(store, projectileRef, PASS_THROUGH_UNSTICK_DISTANCE);
                 }
             }
             return;
@@ -1296,8 +1312,9 @@ public final class ShieldCapThrowHomingService {
 
         boolean shouldRebound = countHit;
         if (countHit) {
-            registerHitTarget(context.getCommandBuffer().getStore(), trackedState, ownerRef, targetRef);
+            registerHitTarget(context.getCommandBuffer().getStore(), projectileRef, trackedState, ownerRef, targetRef);
         } else {
+            clearProjectilePhaseHitTargets(store, projectileRef);
             trackedState.startReturn(
                     trackedState.throwKickMode ? ReturnMode.THROW_KICK : ReturnMode.NORMAL,
                     now
@@ -1309,6 +1326,7 @@ public final class ShieldCapThrowHomingService {
         }
 
         if (trackedState.chainHitCount >= MAX_CHAIN_HITS) {
+            clearProjectilePhaseHitTargets(store, projectileRef);
             trackedState.startReturn(
                     trackedState.throwKickMode ? ReturnMode.THROW_KICK : ReturnMode.NORMAL,
                     now
@@ -1579,6 +1597,7 @@ public final class ShieldCapThrowHomingService {
                                 + " | throwKick=" + trackedState.throwKickMode
                                 + " | elapsedMs=" + autoReturnElapsedMs
                                 + " | velocity=" + projectile.velocity.getVelocity());
+                        clearProjectilePhaseHitTargets(store, projectile.projectileRef);
                         trackedState.startReturn(
                                 trackedState.throwKickMode ? ReturnMode.THROW_KICK : ReturnMode.NORMAL,
                                 nowMs
@@ -1968,6 +1987,7 @@ public final class ShieldCapThrowHomingService {
     }
 
     private static void registerHitTarget(Store<EntityStore> store,
+                                          Ref<EntityStore> projectileRef,
                                           TrackedProjectileState trackedState,
                                           Ref<EntityStore> ownerRef,
                                           Ref<EntityStore> targetRef) {
@@ -1975,6 +1995,7 @@ public final class ShieldCapThrowHomingService {
             return;
         }
         if (ownerRef != null && ownerRef.isValid() && ownerRef.equals(targetRef)) {
+            clearProjectilePhaseHitTargets(store, projectileRef);
             trackedState.startReturn(
                     trackedState.throwKickMode ? ReturnMode.THROW_KICK : ReturnMode.NORMAL,
                     System.currentTimeMillis()
@@ -1987,6 +2008,7 @@ public final class ShieldCapThrowHomingService {
 
         trackedState.hitTargetRefs.add(targetRef);
         UUID targetUuid = getEntityUuid(store, targetRef);
+        rememberProjectilePhaseHitTarget(store, projectileRef, targetRef, targetUuid);
         if (targetUuid != null && trackedState.hitTargetUuids.add(targetUuid)) {
             trackedState.chainHitCount++;
             return;
@@ -2054,6 +2076,12 @@ public final class ShieldCapThrowHomingService {
 
     private static void passThroughProjectile(Store<EntityStore> store,
                                               Ref<EntityStore> projectileRef) {
+        passThroughProjectile(store, projectileRef, PASS_THROUGH_UNSTICK_DISTANCE);
+    }
+
+    private static void passThroughProjectile(Store<EntityStore> store,
+                                              Ref<EntityStore> projectileRef,
+                                              double unstuckDistance) {
         TransformComponent projectileTransform =
                 store.getComponent(projectileRef, EntityModule.get().getTransformComponentType());
         Velocity projectileVelocity =
@@ -2077,7 +2105,7 @@ public final class ShieldCapThrowHomingService {
 
         forward.normalize();
         projectileTransform.setPosition(
-                projectileTransform.getPosition().clone().add(forward.scale(IMPACT_UNSTICK_DISTANCE))
+                projectileTransform.getPosition().clone().add(forward.scale(Math.max(IMPACT_UNSTICK_DISTANCE, unstuckDistance)))
         );
         projectileVelocity.set(currentVelocity);
         if (physicsProvider.getVelocity() != null) {
@@ -2302,6 +2330,7 @@ public final class ShieldCapThrowHomingService {
                     armThrowKickReturnTimeout(store, projectileRef, now);
                     trackedState.markAsThrowKick(now);
                 }
+                clearProjectilePhaseHitTargets(store, projectileRef);
                 trackedState.startReturn(
                         trackedState.throwKickMode ? ReturnMode.THROW_KICK : ReturnMode.NORMAL,
                         now
@@ -3345,6 +3374,48 @@ public final class ShieldCapThrowHomingService {
         return uuidComponent == null ? null : uuidComponent.getUuid();
     }
 
+    private static Vector3d getEntityPosition(Store<EntityStore> store, Ref<EntityStore> ref) {
+        if (store == null || ref == null || !ref.isValid()) {
+            return null;
+        }
+
+        TransformComponent transform = store.getComponent(ref, EntityModule.get().getTransformComponentType());
+        if (transform == null || transform.getPosition() == null || !transform.getPosition().isFinite()) {
+            return null;
+        }
+
+        return transform.getPosition().clone();
+    }
+
+    private static Ref<EntityStore> normalizeTargetRef(Store<EntityStore> store, Ref<EntityStore> targetRef) {
+        if (store == null || targetRef == null || !targetRef.isValid()) {
+            return targetRef;
+        }
+
+        Ref<EntityStore> currentRef = targetRef;
+        for (int depth = 0; depth < TARGET_ROOT_RESOLVE_MAX_DEPTH; depth++) {
+            if (currentRef == null || !currentRef.isValid()) {
+                return targetRef;
+            }
+            if (store.getComponent(currentRef, Player.getComponentType()) != null) {
+                return currentRef;
+            }
+
+            MountedComponent mountedComponent = store.getComponent(currentRef, MountedComponent.getComponentType());
+            if (mountedComponent == null || mountedComponent.getMountedToEntity() == null) {
+                return currentRef;
+            }
+
+            Ref<EntityStore> mountedToEntity = mountedComponent.getMountedToEntity();
+            if (mountedToEntity == null || !mountedToEntity.isValid() || mountedToEntity.equals(currentRef)) {
+                return currentRef;
+            }
+            currentRef = mountedToEntity;
+        }
+
+        return currentRef;
+    }
+
     private static void scheduleAllTrackedProjectilesForRemoval(Store<EntityStore> store, OwnerHomingState state) {
         for (Map.Entry<Ref<EntityStore>, TrackedProjectileState> entry : state.trackedProjectiles.entrySet()) {
             scheduleTrackedProjectileRemoval(store, state, entry.getKey());
@@ -3376,6 +3447,7 @@ public final class ShieldCapThrowHomingService {
     }
 
     private static void forgetShieldCapProjectile(Store<EntityStore> store, Ref<EntityStore> projectileRef) {
+        clearProjectilePhaseHitTargets(store, projectileRef);
         UUID projectileUuid = getEntityUuid(store, projectileRef);
         if (projectileUuid != null) {
             KNOWN_SHIELDCAP_PROJECTILE_UUIDS.remove(projectileUuid);
@@ -3397,6 +3469,7 @@ public final class ShieldCapThrowHomingService {
     }
 
     private static void forgetThrowKickProjectile(Store<EntityStore> store, Ref<EntityStore> projectileRef) {
+        clearProjectilePhaseHitTargets(store, projectileRef);
         UUID projectileUuid = getEntityUuid(store, projectileRef);
         if (projectileUuid != null) {
             KNOWN_THROW_KICK_PROJECTILE_UUIDS.remove(projectileUuid);
@@ -3419,6 +3492,122 @@ public final class ShieldCapThrowHomingService {
             return KNOWN_THROW_KICK_PROJECTILE_UUIDS.contains(projectileUuid);
         }
         return projectileRef != null && KNOWN_THROW_KICK_PROJECTILE_REFS.contains(projectileRef);
+    }
+
+    private static boolean hasProjectilePhaseHitTarget(Store<EntityStore> store,
+                                                       Ref<EntityStore> projectileRef,
+                                                       Ref<EntityStore> targetRef,
+                                                       UUID targetUuid) {
+        if (projectileRef == null || targetRef == null) {
+            return false;
+        }
+
+        UUID projectileUuid = getEntityUuid(store, projectileRef);
+        if (projectileUuid != null) {
+            Set<UUID> hitUuids = PROJECTILE_PHASE_HIT_TARGET_UUIDS.get(projectileUuid);
+            if (targetUuid != null && hitUuids != null && hitUuids.contains(targetUuid)) {
+                return true;
+            }
+            Set<Ref<EntityStore>> hitRefs = PROJECTILE_PHASE_HIT_TARGET_REFS.get(projectileUuid);
+            if (hitRefs != null && hitRefs.contains(targetRef)) {
+                return true;
+            }
+            return isCloseToRememberedTargetPosition(
+                    PROJECTILE_PHASE_HIT_TARGET_POSITIONS.get(projectileUuid),
+                    getEntityPosition(store, targetRef)
+            );
+        }
+
+        Set<UUID> hitUuids = PROJECTILE_PHASE_HIT_TARGET_UUIDS_BY_REF.get(projectileRef);
+        if (targetUuid != null && hitUuids != null && hitUuids.contains(targetUuid)) {
+            return true;
+        }
+        Set<Ref<EntityStore>> hitRefs = PROJECTILE_PHASE_HIT_TARGET_REFS_BY_REF.get(projectileRef);
+        if (hitRefs != null && hitRefs.contains(targetRef)) {
+            return true;
+        }
+        return isCloseToRememberedTargetPosition(
+                PROJECTILE_PHASE_HIT_TARGET_POSITIONS_BY_REF.get(projectileRef),
+                getEntityPosition(store, targetRef)
+        );
+    }
+
+    private static void rememberProjectilePhaseHitTarget(Store<EntityStore> store,
+                                                         Ref<EntityStore> projectileRef,
+                                                         Ref<EntityStore> targetRef,
+                                                         UUID targetUuid) {
+        if (projectileRef == null || targetRef == null) {
+            return;
+        }
+
+        Vector3d targetPosition = getEntityPosition(store, targetRef);
+        UUID projectileUuid = getEntityUuid(store, projectileRef);
+        if (projectileUuid != null) {
+            PROJECTILE_PHASE_HIT_TARGET_REFS
+                    .computeIfAbsent(projectileUuid, ignored -> ConcurrentHashMap.newKeySet())
+                    .add(targetRef);
+            if (targetUuid != null) {
+                PROJECTILE_PHASE_HIT_TARGET_UUIDS
+                        .computeIfAbsent(projectileUuid, ignored -> ConcurrentHashMap.newKeySet())
+                        .add(targetUuid);
+            }
+            if (targetPosition != null) {
+                PROJECTILE_PHASE_HIT_TARGET_POSITIONS
+                        .computeIfAbsent(projectileUuid, ignored -> new CopyOnWriteArrayList<>())
+                        .add(targetPosition);
+            }
+            return;
+        }
+
+        PROJECTILE_PHASE_HIT_TARGET_REFS_BY_REF
+                .computeIfAbsent(projectileRef, ignored -> ConcurrentHashMap.newKeySet())
+                .add(targetRef);
+        if (targetUuid != null) {
+            PROJECTILE_PHASE_HIT_TARGET_UUIDS_BY_REF
+                    .computeIfAbsent(projectileRef, ignored -> ConcurrentHashMap.newKeySet())
+                    .add(targetUuid);
+        }
+        if (targetPosition != null) {
+            PROJECTILE_PHASE_HIT_TARGET_POSITIONS_BY_REF
+                    .computeIfAbsent(projectileRef, ignored -> new CopyOnWriteArrayList<>())
+                    .add(targetPosition);
+        }
+    }
+
+    private static void clearProjectilePhaseHitTargets(Store<EntityStore> store,
+                                                       Ref<EntityStore> projectileRef) {
+        if (projectileRef == null) {
+            return;
+        }
+
+        UUID projectileUuid = getEntityUuid(store, projectileRef);
+        if (projectileUuid != null) {
+            PROJECTILE_PHASE_HIT_TARGET_UUIDS.remove(projectileUuid);
+            PROJECTILE_PHASE_HIT_TARGET_REFS.remove(projectileUuid);
+            PROJECTILE_PHASE_HIT_TARGET_POSITIONS.remove(projectileUuid);
+        }
+        PROJECTILE_PHASE_HIT_TARGET_UUIDS_BY_REF.remove(projectileRef);
+        PROJECTILE_PHASE_HIT_TARGET_REFS_BY_REF.remove(projectileRef);
+        PROJECTILE_PHASE_HIT_TARGET_POSITIONS_BY_REF.remove(projectileRef);
+    }
+
+    private static boolean isCloseToRememberedTargetPosition(List<Vector3d> rememberedPositions,
+                                                             Vector3d targetPosition) {
+        if (rememberedPositions == null || rememberedPositions.isEmpty()
+                || targetPosition == null || !targetPosition.isFinite()) {
+            return false;
+        }
+
+        double toleranceSq = SAME_TARGET_POSITION_TOLERANCE * SAME_TARGET_POSITION_TOLERANCE;
+        for (Vector3d rememberedPosition : rememberedPositions) {
+            if (rememberedPosition == null || !rememberedPosition.isFinite()) {
+                continue;
+            }
+            if (rememberedPosition.distanceSquaredTo(targetPosition) <= toleranceSq) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void armThrowKickReturnTimeout(Store<EntityStore> store, Ref<EntityStore> projectileRef, long nowMs) {
@@ -3550,6 +3739,7 @@ public final class ShieldCapThrowHomingService {
                         + " | stuck=" + trackedState.throwKickStuckInBlock
                         + " | deadline=" + getThrowKickReturnDeadline(store, projectileRef, -1L));
                 if (isReturningThrowKickProjectile(store, projectileRef) && !trackedState.isReturningToOwner()) {
+                    clearProjectilePhaseHitTargets(store, projectileRef);
                     trackedState.startReturn(ReturnMode.THROW_KICK, nowMs);
                     debug("throwKick synced into returning state | owner=" + state.ownerUuid
                             + " | projectile=" + getEntityUuid(store, projectileRef));

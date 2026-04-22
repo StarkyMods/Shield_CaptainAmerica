@@ -25,5 +25,5 @@
       "VelocityType": "Set"
     }
   },
-  "Next": "ShieldCap_Signature_Furious_Onslaught_Damage_Next"
+  "Next": "ShieldCap_Signature_Furious_Onslaught_DamageEntity_Next"
 }
