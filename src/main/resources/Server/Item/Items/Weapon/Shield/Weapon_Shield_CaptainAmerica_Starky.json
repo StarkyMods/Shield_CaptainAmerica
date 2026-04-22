@@ -518,7 +518,7 @@
           "Parent": "ShieldCapLeft_Swing_Damage",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 29
+              "Physical": 26
             }
           },
           "EntityStatsOnHit": [
@@ -560,7 +560,7 @@
           "Parent": "ShieldCapLeft_Swing_Damage",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 65
+              "Physical": 55
             }
           },
           "EntityStatsOnHit": [
