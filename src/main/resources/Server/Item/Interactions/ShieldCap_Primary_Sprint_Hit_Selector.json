@@ -16,7 +16,8 @@
       }
     ],
     "ItemAnimationId": "ShieldCapSprintHit",
-    "ClearAnimationOnFinish": true
+    "ClearAnimationOnFinish": true,
+    "WorldSoundEventId": "SFX_ShieldCap_Swings"
   },
   "Selector": {
     "Id": "Horizontal",

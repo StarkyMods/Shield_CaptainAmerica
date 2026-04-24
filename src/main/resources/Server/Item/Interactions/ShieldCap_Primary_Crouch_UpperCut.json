@@ -35,7 +35,10 @@
               },
               "IgnoreOwner": true,
               "HorizontalSpeedMultiplier": 0,
-              "RunTime": 0.35
+              "RunTime": 0.35,
+              "Effects": {
+                "WorldSoundEventId": "SFX_ShieldCap_Swings"
+              }
             }
           ]
         },
@@ -113,7 +116,8 @@
                     "Effects": {
                       "ItemAnimationId": "ShieldCapJumpHit",
                       "ClearAnimationOnFinish": true,
-                      "CameraEffect": "ShieldCap_Big_Hit_Camera"
+                      "CameraEffect": "ShieldCap_Big_Hit_Camera",
+                      "WorldSoundEventId": "SFX_ShieldCap_Impact"
                     },
                     "RunTime": 0.25
                   }
@@ -124,7 +128,11 @@
                 }
               },
               "HorizontalSpeedMultiplier": 0,
-              "RunTime": 0.15
+              "RunTime": 0.15,
+              "Effects": {
+                "WorldSoundEventId": "SFX_Battleaxe_T1_Shove",
+                "LocalSoundEventId": "SFX_Battleaxe_T1_Shove_Local"
+              }
             }
           ]
         }

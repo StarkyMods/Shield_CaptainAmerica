@@ -13,7 +13,8 @@
       "RunTime": 0.01,
       "Effects": {
         "ItemAnimationId": "ShieldCapCharged",
-        "ClearAnimationOnFinish": false
+        "ClearAnimationOnFinish": false,
+        "WorldSoundEventId": "SFX_ShieldCap_Swings"
       },
       "Next": {
         "Type": "ShieldCap_Throw_Homing_Launch_Config_Projectile",

@@ -12,7 +12,7 @@
       "ExtendTop": 0.5,
       "ExtendBottom": 0.5,
       "StartDistance": 0.1,
-      "EndDistance": 2.5,
+      "EndDistance": 2.8,
       "Length": 120,
       "RollOffset": -50,
       "YawStartOffset": -45
@@ -32,7 +32,14 @@
       ]
     },
     "IgnoreOwner": true,
-    "HorizontalSpeedMultiplier": 0.05
+    "Next": {
+      "Type": "Simple",
+      "RunTime": 0.15
+    },
+    "HorizontalSpeedMultiplier": 0.05,
+    "Effects": {
+      "WorldSoundEventId": "SFX_ShieldCap_Swings"
+    }
   },
   "Effects": {
     "ItemAnimationId": "ShieldCapSwingSpinLeft",

@@ -31,7 +31,10 @@
         }
       ]
     },
-    "IgnoreOwner": true
+    "IgnoreOwner": true,
+    "Effects": {
+      "WorldSoundEventId": "SFX_ShieldCap_Swings"
+    }
   },
   "Effects": {
     "ItemAnimationId": "SwingRight"

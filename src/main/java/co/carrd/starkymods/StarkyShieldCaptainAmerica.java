@@ -8,7 +8,12 @@ import co.carrd.starkymods.interactions.ShieldCapPrimaryJumpStateTickSystem;
 import co.carrd.starkymods.interactions.ShieldCapPrimaryCrouchChainCooldown;
 import co.carrd.starkymods.interactions.ShieldCapPrimarySprintHitCooldown;
 import co.carrd.starkymods.interactions.ShieldCapSprintCondition;
+import co.carrd.starkymods.interactions.ShieldCapNotSprintingCondition;
 import co.carrd.starkymods.interactions.ShieldCapGuardInactiveCondition;
+import co.carrd.starkymods.interactions.ShieldCapGuardFallDamageReductionSystem;
+import co.carrd.starkymods.interactions.ShieldCapGuardCreativeFallRollTickSystem;
+import co.carrd.starkymods.interactions.ShieldCapTemporaryFallProtectionArm;
+import co.carrd.starkymods.interactions.ShieldCapTemporaryFallProtectionClear;
 import co.carrd.starkymods.interactions.ShieldCapSecondaryGuardBashCooldown;
 import co.carrd.starkymods.interactions.ShieldCapCatch;
 import co.carrd.starkymods.interactions.ShieldCapSafeRemoveProjectile;
@@ -33,6 +38,7 @@ import co.carrd.starkymods.interactions.ShieldCapInvulnerabilityClear;
 import co.carrd.starkymods.interactions.ShieldCapThrowHomingTickSystem;
 import co.carrd.starkymods.interactions.StarkyPluginPresentCondition;
 import co.carrd.starkymods.visuals.ShieldCapBackModelSystems;
+import co.carrd.starkymods.visuals.ShieldCapBackShieldDamageReductionSystem;
 import co.carrd.starkymods.visuals.ShieldCapBackStateComponent;
 import co.carrd.starkymods.visuals.ShieldCapReturnReticleInjector;
 import co.carrd.starkymods.visuals.ShieldCapVisualSyncService;
@@ -136,9 +142,24 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
                 ShieldCapSprintCondition.CODEC
         );
         getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_Not_Sprinting_Condition_Java",
+                ShieldCapNotSprintingCondition.class,
+                ShieldCapNotSprintingCondition.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
                 "ShieldCap_Guard_Inactive_Condition_Java",
                 ShieldCapGuardInactiveCondition.class,
                 ShieldCapGuardInactiveCondition.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_Temporary_Fall_Protection_Arm_Java",
+                ShieldCapTemporaryFallProtectionArm.class,
+                ShieldCapTemporaryFallProtectionArm.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_Temporary_Fall_Protection_Clear_Java",
+                ShieldCapTemporaryFallProtectionClear.class,
+                ShieldCapTemporaryFallProtectionClear.CODEC
         );
         getCodecRegistry(Interaction.CODEC).register(
                 "ShieldCap_Secondary_Guard_Bash_Cooldown_Java",
@@ -228,6 +249,9 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new ShieldCapThrowHomingTickSystem());
         getEntityStoreRegistry().registerSystem(new ShieldCapPrimaryJumpStateTickSystem());
         getEntityStoreRegistry().registerSystem(new ShieldCapSignatureFuriousOnslaughtTickSystem());
+        getEntityStoreRegistry().registerSystem(new ShieldCapGuardFallDamageReductionSystem());
+        getEntityStoreRegistry().registerSystem(new ShieldCapGuardCreativeFallRollTickSystem());
+        getEntityStoreRegistry().registerSystem(new ShieldCapBackShieldDamageReductionSystem());
         visualSyncService.register(this);
         returnKickInputService.register(this);
         returnReticleInjector.register(this);

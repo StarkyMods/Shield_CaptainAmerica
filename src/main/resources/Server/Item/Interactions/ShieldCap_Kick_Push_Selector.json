@@ -2,28 +2,9 @@
   "Type": "Selector",
   "$Comment": "Length of Combat",
   "RunTime": 0.5,
-  "Effects": {
-    "CameraEffect": "Shield_Bash",
-    "Particles": [
-      {
-        "SystemId": "Shield_Bash",
-        "TargetEntityPart": "PrimaryItem",
-        "TargetNodeName": "Handle",
-        "RotationOffset": {
-          "Yaw": -180,
-          "Roll": -90
-        }
-      }
-    ]
-  },
   "Selector": {
     "Id": "Stab",
     "TestLineOfSight": true,
-    "ExtendTop": 2,
-    "ExtendLeft": 2,
-    "ExtendRight": 2,
-    "ExtendBottom": 2,
-    "StartDistance": 0,
     "EndDistance": 3
   },
   "HitEntity": {
@@ -34,7 +15,7 @@
         "DefaultOk": true,
         "DefaultValue": {
           "Interactions": [
-            "ShieldCap_Secondary_Guard_Bash_Damage"
+            "ShieldCap_Primary_Damage_NoShield"
           ]
         }
       }

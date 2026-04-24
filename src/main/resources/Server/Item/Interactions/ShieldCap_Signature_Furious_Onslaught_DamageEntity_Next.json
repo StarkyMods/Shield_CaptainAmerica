@@ -3,7 +3,7 @@
   "Interactions": [
     {
       "Type": "Simple",
-      "RunTime": 0.1
+      "RunTime": 0.2
     },
     {
       "Type": "ShieldCap_Invulnerability_Clear_Java"

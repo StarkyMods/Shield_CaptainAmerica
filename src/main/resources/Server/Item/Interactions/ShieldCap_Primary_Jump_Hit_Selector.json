@@ -6,16 +6,58 @@
     "CameraEffect": "ShieldCap_Big_Hit_Camera",
     "Particles": [
       {
-        "SystemId": "Shield_Bash",
+        "SystemId": "Hedera_Scream",
+        "TargetEntityPart": "PrimaryItem"
+      },
+      {
+        "SystemId": "Daggers_Bash",
         "TargetEntityPart": "PrimaryItem",
         "TargetNodeName": "Handle",
         "RotationOffset": {
+          "Yaw": 180,
+          "Pitch": 0,
+          "Roll": 0
+        }
+      },
+      {
+        "SystemId": "Daggers_Bash",
+        "TargetEntityPart": "SecondaryItem",
+        "TargetNodeName": "Handle",
+        "RotationOffset": {
           "Yaw": -180,
-          "Roll": -90
+          "Pitch": 0,
+          "Roll": 0
         }
       }
     ],
-    "ItemAnimationId": "ShieldCapRoll"
+    "ItemAnimationId": "ShieldCapRoll",
+    "WorldSoundEventId": "SFX_ShieldCap_BigImpact",
+    "FirstPersonParticles": [
+      {
+        "SystemId": "Hedera_Scream",
+        "TargetEntityPart": "PrimaryItem"
+      },
+      {
+        "SystemId": "Daggers_Bash",
+        "TargetEntityPart": "PrimaryItem",
+        "TargetNodeName": "Handle",
+        "RotationOffset": {
+          "Yaw": 180,
+          "Pitch": 0,
+          "Roll": 0
+        }
+      },
+      {
+        "SystemId": "Daggers_Bash",
+        "TargetEntityPart": "SecondaryItem",
+        "TargetNodeName": "Handle",
+        "RotationOffset": {
+          "Yaw": -180,
+          "Pitch": 0,
+          "Roll": 0
+        }
+      }
+    ]
   },
   "Selector": {
     "Id": "AOECircle",
