@@ -62,5 +62,17 @@
         "Color": "#fffacf"
       }
     ]
+  },
+  "Failed": {
+    "Type": "Serial",
+    "Interactions": [
+      "ShieldCap_Clear_Guard_Movement_Lock",
+      {
+        "Type": "Simple",
+        "HorizontalSpeedMultiplier": 1,
+        "RunTime": 0.05,
+        "Effects": {}
+      }
+    ]
   }
 }

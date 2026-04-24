@@ -100,8 +100,8 @@ public final class ShieldCapThrowHomingService {
     private static final double OWNER_RETURN_SLOW_RADIUS = 12.0;
     private static final double OWNER_RETURN_CLOSE_SPEED_MULTIPLIER = 0.75;
     private static final double OWNER_RETURN_CLOSE_MIN_STEP = 0.12;
-    private static final double RETURN_KICK_MIN_DISTANCE = 6.0;
-    private static final double RETURN_KICK_MAX_DISTANCE = 10.0;
+    private static final double RETURN_KICK_MIN_DISTANCE = 5.0;
+    private static final double RETURN_KICK_MAX_DISTANCE = 14.0;
     private static final double THROW_KICK_VERTICAL_SURFACE_THRESHOLD = 0.6;
     private static final long RETURN_WINDOW_RETICLE_PULSE_INTERVAL_MS = 45L;
     private static final long RETURN_CALLING_ANIMATION_DELAY_MS = 500L;

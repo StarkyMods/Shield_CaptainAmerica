@@ -3,5 +3,17 @@
   "Costs": {
     "Stamina": 3.6
   },
-  "Next": "ShieldCap_Secondary_Guard_Bash"
+  "Next": "ShieldCap_Secondary_Guard_Bash",
+  "Failed": {
+    "Type": "Serial",
+    "Interactions": [
+      "ShieldCap_Clear_Guard_Movement_Lock",
+      {
+        "Type": "Simple",
+        "HorizontalSpeedMultiplier": 1,
+        "RunTime": 0.05,
+        "Effects": {}
+      }
+    ]
+  }
 }
