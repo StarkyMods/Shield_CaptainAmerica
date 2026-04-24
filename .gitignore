@@ -46,3 +46,5 @@ bin/
 libs/
 .aiignore
 README.md
+.codex_verify_leftcall/
+.gradle-user-home/
