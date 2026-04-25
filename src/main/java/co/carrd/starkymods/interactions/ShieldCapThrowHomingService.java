@@ -48,7 +48,9 @@ import com.hypixel.hytale.server.core.util.PositionUtil;
 
 public final class ShieldCapThrowHomingService {
     private static final boolean DEBUG = false;
+    private static final boolean AUTO_RETURN_DEBUG = true;
     private static final String LOG_PREFIX = "[ShieldCapHomingDebug] ";
+    private static final String AUTO_RETURN_LOG_PREFIX = "[ShieldCapAutoReturnDebug] ";
     private static final String MJOLNIR_ITEM_ID = "Weapon_Mjolnir_Starky";
 
     private static final long HOMING_WINDOW_MS = 8000L;
@@ -65,6 +67,7 @@ public final class ShieldCapThrowHomingService {
     private static final long LAST_KNOWN_SHIELD_SYNC_GRACE_MS = 8000L;
     private static final long OWNER_AUTO_RETURN_RETRY_INTERVAL_MS = 150L;
     private static final long RECENT_THROWN_HAND_GRACE_MS = 700L;
+    private static final long MJOLNIR_CLASH_ARM_GRACE_MS = 300L;
 
     private static final int MAX_CHAIN_HITS = 5;
     private static final int MAX_WALL_BOUNCES = 2;
@@ -129,6 +132,7 @@ public final class ShieldCapThrowHomingService {
     private static final Map<UUID, Long> RECENT_THROW_KICK_USAGE = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> PENDING_THROW_KICK_RELAUNCHES = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> PENDING_THROW_KICK_MARKS = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> PENDING_NORMAL_SHIELD_MARKS = new ConcurrentHashMap<>();
     private static final Set<UUID> KNOWN_SHIELDCAP_PROJECTILE_UUIDS = ConcurrentHashMap.newKeySet();
     private static final Set<Ref<EntityStore>> KNOWN_SHIELDCAP_PROJECTILE_REFS = ConcurrentHashMap.newKeySet();
     private static final Set<UUID> KNOWN_THROW_KICK_PROJECTILE_UUIDS = ConcurrentHashMap.newKeySet();
@@ -250,6 +254,71 @@ public final class ShieldCapThrowHomingService {
             }
             return trackedState;
         });
+        logAutoReturn("mark | owner=" + ownerUuid
+                + " | projectile=" + getEntityUuid(projectileStore != null ? projectileStore : ownerStore, projectileRef)
+                + " | throwKick=" + throwKickMode
+                + " | trackedCount=" + state.trackedProjectiles.size()
+                + " | lastKnown=" + getEntityUuid(projectileStore != null ? projectileStore : ownerStore, state.lastKnownShieldProjectileRef));
+    }
+
+    public static void noteShieldFlightExpected(UUID ownerUuid, Ref<EntityStore> ownerRef) {
+        if (ownerUuid == null) {
+            return;
+        }
+
+        long now = System.currentTimeMillis();
+        OwnerHomingState state = ACTIVE_OWNER_STATES.computeIfAbsent(ownerUuid, ignored -> new OwnerHomingState(ownerUuid));
+        Store<EntityStore> ownerStore = getValidStore(ownerRef);
+        if (ownerStore != null && state.armedStore != null && state.armedStore != ownerStore) {
+            state.trackedProjectiles.clear();
+            state.ownerRef = null;
+        }
+        if (ownerStore != null) {
+            state.armedStore = ownerStore;
+            state.ownerRef = ownerRef;
+        }
+        state.enabledAtMs = Math.min(state.enabledAtMs == 0L ? now : state.enabledAtMs, now);
+        state.expiresAtMs = Math.max(state.expiresAtMs, now + HOMING_WINDOW_MS);
+        state.lastShieldProjectileMarkedAtMs = now;
+        if (ownerStore != null && ownerRef != null && ownerRef.isValid()) {
+            ShieldCapThrownHandResolver.ActiveThrownHand activeHand =
+                    resolveActiveOrRecentThrownHand(ownerStore, state, ownerRef, now);
+            if (activeHand != ShieldCapThrownHandResolver.ActiveThrownHand.NONE) {
+                state.lastObservedThrownHand = activeHand;
+                state.lastObservedThrownHandAtMs = now;
+            }
+        }
+    }
+
+    public static Ref<EntityStore> getCurrentNormalShieldProjectileRef(UUID ownerUuid) {
+        if (ownerUuid == null) {
+            return null;
+        }
+
+        OwnerHomingState state = ACTIVE_OWNER_STATES.get(ownerUuid);
+        if (state == null) {
+            return null;
+        }
+
+        for (Map.Entry<Ref<EntityStore>, TrackedProjectileState> entry : state.trackedProjectiles.entrySet()) {
+            Ref<EntityStore> projectileRef = entry.getKey();
+            TrackedProjectileState trackedState = entry.getValue();
+            if (projectileRef == null || !projectileRef.isValid() || trackedState == null || trackedState.throwKickMode) {
+                continue;
+            }
+            return projectileRef;
+        }
+
+        Ref<EntityStore> lastKnownRef = state.lastKnownShieldProjectileRef;
+        if (lastKnownRef != null && lastKnownRef.isValid()) {
+            return lastKnownRef;
+        }
+
+        return null;
+    }
+
+    public static boolean isKnownShieldProjectileRef(Store<EntityStore> store, Ref<EntityStore> projectileRef) {
+        return isShieldCapProjectile(store, projectileRef);
     }
 
     public static void handleProjectileHit(InteractionContext context) {
@@ -430,6 +499,7 @@ public final class ShieldCapThrowHomingService {
         TrackedProjectileState trackedState =
                 ownerState.trackedProjectiles.computeIfAbsent(projectileRef, ignored -> new TrackedProjectileState(now));
         trackedState.recordActivity(now);
+        rememberNormalShieldProjectile(store, ownerState, ownerRef, projectileRef, now);
 
         UUID targetUuid = getEntityUuid(store, targetRef);
         if ((targetUuid != null && trackedState.hitTargetUuids.contains(targetUuid))
@@ -528,6 +598,11 @@ public final class ShieldCapThrowHomingService {
                 ACTIVE_OWNER_STATES.computeIfAbsent(ownerUuid, ignored -> new OwnerHomingState(ownerUuid));
         ownerState.armedStore = store;
         ownerState.expiresAtMs = System.currentTimeMillis() + HOMING_WINDOW_MS;
+        Ref<EntityStore> ownerRef = resolveOwnerRef(
+                store.getExternalData() == null ? null : store.getExternalData().getWorld(),
+                store,
+                ownerState
+        );
 
         long now = System.currentTimeMillis();
         TrackedProjectileState trackedState =
@@ -556,6 +631,9 @@ public final class ShieldCapThrowHomingService {
             trackedState.throwKickStuckInBlock = false;
         }
         trackedState.recordActivity(now);
+        if (!trackedState.throwKickMode) {
+            rememberNormalShieldProjectile(store, ownerState, ownerRef, projectileRef, now);
+        }
 
         if (now - trackedState.lastWallBounceAtMs < WALL_BOUNCE_DEBOUNCE_MS) {
             return;
@@ -659,6 +737,10 @@ public final class ShieldCapThrowHomingService {
         restoreLastKnownShieldProjectileRef(store, state, now);
         syncKnownShieldCapProjectiles(store, state, ownerRef, now);
         recoverOwnerProjectilesForReturn(store, state, ownerRef, now);
+        logAutoReturn("forceReturn begin | owner=" + ownerUuid
+                + " | tracked=" + state.trackedProjectiles.size()
+                + " | lastKnown=" + getEntityUuid(store, state.lastKnownShieldProjectileRef)
+                + " | markAgeMs=" + (state.lastShieldProjectileMarkedAtMs <= 0L ? -1L : now - state.lastShieldProjectileMarkedAtMs));
         debug("forceReturnToOwner begin | owner=" + ownerUuid
                 + " | tracked=" + state.trackedProjectiles.size()
                 + " | ownerRefValid=" + (ownerRef != null && ownerRef.isValid())
@@ -702,6 +784,9 @@ public final class ShieldCapThrowHomingService {
         }
 
         debug("forceReturnToOwner end | owner=" + ownerUuid
+                + " | foundProjectile=" + foundProjectile
+                + " | trackedAfter=" + state.trackedProjectiles.size());
+        logAutoReturn("forceReturn end | owner=" + ownerUuid
                 + " | foundProjectile=" + foundProjectile
                 + " | trackedAfter=" + state.trackedProjectiles.size());
         return foundProjectile;
@@ -948,6 +1033,7 @@ public final class ShieldCapThrowHomingService {
         tickWorld(world, store, now);
         processPendingReturnCallingEffectRequests(store);
         processPendingReturnCallingClearRequests(store);
+        processPendingNormalShieldMarks(store);
         processPendingReturnKickRequests(store);
         processPendingThrowKickRelaunches(store);
         processPendingThrowKickMarks(store);
@@ -1210,6 +1296,50 @@ public final class ShieldCapThrowHomingService {
         store.forEachChunk(Player.getComponentType(), chunkConsumer);
     }
 
+    public static void queuePendingNormalShieldMark(UUID ownerUuid) {
+        if (ownerUuid != null) {
+            PENDING_NORMAL_SHIELD_MARKS.put(ownerUuid, System.currentTimeMillis());
+        }
+    }
+
+    public static void processPendingNormalShieldMarks(Store<EntityStore> store) {
+        if (store == null || PENDING_NORMAL_SHIELD_MARKS.isEmpty()) {
+            return;
+        }
+
+        BiConsumer<ArchetypeChunk<EntityStore>, CommandBuffer<EntityStore>> chunkConsumer = (chunk, commandBuffer) -> {
+            for (int index = 0; index < chunk.size(); index++) {
+                Ref<EntityStore> playerEntityRef = chunk.getReferenceTo(index);
+                if (playerEntityRef == null || !playerEntityRef.isValid()) {
+                    continue;
+                }
+
+                PlayerRef playerRef = commandBuffer.getComponent(playerEntityRef, PlayerRef.getComponentType());
+                if (playerRef == null || !playerRef.isValid() || playerRef.getUuid() == null) {
+                    continue;
+                }
+
+                UUID ownerUuid = playerRef.getUuid();
+                Long pendingAtMs = PENDING_NORMAL_SHIELD_MARKS.get(ownerUuid);
+                if (pendingAtMs == null) {
+                    continue;
+                }
+
+                Ref<EntityStore> projectileRef = resolvePendingNormalShieldProjectile(commandBuffer, playerEntityRef, ownerUuid);
+                if (projectileRef != null && projectileRef.isValid()) {
+                    markProjectile(ownerUuid, playerEntityRef, projectileRef, false);
+                    PENDING_NORMAL_SHIELD_MARKS.remove(ownerUuid);
+                    continue;
+                }
+
+                if (System.currentTimeMillis() - pendingAtMs > PENDING_REF_GRACE_MS) {
+                    PENDING_NORMAL_SHIELD_MARKS.remove(ownerUuid);
+                }
+            }
+        };
+        store.forEachChunk(Player.getComponentType(), chunkConsumer);
+    }
+
     private static void handleImpact(InteractionContext context, boolean countHit) {
         if (context == null || context.getCommandBuffer() == null) {
             return;
@@ -1254,6 +1384,9 @@ public final class ShieldCapThrowHomingService {
         TrackedProjectileState trackedState =
                 ownerState.trackedProjectiles.computeIfAbsent(projectileRef, ignored -> new TrackedProjectileState(now));
         trackedState.recordActivity(now);
+        if (!trackedState.throwKickMode) {
+            rememberNormalShieldProjectile(store, ownerState, ownerRef, projectileRef, now);
+        }
 
         if (trackedState.fallingAfterProjectileClash || trackedState.groundedAfterProjectileClash) {
             if (isGroundedForProjectileClash(physicsProvider)) {
@@ -1541,18 +1674,25 @@ public final class ShieldCapThrowHomingService {
 
             List<ProjectileSnapshot> ownerProjectiles = collectTrackedProjectiles(state, store, ownerRef, nowMs);
             if (ownerProjectiles.isEmpty()) {
+                boolean shieldFlightStillExpected = shouldExpectShieldProjectileFlight(state, nowMs);
                 ShieldCapThrownHandResolver.ActiveThrownHand thrownHand =
-                        ShieldCapThrownHandResolver.resolveActiveThrownHand(store, ownerRef);
+                        resolveActiveOrRecentThrownHand(store, state, ownerRef, nowMs);
                 boolean ownerLevelAutoReturnDue =
                         !hasKnownThrowKickProjectile
-                                && thrownHand != ShieldCapThrownHandResolver.ActiveThrownHand.NONE
+                                && (thrownHand != ShieldCapThrownHandResolver.ActiveThrownHand.NONE || shieldFlightStillExpected)
                                 && state.lastShieldProjectileMarkedAtMs > 0L
                                 && nowMs - state.lastShieldProjectileMarkedAtMs >= FLIGHT_RETURN_TIMEOUT_MS
                                 && nowMs - state.lastOwnerAutoReturnFallbackAtMs >= OWNER_AUTO_RETURN_RETRY_INTERVAL_MS;
                 if (ownerLevelAutoReturnDue) {
                     state.lastOwnerAutoReturnFallbackAtMs = nowMs;
+                    logAutoReturn("timeout fallback | owner=" + state.ownerUuid
+                            + " | tracked=" + state.trackedProjectiles.size()
+                            + " | lastKnown=" + getEntityUuid(store, state.lastKnownShieldProjectileRef)
+                            + " | hand=" + thrownHand
+                            + " | shieldFlightStillExpected=" + shieldFlightStillExpected);
                     debug("owner-level auto return fallback | owner=" + state.ownerUuid
                             + " | hand=" + thrownHand
+                            + " | shieldFlightStillExpected=" + shieldFlightStillExpected
                             + " | sinceMarkMs=" + (nowMs - state.lastShieldProjectileMarkedAtMs));
                     forceReturnToOwner(state.ownerUuid, ownerRef);
                 }
@@ -2296,6 +2436,9 @@ public final class ShieldCapThrowHomingService {
             return;
         }
 
+        List<Ref<EntityStore>> explicitCandidates = new ArrayList<>();
+        List<Ref<EntityStore>> ambiguousCandidates = new ArrayList<>();
+
         BiConsumer<ArchetypeChunk<EntityStore>, CommandBuffer<EntityStore>> chunkConsumer = (chunk, commandBuffer) -> {
             for (int index = 0; index < chunk.size(); index++) {
                 Ref<EntityStore> projectileRef = chunk.getReferenceTo(index);
@@ -2319,37 +2462,87 @@ public final class ShieldCapThrowHomingService {
                 if (creatorUuid == null || !creatorUuid.equals(state.ownerUuid)) {
                     continue;
                 }
-                if (!hasExplicitShieldCapIdentity(commandBuffer.getStore(), projectileRef)
-                        && !projectileRef.equals(state.lastKnownShieldProjectileRef)) {
+                if (isKnownThrowKickProjectile(store, projectileRef)) {
+                    continue;
+                }
+                String projectileAssetName = getProjectileAssetName(commandBuffer.getStore(), projectileRef);
+                if (projectileAssetName != null && projectileAssetName.startsWith(FOREIGN_PROJECTILE_ASSET_PREFIX)) {
                     continue;
                 }
 
-                TrackedProjectileState trackedState =
-                        state.trackedProjectiles.computeIfAbsent(projectileRef, ignored -> new TrackedProjectileState(now));
-                if (isKnownThrowKickProjectile(store, projectileRef)) {
-                    armThrowKickReturnTimeout(store, projectileRef, now);
-                    trackedState.markAsThrowKick(now);
+                if (hasExplicitShieldCapIdentity(commandBuffer.getStore(), projectileRef)
+                        || projectileRef.equals(state.lastKnownShieldProjectileRef)) {
+                    explicitCandidates.add(projectileRef);
+                    continue;
                 }
-                clearProjectilePhaseHitTargets(store, projectileRef);
-                trackedState.startReturn(
-                        trackedState.throwKickMode ? ReturnMode.THROW_KICK : ReturnMode.NORMAL,
-                        now
-                );
-                if (trackedState.throwKickMode) {
-                    markThrowKickReturning(store, projectileRef);
-                    clearThrowKickStuck(store, projectileRef);
-                    clearReturnKickWindow(state);
-                    debug("throwKick recovered and forced to return | owner=" + state.ownerUuid
-                            + " | projectile=" + getEntityUuid(store, projectileRef));
-                }
-                trackedState.recordActivity(now);
-
-                if (ownerRef != null && ownerRef.isValid()) {
-                    unstickProjectileForReturn(store, projectileRef, ownerRef);
+                if (isRememberedShieldCapProjectileRef(commandBuffer.getStore(), projectileRef)) {
+                    ambiguousCandidates.add(projectileRef);
                 }
             }
         };
         store.forEachChunk(ProjectileModule.get().getStandardPhysicsProviderComponentType(), chunkConsumer);
+        logAutoReturn("recover candidates | owner=" + state.ownerUuid
+                + " | explicit=" + explicitCandidates.size()
+                + " | ambiguous=" + ambiguousCandidates.size()
+                + " | trackedBefore=" + state.trackedProjectiles.size()
+                + " | lastKnown=" + getEntityUuid(store, state.lastKnownShieldProjectileRef));
+
+        List<Ref<EntityStore>> candidatesToRecover = explicitCandidates;
+        if (candidatesToRecover.isEmpty() && ambiguousCandidates.size() == 1) {
+            candidatesToRecover = ambiguousCandidates;
+        } else if (candidatesToRecover.isEmpty()
+                && ambiguousCandidates.size() > 1
+                && state.lastKnownShieldProjectilePosition != null) {
+            Ref<EntityStore> nearestCandidate =
+                    selectNearestProjectileToPosition(store, state.lastKnownShieldProjectilePosition, ambiguousCandidates);
+            if (nearestCandidate != null) {
+                candidatesToRecover = List.of(nearestCandidate);
+            }
+        } else if (candidatesToRecover.isEmpty()
+                && ambiguousCandidates.size() > 1
+                && ownerRef != null
+                && ownerRef.isValid()
+                && shouldExpectShieldProjectileFlight(state, now)) {
+            Ref<EntityStore> nearestCandidate = selectNearestProjectileToOwner(store, ownerRef, ambiguousCandidates);
+            if (nearestCandidate != null) {
+                candidatesToRecover = List.of(nearestCandidate);
+            }
+        }
+
+        for (Ref<EntityStore> projectileRef : candidatesToRecover) {
+            if (projectileRef == null || !projectileRef.isValid()) {
+                continue;
+            }
+
+            TrackedProjectileState trackedState =
+                    state.trackedProjectiles.computeIfAbsent(projectileRef, ignored -> new TrackedProjectileState(now));
+            if (isKnownThrowKickProjectile(store, projectileRef)) {
+                armThrowKickReturnTimeout(store, projectileRef, now);
+                trackedState.markAsThrowKick(now);
+            } else {
+                rememberNormalShieldProjectile(store, state, ownerRef, projectileRef, now);
+            }
+            clearProjectilePhaseHitTargets(store, projectileRef);
+            trackedState.startReturn(
+                    trackedState.throwKickMode ? ReturnMode.THROW_KICK : ReturnMode.NORMAL,
+                    now
+            );
+            if (trackedState.throwKickMode) {
+                markThrowKickReturning(store, projectileRef);
+                clearThrowKickStuck(store, projectileRef);
+                clearReturnKickWindow(state);
+                debug("throwKick recovered and forced to return | owner=" + state.ownerUuid
+                        + " | projectile=" + getEntityUuid(store, projectileRef));
+            }
+            trackedState.recordActivity(now);
+            logAutoReturn("recover apply | owner=" + state.ownerUuid
+                    + " | projectile=" + getEntityUuid(store, projectileRef)
+                    + " | throwKick=" + trackedState.throwKickMode);
+
+            if (ownerRef != null && ownerRef.isValid()) {
+                unstickProjectileForReturn(store, projectileRef, ownerRef);
+            }
+        }
     }
 
     private static Ref<EntityStore> resolveProjectileRef(InteractionContext context) {
@@ -2528,6 +2721,88 @@ public final class ShieldCapThrowHomingService {
         return resolvePendingThrowKickProjectile(commandBuffer.getStore(), ownerRef, ownerUuid);
     }
 
+    private static Ref<EntityStore> resolvePendingNormalShieldProjectile(Store<EntityStore> store,
+                                                                         Ref<EntityStore> ownerRef,
+                                                                         UUID ownerUuid) {
+        if (store == null || ownerUuid == null) {
+            return null;
+        }
+
+        final Ref<EntityStore>[] bestRef = new Ref[]{null};
+        final double[] bestDistanceSq = new double[]{Double.MAX_VALUE};
+        TransformComponent ownerTransform =
+                ownerRef == null || !ownerRef.isValid()
+                        ? null
+                        : store.getComponent(ownerRef, EntityModule.get().getTransformComponentType());
+        Vector3d ownerPos = ownerTransform == null ? null : ownerTransform.getPosition();
+
+        BiConsumer<ArchetypeChunk<EntityStore>, CommandBuffer<EntityStore>> chunkConsumer = (chunk, cb) -> {
+            for (int index = 0; index < chunk.size(); index++) {
+                Ref<EntityStore> projectileRef = chunk.getReferenceTo(index);
+                if (projectileRef == null || !projectileRef.isValid()) {
+                    continue;
+                }
+                if (ownerRef != null && ownerRef.isValid() && ownerRef.equals(projectileRef)) {
+                    continue;
+                }
+                if (cb.getComponent(projectileRef, Player.getComponentType()) != null) {
+                    continue;
+                }
+
+                StandardPhysicsProvider physicsProvider =
+                        cb.getComponent(projectileRef, ProjectileModule.get().getStandardPhysicsProviderComponentType());
+                if (physicsProvider == null) {
+                    continue;
+                }
+                UUID creatorUuid = physicsProvider.getCreatorUuid();
+                if (creatorUuid == null || !creatorUuid.equals(ownerUuid)) {
+                    continue;
+                }
+                if (isKnownThrowKickProjectile(store, projectileRef)) {
+                    continue;
+                }
+                String projectileAssetName = getProjectileAssetName(store, projectileRef);
+                if (projectileAssetName != null && projectileAssetName.startsWith(FOREIGN_PROJECTILE_ASSET_PREFIX)) {
+                    continue;
+                }
+
+                Velocity velocity = cb.getComponent(projectileRef, EntityModule.get().getVelocityComponentType());
+                if (velocity == null || velocity.getVelocity() == null) {
+                    continue;
+                }
+                double speed = velocity.getVelocity().length();
+                if (!Double.isFinite(speed) || speed < THROW_KICK_SPAWN_MIN_SPEED) {
+                    continue;
+                }
+
+                TransformComponent projectileTransform =
+                        cb.getComponent(projectileRef, EntityModule.get().getTransformComponentType());
+                if (projectileTransform == null || projectileTransform.getPosition() == null) {
+                    continue;
+                }
+
+                double distanceSq = ownerPos == null
+                        ? 0.0
+                        : ownerPos.distanceSquaredTo(projectileTransform.getPosition());
+                if (distanceSq < bestDistanceSq[0]) {
+                    bestDistanceSq[0] = distanceSq;
+                    bestRef[0] = projectileRef;
+                }
+            }
+        };
+        store.forEachChunk(ProjectileModule.get().getStandardPhysicsProviderComponentType(), chunkConsumer);
+        return bestRef[0];
+    }
+
+    private static Ref<EntityStore> resolvePendingNormalShieldProjectile(CommandBuffer<EntityStore> commandBuffer,
+                                                                         Ref<EntityStore> ownerRef,
+                                                                         UUID ownerUuid) {
+        if (commandBuffer == null || ownerUuid == null) {
+            return null;
+        }
+        return resolvePendingNormalShieldProjectile(commandBuffer.getStore(), ownerRef, ownerUuid);
+    }
+
     private static Ref<EntityStore> resolveOwnerRef(World world,
                                                     Store<EntityStore> store,
                                                     OwnerHomingState state) {
@@ -2600,6 +2875,10 @@ public final class ShieldCapThrowHomingService {
                 continue;
             }
             if (!isShieldCapProjectile(store, projectileRef)) {
+                logAutoReturn("collect remove:not-shield | owner=" + state.ownerUuid
+                        + " | projectile=" + getEntityUuid(store, projectileRef)
+                        + " | asset=" + getProjectileAssetName(store, projectileRef)
+                        + " | trackedCountBefore=" + state.trackedProjectiles.size());
                 iterator.remove();
                 continue;
             }
@@ -3156,6 +3435,10 @@ public final class ShieldCapThrowHomingService {
         if (trackedState.fallingAfterProjectileClash || trackedState.groundedAfterProjectileClash) {
             return false;
         }
+        long now = System.currentTimeMillis();
+        if (now - trackedState.addedAtMs < MJOLNIR_CLASH_ARM_GRACE_MS) {
+            return false;
+        }
         if (mjolnirProjectileRef != null && isMjolnirProjectileReturningForClash(store, mjolnirProjectileRef)) {
             return false;
         }
@@ -3432,6 +3715,7 @@ public final class ShieldCapThrowHomingService {
         state.trackedProjectiles.remove(projectileRef);
         forgetShieldCapProjectile(store, projectileRef);
         forgetThrowKickProjectile(store, projectileRef);
+        clearShieldFlightMemoryIfIdle(state, projectileRef);
         UUID projectileUuid = getEntityUuid(store, projectileRef);
         ShieldCapSafeRemoveProjectile.scheduleSafeRemoval(store, projectileRef, projectileUuid, OWNER_RETURN_REMOVE_DELAY_MS);
     }
@@ -3757,7 +4041,7 @@ public final class ShieldCapThrowHomingService {
         if (store == null || state == null || ownerRef == null || !ownerRef.isValid()) {
             return;
         }
-        if (ShieldCapThrownHandResolver.resolveActiveThrownHand(store, ownerRef)
+        if (resolveActiveOrRecentThrownHand(store, state, ownerRef, nowMs)
                 == ShieldCapThrownHandResolver.ActiveThrownHand.NONE) {
             return;
         }
@@ -3798,14 +4082,17 @@ public final class ShieldCapThrowHomingService {
                     continue;
                 }
                 if (isRememberedShieldCapProjectileRef(commandBuffer.getStore(), projectileRef)
-                        || projectileRef.equals(state.lastKnownShieldProjectileRef)
-                        || projectileAssetName == null
-                        || projectileAssetName.isBlank()) {
+                        || projectileRef.equals(state.lastKnownShieldProjectileRef)) {
                     ambiguousCandidates.add(projectileRef);
                 }
             }
         };
         store.forEachChunk(ProjectileModule.get().getStandardPhysicsProviderComponentType(), chunkConsumer);
+        logAutoReturn("sync candidates | owner=" + state.ownerUuid
+                + " | explicit=" + explicitCandidates.size()
+                + " | ambiguous=" + ambiguousCandidates.size()
+                + " | trackedBefore=" + state.trackedProjectiles.size()
+                + " | lastKnown=" + getEntityUuid(store, state.lastKnownShieldProjectileRef));
 
         List<Ref<EntityStore>> candidatesToSync = explicitCandidates;
         boolean recentMarkFallback = false;
@@ -3837,7 +4124,7 @@ public final class ShieldCapThrowHomingService {
         for (Ref<EntityStore> projectileRef : candidatesToSync) {
             TrackedProjectileState trackedState =
                     state.trackedProjectiles.computeIfAbsent(projectileRef, ignored -> new TrackedProjectileState(nowMs));
-            rememberShieldCapProjectile(store, projectileRef);
+            rememberNormalShieldProjectile(store, state, ownerRef, projectileRef, nowMs);
             String projectileAssetName = getProjectileAssetName(store, projectileRef);
             debug("shield projectile synced from world | owner=" + state.ownerUuid
                     + " | projectile=" + getEntityUuid(store, projectileRef)
@@ -4003,6 +4290,12 @@ public final class ShieldCapThrowHomingService {
         }
     }
 
+    private static void logAutoReturn(String message) {
+        if (AUTO_RETURN_DEBUG) {
+            System.out.println(AUTO_RETURN_LOG_PREFIX + message);
+        }
+    }
+
     private static String describeHeldShieldState(Store<EntityStore> store, Ref<EntityStore> ownerRef) {
         if (store == null || ownerRef == null || !ownerRef.isValid()) {
             return "owner-invalid";
@@ -4081,6 +4374,77 @@ public final class ShieldCapThrowHomingService {
             return null;
         }
         return ref.getStore();
+    }
+
+    private static boolean shouldExpectShieldProjectileFlight(OwnerHomingState state, long nowMs) {
+        if (state == null || state.lastShieldProjectileMarkedAtMs <= 0L) {
+            return false;
+        }
+        return nowMs - state.lastShieldProjectileMarkedAtMs <= HOMING_WINDOW_MS;
+    }
+
+    private static boolean hasTrackedNormalShieldProjectiles(OwnerHomingState state) {
+        if (state == null || state.trackedProjectiles.isEmpty()) {
+            return false;
+        }
+        for (TrackedProjectileState trackedState : state.trackedProjectiles.values()) {
+            if (trackedState != null && !trackedState.throwKickMode) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void rememberNormalShieldProjectile(Store<EntityStore> store,
+                                                       OwnerHomingState state,
+                                                       Ref<EntityStore> ownerRef,
+                                                       Ref<EntityStore> projectileRef,
+                                                       long nowMs) {
+        if (store == null || state == null || projectileRef == null || !projectileRef.isValid()) {
+            return;
+        }
+
+        rememberShieldCapProjectile(store, projectileRef);
+        state.lastKnownShieldProjectileRef = projectileRef;
+        TransformComponent projectileTransform =
+                store.getComponent(projectileRef, EntityModule.get().getTransformComponentType());
+        if (projectileTransform != null && projectileTransform.getPosition() != null) {
+            state.lastKnownShieldProjectilePosition = projectileTransform.getPosition().clone();
+            state.lastKnownShieldProjectileSeenAtMs = nowMs;
+        }
+        state.lastShieldProjectileMarkedAtMs = Math.max(state.lastShieldProjectileMarkedAtMs, nowMs);
+
+        ShieldCapThrownHandResolver.ActiveThrownHand activeHand =
+                resolveActiveOrRecentThrownHand(store, state, ownerRef, nowMs);
+        if (activeHand != ShieldCapThrownHandResolver.ActiveThrownHand.NONE) {
+            state.lastObservedThrownHand = activeHand;
+            state.lastObservedThrownHandAtMs = nowMs;
+        }
+    }
+
+    private static void clearShieldFlightMemoryIfIdle(OwnerHomingState state,
+                                                      Ref<EntityStore> removedProjectileRef) {
+        if (state == null) {
+            return;
+        }
+
+        if (removedProjectileRef != null && removedProjectileRef.equals(state.lastKnownShieldProjectileRef)) {
+            state.lastKnownShieldProjectileRef = null;
+            state.lastKnownShieldProjectilePosition = null;
+            state.lastKnownShieldProjectileSeenAtMs = 0L;
+        }
+
+        if (hasTrackedNormalShieldProjectiles(state)) {
+            return;
+        }
+
+        state.lastShieldProjectileMarkedAtMs = 0L;
+        state.lastOwnerAutoReturnFallbackAtMs = 0L;
+        state.lastObservedThrownHand = ShieldCapThrownHandResolver.ActiveThrownHand.NONE;
+        state.lastObservedThrownHandAtMs = 0L;
+        state.lastKnownShieldProjectileRef = null;
+        state.lastKnownShieldProjectilePosition = null;
+        state.lastKnownShieldProjectileSeenAtMs = 0L;
     }
 
     private static final class OwnerHomingState {

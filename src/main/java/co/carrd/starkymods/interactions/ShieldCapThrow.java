@@ -153,9 +153,13 @@ public final class ShieldCapThrow extends SimpleInstantInteraction {
         Ref<EntityStore> projectileRef =
                 ProjectileModule.get().spawnProjectile(null, ownerRef, commandBuffer, projectileConfig, position, direction);
         if (projectileRef == null || !projectileRef.isValid()) {
+            ShieldCapThrowHomingService.noteShieldFlightExpected(ownerUuid, ownerRef);
+            ShieldCapThrowHomingService.queuePendingNormalShieldMark(ownerUuid);
             return false;
         }
 
+        ShieldCapThrowHomingService.noteShieldFlightExpected(ownerUuid, ownerRef);
+        ShieldCapThrowHomingService.queuePendingNormalShieldMark(ownerUuid);
         ShieldCapThrowHomingService.markProjectile(ownerUuid, ownerRef, projectileRef);
         return true;
     }

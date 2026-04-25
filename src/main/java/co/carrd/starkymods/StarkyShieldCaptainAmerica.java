@@ -20,6 +20,9 @@ import co.carrd.starkymods.interactions.ShieldCapSprintCondition;
 import co.carrd.starkymods.interactions.ShieldCapNotSprintingCondition;
 import co.carrd.starkymods.interactions.ShieldCapGuardInactiveCondition;
 import co.carrd.starkymods.interactions.ShieldCapGuardFallDamageReductionSystem;
+import co.carrd.starkymods.interactions.ShieldCapKickPushKnockbackImmunitySystem;
+import co.carrd.starkymods.interactions.ShieldCapKickPushKnockbackImmunityTickSystem;
+import co.carrd.starkymods.interactions.ShieldCapKickPushKnockbackImmunityArm;
 import co.carrd.starkymods.interactions.ShieldCapMjolnirGuardWieldImpactSystem;
 import co.carrd.starkymods.interactions.ShieldCapGuardCreativeFallRollTickSystem;
 import co.carrd.starkymods.interactions.ShieldCapTemporaryFallProtectionArm;
@@ -41,6 +44,7 @@ import co.carrd.starkymods.interactions.ShieldCapThrowKickImpact;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickTargetGate;
 import co.carrd.starkymods.interactions.ShieldCapThrowTargetGate;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickRecentMarker;
+import co.carrd.starkymods.interactions.ShieldCapThrowKickCallingClear;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickRootRouter;
 import co.carrd.starkymods.interactions.ShieldCapThrowKickWindowCondition;
 import co.carrd.starkymods.interactions.ShieldCapReturnCallingAnimation;
@@ -293,6 +297,11 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
                 ShieldCapThrowHomingReturnOnMiss.CODEC
         );
         getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_Kick_Push_Knockback_Immunity_Arm_Java",
+                ShieldCapKickPushKnockbackImmunityArm.class,
+                ShieldCapKickPushKnockbackImmunityArm.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
                 "ShieldCap_Throw_Kick_Impact",
                 ShieldCapThrowKickImpact.class,
                 ShieldCapThrowKickImpact.CODEC
@@ -316,6 +325,11 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
                 "ShieldCap_Throw_Kick_Recent_Java",
                 ShieldCapThrowKickRecentMarker.class,
                 ShieldCapThrowKickRecentMarker.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_Throw_Kick_Calling_Clear_Java",
+                ShieldCapThrowKickCallingClear.class,
+                ShieldCapThrowKickCallingClear.CODEC
         );
         getCodecRegistry(Interaction.CODEC).register(
                 "ShieldCap_Throw_Kick_Window_Java",
@@ -346,6 +360,8 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new ShieldCapPrimaryJumpStateTickSystem());
         getEntityStoreRegistry().registerSystem(new ShieldCapSignatureFuriousOnslaughtTickSystem());
         getEntityStoreRegistry().registerSystem(new ShieldCapGuardFallDamageReductionSystem());
+        getEntityStoreRegistry().registerSystem(new ShieldCapKickPushKnockbackImmunitySystem());
+        getEntityStoreRegistry().registerSystem(new ShieldCapKickPushKnockbackImmunityTickSystem());
         getEntityStoreRegistry().registerSystem(new ShieldCapMjolnirGuardWieldImpactSystem());
         getEntityStoreRegistry().registerSystem(new ShieldCapGuardCreativeFallRollTickSystem());
         getEntityStoreRegistry().registerSystem(new ShieldCapBackShieldDamageReductionSystem());

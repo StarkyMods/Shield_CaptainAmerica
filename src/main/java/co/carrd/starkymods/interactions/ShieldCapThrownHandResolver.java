@@ -33,6 +33,9 @@ final class ShieldCapThrownHandResolver {
         if (isValidSlot(hotbar, activeHotbarSlot) && matchesId(hotbar.getItemStack(activeHotbarSlot), THROWN_ITEM_ID)) {
             return ActiveThrownHand.MAIN;
         }
+        if (containsThrownShield(hotbar)) {
+            return ActiveThrownHand.MAIN;
+        }
 
         ItemContainer utility = inventory.getUtility();
         byte activeUtilitySlot = inventory.getActiveUtilitySlot();

@@ -17,47 +17,60 @@
         "Next": {
           "Type": "ShieldCap_Throw_Kick_Recent_Java",
           "Next": {
-            "Type": "ApplyForce",
-            "Effects": {
-              "ItemAnimationId": "ShieldCapThrowKick",
-              "ClearAnimationOnFinish": false
-            },
-            "Direction": {
-              "Z": 0,
-              "Y": 1
-            },
-            "Force": 11,
-            "AdjustVertical": false,
-            "VelocityConfig": {
-              "GroundResistance": 0.936,
-              "GroundResistanceMax": 0.928,
-              "AirResistance": 0.924,
-              "AirResistanceMax": 0.932,
-              "Threshold": 3,
-              "Style": "Linear"
-            },
-            "ChangeVelocityType": "Add",
-            "WaitForGround": false,
-            "WaitForCollision": false,
-            "RunTime": 0.4,
+            "Type": "ShieldCap_Throw_Kick_Calling_Clear_Java",
             "Next": {
-              "Type": "Simple",
-              "RunTime": 0.4,
-              "Effects": {
-                "CameraEffect": "ShieldCap_Hit_Camera",
-                "Particles": [
-                  {
-                    "SystemId": "Hedera_Scream",
-                    "Scale": 0.1,
-                    "TargetEntityPart": "Entity",
-                    "TargetNodeName": "Hip",
-                    "PositionOffset": {
-                      "Z": 1,
-                      "Y": 1.9,
-                      "X": 0
-                    }
-                  }
+              "Type": "ApplyForce",
+              "Rules": {
+                "Blocking": [
+                  "Secondary"
                 ]
+              },
+              "Effects": {
+                "ItemAnimationId": "ShieldCapThrowKick",
+                "ClearAnimationOnFinish": false
+              },
+              "Direction": {
+                "Z": 0,
+                "Y": 1
+              },
+              "Force": 11,
+              "AdjustVertical": false,
+              "VelocityConfig": {
+                "GroundResistance": 0.936,
+                "GroundResistanceMax": 0.928,
+                "AirResistance": 0.924,
+                "AirResistanceMax": 0.932,
+                "Threshold": 3,
+                "Style": "Linear"
+              },
+              "ChangeVelocityType": "Add",
+              "WaitForGround": false,
+              "WaitForCollision": false,
+              "RunTime": 0.4,
+              "Next": {
+                "Type": "Simple",
+                "RunTime": 0.4,
+                "Rules": {
+                  "Blocking": [
+                    "Secondary"
+                  ]
+                },
+                "Effects": {
+                  "CameraEffect": "ShieldCap_Hit_Camera",
+                  "Particles": [
+                    {
+                      "SystemId": "Hedera_Scream",
+                      "Scale": 0.1,
+                      "TargetEntityPart": "Entity",
+                      "TargetNodeName": "Hip",
+                      "PositionOffset": {
+                        "Z": 1,
+                        "Y": 1.9,
+                        "X": 0
+                      }
+                    }
+                  ]
+                }
               }
             }
           },

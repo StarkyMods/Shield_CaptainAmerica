@@ -14,7 +14,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Sim
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 
 public final class ShieldCapForceReturn extends SimpleInstantInteraction {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final String LOG_PREFIX = "[ShieldCapForceReturnDebug] ";
 
     @Nonnull

@@ -52,9 +52,22 @@ public class ShieldCapThrowHomingMarkProjectile extends SimpleInstantInteraction
             return;
         }
 
+        Ref<EntityStore> existingShieldProjectileRef =
+                ShieldCapThrowHomingService.getCurrentNormalShieldProjectileRef(owner.ownerUuid);
         Ref<EntityStore> projectileRef = resolveProjectileRef(commandBuffer, context, owner.ownerRef, owner.ownerUuid);
         if (projectileRef == null || !projectileRef.isValid()) {
-            ShieldCapThrowHomingService.tripSafetyFuse(owner.ownerUuid, "mark interaction could not resolve projectile");
+            if (existingShieldProjectileRef != null && existingShieldProjectileRef.isValid()) {
+                ShieldCapThrowHomingService.markProjectile(owner.ownerUuid, owner.ownerRef, existingShieldProjectileRef);
+            } else {
+                ShieldCapThrowHomingService.noteShieldFlightExpected(owner.ownerUuid, owner.ownerRef);
+            }
+            return;
+        }
+
+        if (!isExplicitShieldProjectile(commandBuffer, projectileRef)
+                && existingShieldProjectileRef != null
+                && existingShieldProjectileRef.isValid()) {
+            ShieldCapThrowHomingService.markProjectile(owner.ownerUuid, owner.ownerRef, existingShieldProjectileRef);
             return;
         }
 
@@ -192,9 +205,23 @@ public class ShieldCapThrowHomingMarkProjectile extends SimpleInstantInteraction
             }
         }
 
-        StandardPhysicsProvider provider =
-                commandBuffer.getComponent(ref, ProjectileModule.get().getStandardPhysicsProviderComponentType());
-        return provider != null;
+        return ShieldCapThrowHomingService.isKnownShieldProjectileRef(commandBuffer.getStore(), ref);
+    }
+
+    private boolean isExplicitShieldProjectile(@Nonnull CommandBuffer<EntityStore> commandBuffer,
+                                               Ref<EntityStore> ref) {
+        if (ref == null || !ref.isValid()) {
+            return false;
+        }
+
+        ProjectileComponent projectileComponent =
+                commandBuffer.getComponent(ref, ProjectileComponent.getComponentType());
+        if (projectileComponent == null) {
+            return false;
+        }
+
+        String projectileAssetName = projectileComponent.getProjectileAssetName();
+        return SHIELDCAP_PROJECTILE_ASSET_ID.equals(projectileAssetName);
     }
 
     private boolean isOwnedByOwner(@Nonnull CommandBuffer<EntityStore> commandBuffer,

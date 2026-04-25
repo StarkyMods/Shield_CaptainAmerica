@@ -17,7 +17,9 @@
         "StaminaRegenDelay": -1.5
       },
       "Next": {
-        "Type": "ApplyForce",
+        "Type": "ShieldCap_Kick_Push_Knockback_Immunity_Arm_Java",
+        "Next": {
+          "Type": "ApplyForce",
         "Direction": {
           "Z": 0,
           "Y": 1
@@ -81,6 +83,7 @@
           }
         },
         "RunTime": 0.15
+        }
       },
       "Effects": {
         "WorldSoundEventId": "SFX_Unarmed_Swing"
