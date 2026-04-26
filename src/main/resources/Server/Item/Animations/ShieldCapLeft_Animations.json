@@ -398,6 +398,26 @@
       "ThirdPersonFace": "Characters/Animations/Expressions/Frown.blockyanim",
       "Looping": true,
       "BlendingDuration": 0.15
+    },
+    "ShieldCapBackToHandLeft": {
+      "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Back_To_Hand_Left.blockyanim",
+      "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Back_To_Hand_Left.blockyanim",
+      "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Back_To_Hand_Left_FPS.blockyanim",
+      "ThirdPersonFace": "Characters/Animations/Expressions/Frown.blockyanim",
+      "BlendingDuration": 0,
+      "Speed": 1,
+      "Looping": false,
+      "ClipsGeometry": true
+    },
+    "ShieldCapHandToBackLeft": {
+      "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Hand_To_Back_Fast_Left.blockyanim",
+      "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Hand_To_Back_Fast_Left.blockyanim",
+      "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Hand_To_Back_Fast_Left_FPS.blockyanim",
+      "ThirdPersonFace": "Characters/Animations/Expressions/Frown.blockyanim",
+      "BlendingDuration": 0.15,
+      "Speed": 1.4,
+      "Looping": false,
+      "ClipsGeometry": true
     }
   },
   "Camera": {

@@ -17,8 +17,33 @@
         "Next": {
           "Type": "ShieldCap_Throw_Kick_Recent_Java",
           "Next": {
-            "Type": "ShieldCap_Throw_Kick_Calling_Clear_Java",
-            "Next": {
+            "Type": "Serial",
+            "Interactions": [
+              {
+                "Type": "Simple",
+                "RunTime": 0.0,
+                "Rules": {
+                  "Blocking": [
+                    "Secondary"
+                  ]
+                },
+                "Effects": {
+                  "ItemAnimationId": "ShieldCapThrowKick",
+                  "ClearAnimationOnFinish": false
+                },
+                "CancelOnItemChange": false
+              },
+              {
+                "Type": "Simple",
+                "RunTime": 0.05,
+                "Rules": {
+                  "Blocking": [
+                    "Secondary"
+                  ]
+                },
+                "CancelOnItemChange": false
+              },
+              {
               "Type": "ApplyForce",
               "Rules": {
                 "Blocking": [
@@ -46,6 +71,7 @@
               "ChangeVelocityType": "Add",
               "WaitForGround": false,
               "WaitForCollision": false,
+              "CancelOnItemChange": false,
               "RunTime": 0.4,
               "Next": {
                 "Type": "Simple",
@@ -72,7 +98,8 @@
                   ]
                 }
               }
-            }
+              }
+            ]
           },
           "HorizontalSpeedMultiplier": 0
         },

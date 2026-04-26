@@ -33,6 +33,7 @@ import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.entity.EntityModule;
+import com.hypixel.hytale.server.core.modules.entity.component.NPCMarkerComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.interaction.InteractionModule;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.RootInteraction;
@@ -62,7 +63,6 @@ public final class ShieldCapThrowHomingService {
     private static final long THROW_KICK_RECENT_WINDOW_MS = 2000L;
     private static final long THROW_KICK_OWNER_CONTACT_GRACE_MS = 300L;
     private static final long THROW_KICK_TRACK_WINDOW_MS = 600000L;
-    private static final long RETURN_CALLING_CLEAR_RETRY_WINDOW_MS = 400L;
     private static final long RECENT_SHIELD_MARK_SYNC_GRACE_MS = 500L;
     private static final long LAST_KNOWN_SHIELD_SYNC_GRACE_MS = 8000L;
     private static final long OWNER_AUTO_RETURN_RETRY_INTERVAL_MS = 150L;
@@ -429,6 +429,9 @@ public final class ShieldCapThrowHomingService {
         if (isProjectileEntity(store, targetRef)) {
             return false;
         }
+        if (!isEligibleHomingTarget(store, targetRef)) {
+            return false;
+        }
 
         TrackedProjectileState trackedState =
                 ownerState.trackedProjectiles.computeIfAbsent(projectileRef, ignored -> new TrackedProjectileState(now));
@@ -493,6 +496,9 @@ public final class ShieldCapThrowHomingService {
             return false;
         }
         if (isProjectileEntity(store, targetRef)) {
+            return false;
+        }
+        if (!isEligibleHomingTarget(store, targetRef)) {
             return false;
         }
 
@@ -1186,9 +1192,7 @@ public final class ShieldCapThrowHomingService {
                             InteractionContext.forInteraction(interactionManager, playerRefEntity, InteractionType.Primary, commandBuffer);
                     interactionManager.tryStartChain(playerRefEntity, commandBuffer, InteractionType.Primary, context, rootInteraction);
                 } finally {
-                    if (System.currentTimeMillis() - requestedAt >= RETURN_CALLING_CLEAR_RETRY_WINDOW_MS) {
-                        PENDING_RETURN_CALLING_CLEAR_REQUESTS.remove(ownerUuid, requestedAt);
-                    }
+                    PENDING_RETURN_CALLING_CLEAR_REQUESTS.remove(ownerUuid, requestedAt);
                 }
             }
         };
@@ -2966,6 +2970,9 @@ public final class ShieldCapThrowHomingService {
             if (isTrackedProjectile(store, targetRef) || isProjectileEntity(store, targetRef)) {
                 continue;
             }
+            if (!isEligibleHomingTarget(store, targetRef)) {
+                continue;
+            }
 
             UUID targetUuid = getEntityUuid(store, targetRef);
             if (targetUuid != null && trackedState != null && trackedState.hitTargetUuids.contains(targetUuid)) {
@@ -3098,6 +3105,14 @@ public final class ShieldCapThrowHomingService {
         }
 
         return false;
+    }
+
+    private static boolean isEligibleHomingTarget(Store<EntityStore> store, Ref<EntityStore> targetRef) {
+        if (store == null || targetRef == null || !targetRef.isValid()) {
+            return false;
+        }
+        return store.getComponent(targetRef, Player.getComponentType()) != null
+                || store.getComponent(targetRef, NPCMarkerComponent.getComponentType()) != null;
     }
 
     private static boolean isProjectileEntity(Store<EntityStore> store, Ref<EntityStore> ref) {
