@@ -14,7 +14,7 @@
       "Effects": {
         "ItemAnimationId": "ShieldCapChargedLeft",
         "ClearAnimationOnFinish": false,
-        "WorldSoundEventId": "SFX_ShieldCap_Swings"
+        "WorldSoundEventId": "SFX_ShieldCap_Throw"
       },
       "Next": {
         "Type": "ShieldCap_Throw"

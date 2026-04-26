@@ -42,6 +42,8 @@ import java.util.zip.ZipFile;
 public final class ShieldCapBackModelSystems {
     private static final String BACK_ATTACHMENT_MODEL =
             "Items/Weapons/StarkyMods/starkyshieldcaptainamericaback.blockymodel";
+    private static final String BACK_ATTACHMENT_CAPE_MODEL =
+            "Items/Weapons/StarkyMods/starkyshieldcaptainamericaback_cape.blockymodel";
     private static final String BACK_ATTACHMENT_TEXTURE =
             "Items/Weapons/StarkyMods/starkyshieldcaptainamericaback_attachment.png";
     private static final String SIMPLIFIED_HAIRCUT_MODEL =
@@ -92,11 +94,28 @@ public final class ShieldCapBackModelSystems {
                 return;
             }
 
+            boolean dirty = state.consumeDirty();
+            boolean hasActiveShieldAttachment = currentModel != null && hasShieldCapAttachment(currentModel);
+            if (dirty && !state.shouldShowBackShield()) {
+                state.setPendingApply(false);
+                state.setPendingModelReset(false);
+                state.clearPendingBaseModel();
+                state.clearNaturalBaseModel();
+                state.clearPreservedExtraAttachments();
+                if (!hasActiveShieldAttachment) {
+                    state.setAwaitingNaturalModel(false);
+                    debug("skip remove back shield | player=" + resolvePlayerDebugId(chunk.getComponent(entityIndex, Player.getComponentType()))
+                            + " | reason=no active back shield"
+                            + " | currentModel=" + summarizeModel(currentModel));
+                    return;
+                }
+            }
+
             Player player = chunk.getComponent(entityIndex, Player.getComponentType());
             String playerId = resolvePlayerDebugId(player);
             Model appearanceModel = createAppearanceModel(player, playerSkinComponent);
 
-            if (!state.consumeDirty()) {
+            if (!dirty) {
                 rememberNaturalBaseModel(state, currentModel, appearanceModel);
                 return;
             }
@@ -117,14 +136,12 @@ public final class ShieldCapBackModelSystems {
 
             if (!state.shouldShowBackShield()) {
                 Model storedBaseModel = state.getPendingBaseModel();
-                state.setPendingApply(false);
                 state.setAwaitingNaturalModel(true);
-                state.clearPreservedExtraAttachments();
                 state.clearNaturalBaseModel();
                 Model directBaseModel;
                 if (storedBaseModel != null) {
                     directBaseModel = removeShieldCapAttachment(storedBaseModel);
-                } else if (currentModel != null && hasShieldCapAttachment(currentModel)) {
+                } else if (hasActiveShieldAttachment) {
                     directBaseModel = removeShieldCapAttachment(currentModel);
                 } else {
                     directBaseModel =
@@ -140,12 +157,27 @@ public final class ShieldCapBackModelSystems {
                 return;
             }
 
+            if (state.isPendingModelReset()) {
+                state.setPendingModelReset(false);
+                state.setPendingApply(true);
+                state.setAwaitingNaturalModel(false);
+                state.clearNaturalBaseModel();
+                state.clearPendingBaseModel();
+                playerSkinComponent.setNetworkOutdated();
+                state.rebuild();
+                debug("request player model reset before back shield | player=" + playerId
+                        + " | currentModel=" + summarizeModel(currentModel)
+                        + " | appearanceModel=" + summarizeModel(appearanceModel));
+                return;
+            }
+
             Model preparedBaseModel = removeShieldCapAttachment(baseModel);
             boolean preserveRuntimeState = currentModel != null && preparedBaseModel == currentModel;
             Model storedBaseModel = preserveRuntimeState
                     ? cloneModelWithAttachments(preparedBaseModel, preparedBaseModel.getAttachments())
                     : preparedBaseModel;
-            Model shieldModel = buildShieldCapModel(preparedBaseModel, preserveRuntimeState);
+            boolean useCapeShieldModel = hasCapeEquipped(playerSkinComponent);
+            Model shieldModel = buildShieldCapModel(preparedBaseModel, preserveRuntimeState, useCapeShieldModel);
             state.setPendingApply(false);
             state.setAwaitingNaturalModel(false);
             state.setPendingBaseModel(storedBaseModel);
@@ -154,6 +186,7 @@ public final class ShieldCapBackModelSystems {
                     + " | baseModel=" + summarizeModel(baseModel)
                     + " | currentModel=" + summarizeModel(currentModel)
                     + " | preparedBaseModel=" + summarizeModel(preparedBaseModel)
+                    + " | useCapeShieldModel=" + useCapeShieldModel
                     + " | preserveRuntimeState=" + preserveRuntimeState
                     + " | shieldModel=" + summarizeModel(shieldModel));
             chunk.setComponent(entityIndex, ModelComponent.getComponentType(), new ModelComponent(shieldModel));
@@ -166,10 +199,14 @@ public final class ShieldCapBackModelSystems {
         }
 
         private Model buildShieldCapModel(Model baseModel) {
-            return buildShieldCapModel(baseModel, false);
+            return buildShieldCapModel(baseModel, false, false);
         }
 
         private Model buildShieldCapModel(Model baseModel, boolean mutateInPlace) {
+            return buildShieldCapModel(baseModel, mutateInPlace, false);
+        }
+
+        private Model buildShieldCapModel(Model baseModel, boolean mutateInPlace, boolean useCapeShieldModel) {
             List<ModelAttachment> attachments = new ArrayList<>();
             ModelAttachment[] baseAttachments = baseModel.getAttachments();
             if (baseAttachments != null) {
@@ -181,7 +218,7 @@ public final class ShieldCapBackModelSystems {
             }
 
             attachments.add(new ModelAttachment(
-                    BACK_ATTACHMENT_MODEL,
+                    resolveBackAttachmentModel(useCapeShieldModel),
                     BACK_ATTACHMENT_TEXTURE,
                     null,
                     null,
@@ -193,6 +230,20 @@ public final class ShieldCapBackModelSystems {
                 return setModelAttachmentsInPlace(baseModel, updatedAttachments);
             }
             return cloneModelWithAttachments(baseModel, updatedAttachments);
+        }
+
+        private String resolveBackAttachmentModel(boolean useCapeShieldModel) {
+            return useCapeShieldModel ? BACK_ATTACHMENT_CAPE_MODEL : BACK_ATTACHMENT_MODEL;
+        }
+
+        private boolean hasCapeEquipped(PlayerSkinComponent playerSkinComponent) {
+            if (playerSkinComponent == null || playerSkinComponent.getPlayerSkin() == null) {
+                return false;
+            }
+
+            PlayerSkin playerSkin = skinFromProtocol(playerSkinComponent.getPlayerSkin());
+            PlayerSkin.PlayerSkinPartId cape = playerSkin == null ? null : playerSkin.getCape();
+            return cape != null && cape.getAssetId() != null && !cape.getAssetId().isBlank();
         }
 
         private Model createAppearanceModel(Player player, PlayerSkinComponent playerSkinComponent) {
@@ -925,7 +976,8 @@ public final class ShieldCapBackModelSystems {
 
         private boolean isShieldCapAttachment(ModelAttachment attachment) {
             return attachment != null
-                    && BACK_ATTACHMENT_MODEL.equals(attachment.getModel())
+                    && (BACK_ATTACHMENT_MODEL.equals(attachment.getModel())
+                    || BACK_ATTACHMENT_CAPE_MODEL.equals(attachment.getModel()))
                     && BACK_ATTACHMENT_TEXTURE.equals(attachment.getTexture());
         }
 

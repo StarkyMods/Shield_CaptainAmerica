@@ -46,7 +46,17 @@
       "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Throw_Kick.blockyanim",
       "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Throw_Kick.blockyanim",
       "ThirdPersonFace": "Characters/Animations/Expressions/Angry.blockyanim",
-      "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Throw_Kick.blockyanim",
+      "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Throw_Kick_FPS.blockyanim",
+      "KeepPreviousFirstPersonAnimation": true,
+      "Speed": 1.3,
+      "BlendingDuration": 0.13,
+      "Looping": false
+    },
+    "ShieldCapThrowKickLeft": {
+      "ThirdPerson": "Characters/Animations/StarkyMods/ShieldCap_Throw_Kick.blockyanim",
+      "ThirdPersonMoving": "Characters/Animations/StarkyMods/ShieldCap_Throw_Kick.blockyanim",
+      "ThirdPersonFace": "Characters/Animations/Expressions/Angry.blockyanim",
+      "FirstPerson": "Characters/Animations/StarkyMods/ShieldCap_Throw_Kick_FPS.blockyanim",
       "KeepPreviousFirstPersonAnimation": true,
       "Speed": 1.3,
       "BlendingDuration": 0.13,

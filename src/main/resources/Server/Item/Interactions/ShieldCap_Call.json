@@ -1,5 +1,8 @@
 {
   "Type": "EffectCondition",
+  "Effects": {
+    "WorldSoundEventId": "SFX_ShieldCap_Calling"
+  },
   "Match": "None",
   "Next": {
     "Type": "Serial",

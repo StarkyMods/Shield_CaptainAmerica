@@ -388,8 +388,12 @@ public final class ShieldCapVisualSyncService {
             ShieldCapBackStateComponent newState = new ShieldCapBackStateComponent();
             if (shouldShowBackShield) {
                 newState.updateShowBackShield(true);
+                newState.setPendingModelReset(true);
             }
             if (forceBackRebuild) {
+                if (shouldShowBackShield) {
+                    newState.setPendingModelReset(true);
+                }
                 newState.rebuild();
             }
             store.putComponent(ref, ShieldCapBackStateComponent.getComponentType(), newState);
@@ -397,7 +401,15 @@ public final class ShieldCapVisualSyncService {
         }
 
         boolean changed = currentState.updateShowBackShield(shouldShowBackShield);
+        if (shouldShowBackShield && changed) {
+            currentState.setPendingModelReset(true);
+        } else if (!shouldShowBackShield) {
+            currentState.setPendingModelReset(false);
+        }
         if (forceBackRebuild) {
+            if (shouldShowBackShield) {
+                currentState.setPendingModelReset(true);
+            }
             currentState.rebuild();
         }
 

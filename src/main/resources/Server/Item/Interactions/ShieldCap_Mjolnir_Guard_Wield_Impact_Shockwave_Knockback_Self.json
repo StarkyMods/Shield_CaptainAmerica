@@ -5,7 +5,7 @@
     "Y": 1.0,
     "Z": 2.0
   },
-  "Force": 30,
+  "Force": 40,
   "AdjustVertical": true,
   "VelocityConfig": {
     "AirResistance": 0.99,

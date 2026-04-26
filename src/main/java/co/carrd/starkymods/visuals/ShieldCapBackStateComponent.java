@@ -26,6 +26,7 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
     private boolean showBackShield;
     private boolean dirty;
     private boolean pendingApply;
+    private boolean pendingModelReset;
     private boolean awaitingNaturalModel;
     private Model pendingBaseModel;
     private Model naturalBaseModel;
@@ -61,6 +62,14 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
 
     public void setPendingApply(boolean pendingApply) {
         this.pendingApply = pendingApply;
+    }
+
+    public boolean isPendingModelReset() {
+        return pendingModelReset;
+    }
+
+    public void setPendingModelReset(boolean pendingModelReset) {
+        this.pendingModelReset = pendingModelReset;
     }
 
     public boolean isAwaitingNaturalModel() {
@@ -114,6 +123,7 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
         copy.showBackShield = showBackShield;
         copy.dirty = dirty;
         copy.pendingApply = pendingApply;
+        copy.pendingModelReset = pendingModelReset;
         copy.awaitingNaturalModel = awaitingNaturalModel;
         copy.pendingBaseModel = pendingBaseModel;
         copy.naturalBaseModel = naturalBaseModel;

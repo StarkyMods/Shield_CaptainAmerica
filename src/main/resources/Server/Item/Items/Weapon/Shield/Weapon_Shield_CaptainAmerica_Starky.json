@@ -53,6 +53,14 @@
                       "CancelOnItemChange": false
                     },
                     {
+                      "Type": "Simple",
+                      "RunTime": 0,
+                      "Effects": {
+                        "WorldSoundEventId": "SFX_ShieldCap_Grab"
+                      },
+                      "CancelOnItemChange": false
+                    },
+                    {
                       "Type": "ChangeActiveSlot"
                     }
                   ]
@@ -91,7 +99,8 @@
                   "RunTime": 0.2,
                   "Effects": {
                     "ItemAnimationId": "ShieldCapBackToHand",
-                    "ClearAnimationOnFinish": true
+                    "ClearAnimationOnFinish": true,
+                    "WorldSoundEventId": "SFX_ShieldCap_Grab"
                   },
                   "CancelOnItemChange": true
                 }

@@ -3,7 +3,7 @@
   "Pitch": 0,
   "Layers": [
     {
-      "Volume": -12,
+      "Volume": -10,
       "StartDelay": 0,
       "Looping": false,
       "RandomSettings": {
@@ -14,11 +14,7 @@
         "MaxStartOffset": 0
       },
       "Files": [
-        "Sounds/StarkyMods/ShieldCapCatch.ogg",
-        "Sounds/StarkyMods/ShieldCapCatch2.ogg",
-        "Sounds/StarkyMods/ShieldCapCatch3.ogg",
-        "Sounds/StarkyMods/ShieldCapCatch4.ogg",
-        "Sounds/StarkyMods/ShieldCapCatch5.ogg"
+        "Sounds/StarkyMods/ShieldCapCalling.ogg"
       ]
     }
   ],

@@ -21,7 +21,7 @@
         "Y": 1.0,
         "Z": -2.0
       },
-      "Force": 25,
+      "Force": 35,
       "VelocityType": "Set"
     }
   }

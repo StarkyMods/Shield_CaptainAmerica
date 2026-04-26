@@ -48,7 +48,7 @@ import com.hypixel.hytale.server.core.util.PositionUtil;
 
 public final class ShieldCapThrowHomingService {
     private static final boolean DEBUG = false;
-    private static final boolean AUTO_RETURN_DEBUG = true;
+    private static final boolean AUTO_RETURN_DEBUG = false;
     private static final String LOG_PREFIX = "[ShieldCapHomingDebug] ";
     private static final String AUTO_RETURN_LOG_PREFIX = "[ShieldCapAutoReturnDebug] ";
     private static final String MJOLNIR_ITEM_ID = "Weapon_Mjolnir_Starky";
@@ -2609,12 +2609,8 @@ public final class ShieldCapThrowHomingService {
             if (creatorUuid == null || !creatorUuid.equals(ownerUuid)) {
                 continue;
             }
-            if (!isShieldCapProjectile(commandBuffer, ref)) {
-                continue;
-            }
-
             Velocity velocity = commandBuffer.getComponent(ref, EntityModule.get().getVelocityComponentType());
-            if (velocity == null || velocity.getVelocity() == null || velocity.getVelocity().length() < THROW_KICK_SPAWN_MIN_SPEED) {
+            if (!isEligibleThrowKickSpawnCandidate(store, ref, velocity)) {
                 continue;
             }
 
@@ -2672,23 +2668,15 @@ public final class ShieldCapThrowHomingService {
                 if (creatorUuid == null || !creatorUuid.equals(ownerUuid)) {
                     continue;
                 }
-                if (!isShieldCapProjectile(store, projectileRef)) {
-                    continue;
-                }
-
                 Velocity velocity = cb.getComponent(projectileRef, EntityModule.get().getVelocityComponentType());
                 TransformComponent projectileTransform =
                         cb.getComponent(projectileRef, EntityModule.get().getTransformComponentType());
-                if (velocity == null || velocity.getVelocity() == null
+                if (!isEligibleThrowKickSpawnCandidate(store, projectileRef, velocity)
                         || projectileTransform == null || projectileTransform.getPosition() == null) {
                     continue;
                 }
 
                 double speed = velocity.getVelocity().length();
-                if (!Double.isFinite(speed) || speed < THROW_KICK_SPAWN_MIN_SPEED) {
-                    continue;
-                }
-
                 double score = speed;
                 if (ownerPos != null) {
                     double distance = ownerPos.distanceTo(projectileTransform.getPosition());
@@ -4007,13 +3995,15 @@ public final class ShieldCapThrowHomingService {
                 if (creatorUuid == null || !creatorUuid.equals(state.ownerUuid)) {
                     continue;
                 }
-                if (!isShieldCapProjectile(commandBuffer, projectileRef)) {
+                Velocity velocity = commandBuffer.getComponent(projectileRef, EntityModule.get().getVelocityComponentType());
+                if (!isEligibleThrowKickSpawnCandidate(store, projectileRef, velocity)) {
                     continue;
                 }
 
                 found[0] = true;
                 TrackedProjectileState trackedState =
                         state.trackedProjectiles.computeIfAbsent(projectileRef, ignored -> new TrackedProjectileState(nowMs));
+                rememberShieldCapProjectile(store, projectileRef);
                 armThrowKickReturnTimeout(store, projectileRef, nowMs);
                 trackedState.markAsThrowKick(nowMs);
                 trackedState.throwKickStuckInBlock = isThrowKickStuck(store, projectileRef);
@@ -4274,6 +4264,30 @@ public final class ShieldCapThrowHomingService {
 
         String projectileAssetName = projectileComponent.getProjectileAssetName();
         return projectileAssetName == null || projectileAssetName.isBlank() ? null : projectileAssetName;
+    }
+
+    private static boolean isEligibleThrowKickSpawnCandidate(Store<EntityStore> store,
+                                                             Ref<EntityStore> projectileRef,
+                                                             Velocity velocity) {
+        if (store == null || projectileRef == null || !projectileRef.isValid()
+                || velocity == null || velocity.getVelocity() == null) {
+            return false;
+        }
+
+        double speed = velocity.getVelocity().length();
+        if (!Double.isFinite(speed) || speed < THROW_KICK_SPAWN_MIN_SPEED) {
+            return false;
+        }
+
+        String projectileAssetName = getProjectileAssetName(store, projectileRef);
+        if (projectileAssetName != null && projectileAssetName.startsWith(FOREIGN_PROJECTILE_ASSET_PREFIX)) {
+            return false;
+        }
+
+        return projectileAssetName == null
+                || SHIELDCAP_PROJECTILE_ASSET_ID.equals(projectileAssetName)
+                || isRememberedShieldCapProjectileRef(store, projectileRef)
+                || isKnownThrowKickProjectile(store, projectileRef);
     }
 
     private static void clearReturnKickWindow(OwnerHomingState state) {
