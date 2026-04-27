@@ -19,9 +19,11 @@ import java.util.Objects;
 
 public final class ShieldCapCraftConfigManager {
     private static final String CRAFT_COMMENT = "If you wish, customize Cap Shield crafting recipe to your liking.";
-    private static final File FOLDER = new File("ShieldCap_Starky");
+    private static final File FOLDER = ShieldCapConfigPaths.getFolder();
     private static final File CRAFT_CONFIG_FILE = new File(FOLDER, "shieldcapcraft.json");
     private static final String SHIELD_RECIPE_ID = "ShieldCap_Craft";
+    private static final String VIBRANIUM_SHIELD_RECIPE_ID = "ShieldCap_Vibranium_Craft";
+    private static final List<String> SHIELD_RECIPE_IDS = List.of(SHIELD_RECIPE_ID, VIBRANIUM_SHIELD_RECIPE_ID);
     private static final String PRIMARY_WEAPON_ASSET_PATH =
             "Server/Item/Items/Weapon/Shield/Weapon_Shield_CaptainAmerica_Starky.json";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -68,6 +70,10 @@ public final class ShieldCapCraftConfigManager {
 
     public static String getShieldRecipeId() {
         return SHIELD_RECIPE_ID;
+    }
+
+    public static List<String> getShieldRecipeIds() {
+        return SHIELD_RECIPE_IDS;
     }
 
     public static void load() {

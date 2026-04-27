@@ -11,18 +11,28 @@ import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.modules.projectile.ProjectileModule;
 import com.hypixel.hytale.server.core.modules.projectile.config.ProjectileConfig;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.TargetUtil;
+import org.bson.BsonDocument;
+import org.bson.BsonString;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
 public class ShieldCapThrowHomingLaunchConfigProjectile extends SimpleInstantInteraction {
+    private static final String NORMAL_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig";
+    private static final String VIBRANIUM_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Silver";
+    private static final String THROWN_ITEM_ID = "Weapon_ShieldCap_Thrown_Starky";
+    private static final String VARIANT_METADATA_KEY = "ShieldCapVariant";
+    private static final String VIBRANIUM_VARIANT_VALUE = "Vibranium";
 
     @Nonnull
     public static final BuilderCodec<ShieldCapThrowHomingLaunchConfigProjectile> CODEC =
@@ -45,8 +55,8 @@ public class ShieldCapThrowHomingLaunchConfigProjectile extends SimpleInstantInt
     protected String config;
 
     @Nullable
-    private ProjectileConfig getConfig() {
-        return ProjectileConfig.getAssetMap().getAsset(config);
+    private ProjectileConfig getConfig(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> ownerRef) {
+        return ProjectileConfig.getAssetMap().getAsset(resolveConfigId(commandBuffer, ownerRef));
     }
 
     @Override
@@ -59,7 +69,7 @@ public class ShieldCapThrowHomingLaunchConfigProjectile extends SimpleInstantInt
             return;
         }
 
-        ProjectileConfig projectileConfig = getConfig();
+        ProjectileConfig projectileConfig = getConfig(commandBuffer, ownerRef);
         if (projectileConfig == null) {
             return;
         }
@@ -81,5 +91,66 @@ public class ShieldCapThrowHomingLaunchConfigProjectile extends SimpleInstantInt
         }
 
         ShieldCapThrowHomingService.markProjectile(ownerUuid, ownerRef, projectileRef);
+    }
+
+    private String resolveConfigId(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> ownerRef) {
+        if (NORMAL_PROJECTILE_CONFIG_ID.equals(config) && hasVibraniumThrownShield(commandBuffer, ownerRef)) {
+            return VIBRANIUM_PROJECTILE_CONFIG_ID;
+        }
+        return config;
+    }
+
+    private boolean hasVibraniumThrownShield(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> ownerRef) {
+        if (commandBuffer == null || ownerRef == null || !ownerRef.isValid()) {
+            return false;
+        }
+
+        Player player = commandBuffer.getComponent(ownerRef, Player.getComponentType());
+        if (player == null || player.getInventory() == null) {
+            return false;
+        }
+
+        Inventory inventory = player.getInventory();
+        return hasVibraniumThrownShield(inventory.getHotbar())
+                || hasVibraniumThrownShield(inventory.getUtility())
+                || hasVibraniumThrownShield(inventory.getStorage())
+                || hasVibraniumThrownShield(inventory.getBackpack())
+                || hasVibraniumThrownShield(inventory.getTools());
+    }
+
+    private boolean hasVibraniumThrownShield(ItemContainer container) {
+        if (container == null) {
+            return false;
+        }
+
+        for (short slot = 0; slot < container.getCapacity(); slot++) {
+            if (isVibraniumThrownShield(container.getItemStack(slot))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isVibraniumThrownShield(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return false;
+        }
+
+        String itemId = stack.getItemId();
+        if (itemId == null || itemId.isBlank()
+                || !(itemId.equals(THROWN_ITEM_ID) || itemId.endsWith("." + THROWN_ITEM_ID) || itemId.contains(THROWN_ITEM_ID))) {
+            return false;
+        }
+
+        BsonDocument metadata = stack.getMetadata();
+        if (metadata == null || !metadata.containsKey(VARIANT_METADATA_KEY)) {
+            return false;
+        }
+
+        try {
+            return VIBRANIUM_VARIANT_VALUE.equals(metadata.getString(VARIANT_METADATA_KEY, new BsonString("")).getValue());
+        } catch (Exception ignored) {
+            return false;
+        }
     }
 }

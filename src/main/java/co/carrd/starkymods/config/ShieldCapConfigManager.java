@@ -8,11 +8,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 public final class ShieldCapConfigManager {
-    private static final File FOLDER = new File("ShieldCap_Starky");
+    private static final File FOLDER = ShieldCapConfigPaths.getFolder();
     private static final File MAIN_CONFIG_FILE = new File(FOLDER, "shieldcapconfig.json");
     private static final String SHIELD_RECIPE_ID = "ShieldCap_Craft";
+    private static final String VIBRANIUM_SHIELD_RECIPE_ID = "ShieldCap_Vibranium_Craft";
+    private static final List<String> SHIELD_RECIPE_IDS = List.of(SHIELD_RECIPE_ID, VIBRANIUM_SHIELD_RECIPE_ID);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private static ShieldCapConfig mainConfig;
@@ -46,6 +49,13 @@ public final class ShieldCapConfigManager {
 
     public static String getShieldRecipeId() {
         return SHIELD_RECIPE_ID;
+    }
+
+    public static boolean isShieldRecipeId(String recipeId) {
+        if (recipeId == null || recipeId.isBlank()) {
+            return false;
+        }
+        return SHIELD_RECIPE_IDS.stream().anyMatch(id -> id.equalsIgnoreCase(recipeId));
     }
 
     public static boolean isCraftingAllowed() {

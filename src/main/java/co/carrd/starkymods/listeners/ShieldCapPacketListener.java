@@ -37,7 +37,7 @@ public final class ShieldCapPacketListener {
                 return false;
             }
 
-            if (!ShieldCapConfigManager.getShieldRecipeId().equalsIgnoreCase(recipeAction.recipeId)) {
+            if (!ShieldCapConfigManager.isShieldRecipeId(recipeAction.recipeId)) {
                 return false;
             }
 

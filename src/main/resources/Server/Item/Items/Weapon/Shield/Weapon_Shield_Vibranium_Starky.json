@@ -1,11 +1,11 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.Weapon_Shield_CaptainAmerica_Starky.name",
-    "Description": "server.items.Weapon_Shield_CaptainAmerica_Starky.description"
+    "Name": "server.items.Weapon_Shield_Vibranium_Starky.name",
+    "Description": "server.items.Weapon_Shield_Vibranium_Starky.description"
   },
   "Model": "Items/Weapons/StarkyMods/starkyshieldcaptainamericaright.blockymodel",
-  "Texture": "Items/Weapons/StarkyMods/starkyshieldcaptainamerica.png",
-  "Icon": "Icons/ItemsGenerated/Weapon_Shield_CaptainAmerica_Starky.png",
+  "Texture": "Items/Weapons/StarkyMods/starkyshieldcaptainamericasilver.png",
+  "Icon": "Icons/ItemsGenerated/Weapon_Shield_Vibranium_Starky.png",
   "Quality": "ShieldCap_Quality",
   "ItemLevel": 100,
   "Scale": 2.8,

@@ -38,9 +38,8 @@ public final class ShieldCapRecipeOverrideManager {
             return;
         }
 
-        String recipeId = ShieldCapCraftConfigManager.getShieldRecipeId();
         for (Map.Entry<String, CraftingRecipe> entry : event.getLoadedAssets().entrySet()) {
-            if (!entry.getKey().equalsIgnoreCase(recipeId)) {
+            if (!isManagedShieldRecipe(entry.getKey())) {
                 continue;
             }
             applyConfiguredRecipe();
@@ -54,28 +53,39 @@ public final class ShieldCapRecipeOverrideManager {
         }
 
         ShieldCapCraft config = ShieldCapCraftConfigManager.getConfig();
-        String recipeId = ShieldCapCraftConfigManager.getShieldRecipeId();
-        if (config == null || recipeId == null || recipeId.isBlank()) {
+        List<String> recipeIds = ShieldCapCraftConfigManager.getShieldRecipeIds();
+        if (config == null || recipeIds == null || recipeIds.isEmpty()) {
             APPLYING_OVERRIDE.set(false);
             return false;
         }
-
-        CraftingRecipe original = CraftingRecipe.getAssetMap().getAsset(recipeId);
-        if (original == null) {
-            System.out.println("[ShieldCap] Could not apply recipe override: recipe not found -> " + recipeId);
-            APPLYING_OVERRIDE.set(false);
-            return false;
-        }
-
-        CraftingRecipe modified = buildFromConfig(original, config);
 
         try {
-            setRecipeId(modified, recipeId);
+            List<CraftingRecipe> modifiedRecipes = new java.util.ArrayList<>();
+            for (String recipeId : recipeIds) {
+                if (recipeId == null || recipeId.isBlank()) {
+                    continue;
+                }
+
+                CraftingRecipe original = CraftingRecipe.getAssetMap().getAsset(recipeId);
+                if (original == null) {
+                    System.out.println("[ShieldCap] Could not apply recipe override: recipe not found -> " + recipeId);
+                    return false;
+                }
+
+                CraftingRecipe modified = buildFromConfig(original, config);
+                setRecipeId(modified, recipeId);
+                modifiedRecipes.add(modified);
+            }
+
+            if (modifiedRecipes.isEmpty()) {
+                return false;
+            }
+
             CraftingRecipe.getAssetStore().loadAssets(
                     "StarkyShieldCap:Override",
-                    List.of(modified)
+                    modifiedRecipes
             );
-            System.out.println("[ShieldCap] Recipe override applied for " + recipeId);
+            System.out.println("[ShieldCap] Recipe override applied for " + String.join(", ", recipeIds));
             return true;
         } catch (Exception e) {
             System.out.println("[ShieldCap] Failed to apply recipe override:");
@@ -93,13 +103,7 @@ public final class ShieldCapRecipeOverrideManager {
             inputs[i] = new MaterialQuantity(entry.ItemId, null, null, entry.Quantity, null);
         }
 
-        MaterialQuantity primaryOutput = new MaterialQuantity(
-                "Weapon_Shield_CaptainAmerica_Starky",
-                null,
-                null,
-                1,
-                null
-        );
+        MaterialQuantity primaryOutput = original.getPrimaryOutput();
 
         List<ShieldCapCraft.BenchConfig> configuredBenches = config.BenchRequirements;
         if (configuredBenches == null || configuredBenches.isEmpty()) {
@@ -136,5 +140,14 @@ public final class ShieldCapRecipeOverrideManager {
         Field field = CraftingRecipe.class.getDeclaredField("id");
         field.setAccessible(true);
         field.set(recipe, id);
+    }
+
+    private static boolean isManagedShieldRecipe(String recipeId) {
+        if (recipeId == null || recipeId.isBlank()) {
+            return false;
+        }
+        return ShieldCapCraftConfigManager.getShieldRecipeIds()
+                .stream()
+                .anyMatch(id -> id.equalsIgnoreCase(recipeId));
     }
 }

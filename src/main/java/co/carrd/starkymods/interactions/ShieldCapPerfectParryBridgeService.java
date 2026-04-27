@@ -28,6 +28,8 @@ public final class ShieldCapPerfectParryBridgeService {
     private static final String PERFECT_PARRY_EVENT_CLASS = "org.narwhals.plugin.api.events.PerfectParryEvent";
     private static final String MAIN_SHIELD_ID = "Weapon_Shield_CaptainAmerica_Starky";
     private static final String LEFT_SHIELD_ID = "Weapon_ShieldLeft_CaptainAmerica_Starky";
+    private static final String VIBRANIUM_MAIN_SHIELD_ID = "Weapon_Shield_Vibranium_Starky";
+    private static final String VIBRANIUM_LEFT_SHIELD_ID = "Weapon_ShieldLeft_Vibranium_Starky";
     private static final String PERFECT_PARRY_ROOT_ID = "Root_ShieldCap_Perfect_Parry_Shockwave";
     private static final long PERFECT_PARRY_IMPACT_SUPPRESSION_WINDOW_MS = 1500L;
     private static final InteractionType[] FORCED_LANES = {
@@ -202,7 +204,9 @@ public final class ShieldCapPerfectParryBridgeService {
         Inventory inventory = player.getInventory();
         ItemContainer hotbar = inventory.getHotbar();
         byte activeHotbarSlot = inventory.getActiveHotbarSlot();
-        if (isValidSlot(hotbar, activeHotbarSlot) && matchesId(hotbar.getItemStack(activeHotbarSlot), MAIN_SHIELD_ID)) {
+        if (isValidSlot(hotbar, activeHotbarSlot)
+                && (matchesId(hotbar.getItemStack(activeHotbarSlot), MAIN_SHIELD_ID)
+                || matchesId(hotbar.getItemStack(activeHotbarSlot), VIBRANIUM_MAIN_SHIELD_ID))) {
             log("shield equipped | hand=main | slot=" + activeHotbarSlot);
             return true;
         }
@@ -211,7 +215,9 @@ public final class ShieldCapPerfectParryBridgeService {
         byte activeUtilitySlot = inventory.getActiveUtilitySlot();
         boolean leftEquipped = isValidSlot(utility, activeUtilitySlot)
                 && (matchesId(utility.getItemStack(activeUtilitySlot), LEFT_SHIELD_ID)
-                || matchesId(utility.getItemStack(activeUtilitySlot), MAIN_SHIELD_ID));
+                || matchesId(utility.getItemStack(activeUtilitySlot), MAIN_SHIELD_ID)
+                || matchesId(utility.getItemStack(activeUtilitySlot), VIBRANIUM_LEFT_SHIELD_ID)
+                || matchesId(utility.getItemStack(activeUtilitySlot), VIBRANIUM_MAIN_SHIELD_ID));
         if (leftEquipped) {
             log("shield equipped | hand=left | slot=" + activeUtilitySlot);
         }

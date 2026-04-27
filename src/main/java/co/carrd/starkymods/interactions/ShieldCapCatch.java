@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
 import org.bson.BsonDocument;
+import org.bson.BsonString;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
@@ -36,6 +37,9 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
     private static final String LOG_PREFIX = "[ShieldCapCatchDebug] ";
     private static final String THROWN_ITEM_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String RETURNED_ITEM_ID = "Weapon_Shield_CaptainAmerica_Starky";
+    private static final String VIBRANIUM_RETURNED_ITEM_ID = "Weapon_Shield_Vibranium_Starky";
+    private static final String VARIANT_METADATA_KEY = "ShieldCapVariant";
+    private static final String VIBRANIUM_VARIANT_VALUE = "Vibranium";
     private static final String CATCH_SOUND_ID = "SFX_ShieldCap_Catch";
     private static final long[] CALLING_ANIMATION_CLEAR_RETRY_DELAYS_MS =
             new long[] {0L, 100L};
@@ -206,22 +210,33 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
                 continue;
             }
 
-            container.setItemStackForSlot(slot, remapItem(current, RETURNED_ITEM_ID));
+            container.setItemStackForSlot(slot, remapItem(current, resolveReturnedItemId(current)));
             return containerName + "[" + slot + "]";
         }
 
         return null;
     }
 
+    private static String resolveReturnedItemId(ItemStack current) {
+        return isVibraniumThrownItem(current) ? VIBRANIUM_RETURNED_ITEM_ID : RETURNED_ITEM_ID;
+    }
+
+    private static boolean isVibraniumThrownItem(ItemStack current) {
+        BsonDocument metadata = copyMetadata(current);
+        if (metadata == null || !metadata.containsKey(VARIANT_METADATA_KEY)) {
+            return false;
+        }
+        try {
+            return VIBRANIUM_VARIANT_VALUE.equals(metadata.getString(VARIANT_METADATA_KEY, new BsonString("")).getValue());
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
     private static ItemStack remapItem(ItemStack current, String targetItemId) {
-        String rawMetadata = current.toPacket().metadata;
-        BsonDocument copiedMetadata = null;
-        if (rawMetadata != null && !rawMetadata.isBlank()) {
-            try {
-                copiedMetadata = BsonDocument.parse(rawMetadata);
-            } catch (Exception ignored) {
-                copiedMetadata = null;
-            }
+        BsonDocument copiedMetadata = copyMetadata(current);
+        if (copiedMetadata != null) {
+            copiedMetadata.remove(VARIANT_METADATA_KEY);
         }
 
         ItemStack newItem = new ItemStack(targetItemId, 1, copiedMetadata);
@@ -230,6 +245,23 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
             newItem = newItem.withDurability(copiedDurability);
         }
         return newItem;
+    }
+
+    private static BsonDocument copyMetadata(ItemStack current) {
+        if (current == null) {
+            return null;
+        }
+
+        String rawMetadata = current.toPacket().metadata;
+        if (rawMetadata == null || rawMetadata.isBlank()) {
+            return null;
+        }
+
+        try {
+            return BsonDocument.parse(rawMetadata);
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     private static boolean matchesId(ItemStack stack, String itemId) {

@@ -31,12 +31,12 @@
   "MaxDurability": 0,
   "DurabilityLossOnHit": 0.21,
   "TranslationProperties": {
-    "Name": "server.items.Weapon_Shield_CaptainAmerica_Starky.name",
-    "Description": "server.items.Weapon_Shield_CaptainAmerica_Starky.description"
+    "Name": "server.items.Weapon_ShieldCap_Thrown_Starky.name",
+    "Description": "server.items.Weapon_ShieldCap_Thrown_Starky.description"
   },
   "MaxStack": 1,
   "Model": "Items/Projectiles/Projectile.blockymodel",
-  "Texture": "Items/Weapons/StarkyMods/starkyshieldcaptainamericalit.png",
+  "Texture": "Items/Projectiles/Projectile_default.png",
   "Scale": 0.7,
   "FuelQuality": 0,
   "Weapon": {

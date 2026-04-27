@@ -18,6 +18,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.bson.BsonDocument;
+import org.bson.BsonString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +31,16 @@ public final class ShieldCapVisualSyncService {
     private static final String BASE_SHIELD_ID = "Weapon_Shield_CaptainAmerica_Starky";
     private static final String RIGHT_SHIELD_ID = "Weapon_ShieldRight_CaptainAmerica_Starky";
     private static final String LEFT_SHIELD_ID = "Weapon_ShieldLeft_CaptainAmerica_Starky";
+    private static final String VIBRANIUM_BASE_SHIELD_ID = "Weapon_Shield_Vibranium_Starky";
+    private static final String VIBRANIUM_LEFT_SHIELD_ID = "Weapon_ShieldLeft_Vibranium_Starky";
     private static final String THROWN_SHIELD_ID = "Weapon_ShieldCap_Thrown_Starky";
+    private static final String VARIANT_METADATA_KEY = "ShieldCapVariant";
+    private static final String VIBRANIUM_VARIANT_VALUE = "Vibranium";
 
     private final Set<UUID> syncingPlayers = ConcurrentHashMap.newKeySet();
     private final Set<UUID> pendingSyncPlayers = ConcurrentHashMap.newKeySet();
     private final Set<UUID> forceBackRebuildPlayers = ConcurrentHashMap.newKeySet();
+    private final Map<UUID, BackShieldPreference> pendingBackShieldPreferences = new ConcurrentHashMap<>();
     private final Map<UUID, List<EventRegistration<Void, ItemContainer.ItemContainerChangeEvent>>> inventoryContainerRegistrations =
             new ConcurrentHashMap<>();
 
@@ -66,6 +72,7 @@ public final class ShieldCapVisualSyncService {
         syncingPlayers.clear();
         pendingSyncPlayers.clear();
         forceBackRebuildPlayers.clear();
+        pendingBackShieldPreferences.clear();
         inventoryContainerRegistrations.values().forEach(this::unregisterContainerListeners);
         inventoryContainerRegistrations.clear();
     }
@@ -79,6 +86,12 @@ public final class ShieldCapVisualSyncService {
     }
 
     public void syncDeferred(Player player, boolean forceBackRebuild) {
+        syncDeferred(player, forceBackRebuild, BackShieldPreference.AUTO);
+    }
+
+    public void syncDeferred(Player player,
+                             boolean forceBackRebuild,
+                             BackShieldPreference backShieldPreference) {
         if (player == null) {
             return;
         }
@@ -97,6 +110,7 @@ public final class ShieldCapVisualSyncService {
             forceBackRebuildPlayers.add(playerUuid);
         }
 
+        rememberPendingBackShieldPreference(playerUuid, backShieldPreference);
         if (!pendingSyncPlayers.add(playerUuid)) {
             return;
         }
@@ -104,9 +118,16 @@ public final class ShieldCapVisualSyncService {
         World world = resolvePlayerWorld(playerRef);
         if (world == null) {
             try {
-                sync(player, null, null, forceBackRebuildPlayers.remove(playerUuid));
+                sync(
+                        player,
+                        null,
+                        null,
+                        forceBackRebuildPlayers.remove(playerUuid),
+                        consumePendingBackShieldPreference(playerUuid)
+                );
             } finally {
                 pendingSyncPlayers.remove(playerUuid);
+                pendingBackShieldPreferences.remove(playerUuid);
             }
             return;
         }
@@ -115,12 +136,37 @@ public final class ShieldCapVisualSyncService {
             try {
                 Player resolvedPlayer = resolvePlayer(playerRef);
                 if (resolvedPlayer != null) {
-                    sync(resolvedPlayer, null, null, forceBackRebuildPlayers.remove(playerUuid));
+                    sync(
+                            resolvedPlayer,
+                            null,
+                            null,
+                            forceBackRebuildPlayers.remove(playerUuid),
+                            consumePendingBackShieldPreference(playerUuid)
+                    );
                 }
             } finally {
                 pendingSyncPlayers.remove(playerUuid);
+                pendingBackShieldPreferences.remove(playerUuid);
             }
         });
+    }
+
+    private void rememberPendingBackShieldPreference(UUID playerUuid, BackShieldPreference preference) {
+        if (playerUuid == null || preference == null || preference == BackShieldPreference.AUTO) {
+            return;
+        }
+        if (preference == BackShieldPreference.AUTO_CLEAR_PENDING) {
+            pendingBackShieldPreferences.remove(playerUuid);
+            return;
+        }
+        pendingBackShieldPreferences.put(playerUuid, preference);
+    }
+
+    private BackShieldPreference consumePendingBackShieldPreference(UUID playerUuid) {
+        if (playerUuid == null) {
+            return BackShieldPreference.AUTO;
+        }
+        return pendingBackShieldPreferences.getOrDefault(playerUuid, BackShieldPreference.AUTO);
     }
 
     private void handlePlayerReady(PlayerReadyEvent event) {
@@ -188,7 +234,7 @@ public final class ShieldCapVisualSyncService {
                 continue;
             }
 
-            container.setItemStackForSlot(slot, remapItem(current, BASE_SHIELD_ID));
+            container.setItemStackForSlot(slot, remapItem(current, resolveBaseShieldId(current)));
         }
     }
 
@@ -200,6 +246,7 @@ public final class ShieldCapVisualSyncService {
         syncingPlayers.remove(event.getPlayerRef().getUuid());
         pendingSyncPlayers.remove(event.getPlayerRef().getUuid());
         forceBackRebuildPlayers.remove(event.getPlayerRef().getUuid());
+        pendingBackShieldPreferences.remove(event.getPlayerRef().getUuid());
         unregisterInventoryListeners(event.getPlayerRef().getUuid());
     }
 
@@ -225,13 +272,21 @@ public final class ShieldCapVisualSyncService {
     }
 
     private void sync(Player player, Integer hotbarOverride, Integer utilityOverride) {
-        sync(player, hotbarOverride, utilityOverride, false);
+        sync(player, hotbarOverride, utilityOverride, false, BackShieldPreference.AUTO);
     }
 
     private void sync(Player player,
                       Integer hotbarOverride,
                       Integer utilityOverride,
                       boolean forceBackRebuild) {
+        sync(player, hotbarOverride, utilityOverride, forceBackRebuild, BackShieldPreference.AUTO);
+    }
+
+    private void sync(Player player,
+                      Integer hotbarOverride,
+                      Integer utilityOverride,
+                      boolean forceBackRebuild,
+                      BackShieldPreference backShieldPreference) {
         if (player == null) {
             return;
         }
@@ -264,8 +319,18 @@ public final class ShieldCapVisualSyncService {
                     utilityOverride != null ? (byte) utilityOverride.intValue() : inventory.getActiveUtilitySlot();
 
             boolean inventoryChanged = false;
-            inventoryChanged |= normalizeActiveSlotItem(hotbar, activeHotbarSlot, BASE_SHIELD_ID);
-            inventoryChanged |= normalizeActiveSlotItem(utility, activeUtilitySlot, LEFT_SHIELD_ID);
+            inventoryChanged |= normalizeActiveSlotItem(
+                    hotbar,
+                    activeHotbarSlot,
+                    BASE_SHIELD_ID,
+                    VIBRANIUM_BASE_SHIELD_ID
+            );
+            inventoryChanged |= normalizeActiveSlotItem(
+                    utility,
+                    activeUtilitySlot,
+                    LEFT_SHIELD_ID,
+                    VIBRANIUM_LEFT_SHIELD_ID
+            );
             inventoryChanged |= normalizeInactiveSlotItems(hotbar, activeHotbarSlot);
             inventoryChanged |= normalizeInactiveSlotItems(utility, activeUtilitySlot);
             inventoryChanged |= normalizeContainerItems(storage);
@@ -282,25 +347,51 @@ public final class ShieldCapVisualSyncService {
                     countShieldInEquippedSlot(hotbar, activeHotbarSlot)
                             + countShieldInEquippedSlot(utility, activeUtilitySlot);
             boolean hasSpareShieldOutsideActiveHands = totalShieldCount > equippedShieldCount;
+            boolean hasNormalBackShieldCandidate =
+                    hasNormalShieldOutsideActiveSlot(hotbar, activeHotbarSlot)
+                            || hasNormalShieldOutsideActiveSlot(utility, activeUtilitySlot)
+                            || hasNormalShield(storage)
+                            || hasNormalShield(backpack)
+                            || hasNormalShield(tools);
+            boolean hasVibraniumBackShieldCandidate =
+                    hasVibraniumShieldOutsideActiveSlot(hotbar, activeHotbarSlot)
+                            || hasVibraniumShieldOutsideActiveSlot(utility, activeUtilitySlot)
+                            || hasVibraniumShield(storage)
+                            || hasVibraniumShield(backpack)
+                            || hasVibraniumShield(tools);
+            boolean useVibraniumBackShield =
+                    resolveBackShieldTexturePreference(
+                            hasNormalBackShieldCandidate,
+                            hasVibraniumBackShieldCandidate,
+                            backShieldPreference
+                    );
 
             boolean shouldShowBackShield =
                     ShieldCapConfigManager.isBackShieldVisualEnabled()
                             && hasSpareShieldOutsideActiveHands;
 
-            syncBackAttachment(player, shouldShowBackShield, forceBackRebuild);
+            syncBackAttachment(player, shouldShowBackShield, useVibraniumBackShield, forceBackRebuild);
 
         } finally {
             syncingPlayers.remove(playerUuid);
         }
     }
 
-    private boolean normalizeActiveSlotItem(ItemContainer container, byte activeSlot, String desiredId) {
+    private boolean normalizeActiveSlotItem(ItemContainer container,
+                                            byte activeSlot,
+                                            String normalDesiredId,
+                                            String vibraniumDesiredId) {
         if (container == null || activeSlot == Inventory.INACTIVE_SLOT_INDEX || activeSlot < 0 || activeSlot >= container.getCapacity()) {
             return false;
         }
 
         ItemStack current = container.getItemStack(activeSlot);
-        if (!isShield(current) || matchesId(current, desiredId)) {
+        if (!isShield(current)) {
+            return false;
+        }
+
+        String desiredId = isVibraniumShield(current) ? vibraniumDesiredId : normalDesiredId;
+        if (matchesId(current, desiredId)) {
             return false;
         }
 
@@ -324,7 +415,7 @@ public final class ShieldCapVisualSyncService {
                 continue;
             }
 
-            container.setItemStackForSlot(slot, remapItem(current, BASE_SHIELD_ID));
+            container.setItemStackForSlot(slot, remapItem(current, resolveBaseShieldId(current)));
             changed = true;
         }
         return changed;
@@ -342,7 +433,7 @@ public final class ShieldCapVisualSyncService {
                 continue;
             }
 
-            container.setItemStackForSlot(slot, remapItem(current, BASE_SHIELD_ID));
+            container.setItemStackForSlot(slot, remapItem(current, resolveBaseShieldId(current)));
             changed = true;
         }
         return changed;
@@ -370,7 +461,10 @@ public final class ShieldCapVisualSyncService {
         return isShield(container.getItemStack((short) activeSlot)) ? 1 : 0;
     }
 
-    private void syncBackAttachment(Player player, boolean shouldShowBackShield, boolean forceBackRebuild) {
+    private void syncBackAttachment(Player player,
+                                    boolean shouldShowBackShield,
+                                    boolean useVibraniumBackShield,
+                                    boolean forceBackRebuild) {
         Ref<EntityStore> ref = player.getReference();
         if (ref == null || !ref.isValid()) {
             return;
@@ -386,6 +480,7 @@ public final class ShieldCapVisualSyncService {
 
         if (currentState == null) {
             ShieldCapBackStateComponent newState = new ShieldCapBackStateComponent();
+            newState.updateVibraniumBackShield(useVibraniumBackShield);
             if (shouldShowBackShield) {
                 newState.updateShowBackShield(true);
                 newState.setPendingModelReset(true);
@@ -401,7 +496,8 @@ public final class ShieldCapVisualSyncService {
         }
 
         boolean changed = currentState.updateShowBackShield(shouldShowBackShield);
-        if (shouldShowBackShield && changed) {
+        boolean textureChanged = currentState.updateVibraniumBackShield(useVibraniumBackShield);
+        if (shouldShowBackShield && (changed || textureChanged)) {
             currentState.setPendingModelReset(true);
         } else if (!shouldShowBackShield) {
             currentState.setPendingModelReset(false);
@@ -413,7 +509,7 @@ public final class ShieldCapVisualSyncService {
             currentState.rebuild();
         }
 
-        if (changed || forceBackRebuild) {
+        if (changed || textureChanged || forceBackRebuild) {
             store.putComponent(ref, ShieldCapBackStateComponent.getComponentType(), currentState);
         }
     }
@@ -435,11 +531,128 @@ public final class ShieldCapVisualSyncService {
     private boolean isShield(ItemStack stack) {
         return matchesId(stack, BASE_SHIELD_ID)
                 || matchesId(stack, RIGHT_SHIELD_ID)
-                || matchesId(stack, LEFT_SHIELD_ID);
+                || matchesId(stack, LEFT_SHIELD_ID)
+                || matchesId(stack, VIBRANIUM_BASE_SHIELD_ID)
+                || matchesId(stack, VIBRANIUM_LEFT_SHIELD_ID);
     }
 
     private boolean isHandVariant(ItemStack stack) {
-        return matchesId(stack, RIGHT_SHIELD_ID) || matchesId(stack, LEFT_SHIELD_ID);
+        return matchesId(stack, RIGHT_SHIELD_ID)
+                || matchesId(stack, LEFT_SHIELD_ID)
+                || matchesId(stack, VIBRANIUM_LEFT_SHIELD_ID);
+    }
+
+    private String resolveBaseShieldId(ItemStack stack) {
+        return isVibraniumShield(stack) || isVibraniumThrownShield(stack)
+                ? VIBRANIUM_BASE_SHIELD_ID
+                : BASE_SHIELD_ID;
+    }
+
+    private boolean isVibraniumShield(ItemStack stack) {
+        return matchesId(stack, VIBRANIUM_BASE_SHIELD_ID)
+                || matchesId(stack, VIBRANIUM_LEFT_SHIELD_ID);
+    }
+
+    private boolean isNormalShield(ItemStack stack) {
+        return matchesId(stack, BASE_SHIELD_ID)
+                || matchesId(stack, RIGHT_SHIELD_ID)
+                || matchesId(stack, LEFT_SHIELD_ID);
+    }
+
+    private boolean isVibraniumThrownShield(ItemStack stack) {
+        if (!matchesId(stack, THROWN_SHIELD_ID)) {
+            return false;
+        }
+
+        BsonDocument metadata = stack.getMetadata() != null ? stack.getMetadata() : null;
+        if (metadata == null || !metadata.containsKey(VARIANT_METADATA_KEY)) {
+            return false;
+        }
+        try {
+            return VIBRANIUM_VARIANT_VALUE.equals(metadata.getString(VARIANT_METADATA_KEY, new BsonString("")).getValue());
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    private boolean hasVibraniumShield(ItemContainer container) {
+        if (container == null) {
+            return false;
+        }
+
+        for (short slot = 0; slot < container.getCapacity(); slot++) {
+            if (isVibraniumShield(container.getItemStack(slot))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasNormalShield(ItemContainer container) {
+        if (container == null) {
+            return false;
+        }
+
+        for (short slot = 0; slot < container.getCapacity(); slot++) {
+            if (isNormalShield(container.getItemStack(slot))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasVibraniumShieldOutsideActiveSlot(ItemContainer container, byte activeSlot) {
+        if (container == null) {
+            return false;
+        }
+
+        for (short slot = 0; slot < container.getCapacity(); slot++) {
+            if (slot == activeSlot) {
+                continue;
+            }
+            if (isVibraniumShield(container.getItemStack(slot))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasNormalShieldOutsideActiveSlot(ItemContainer container, byte activeSlot) {
+        if (container == null) {
+            return false;
+        }
+
+        for (short slot = 0; slot < container.getCapacity(); slot++) {
+            if (slot == activeSlot) {
+                continue;
+            }
+            if (isNormalShield(container.getItemStack(slot))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean resolveBackShieldTexturePreference(boolean hasNormalBackShieldCandidate,
+                                                       boolean hasVibraniumBackShieldCandidate,
+                                                       BackShieldPreference preference) {
+        if (preference == BackShieldPreference.NORMAL) {
+            return false;
+        }
+        if (preference == BackShieldPreference.VIBRANIUM) {
+            return true;
+        }
+        if (hasNormalBackShieldCandidate) {
+            return false;
+        }
+        return hasVibraniumBackShieldCandidate;
+    }
+
+    public enum BackShieldPreference {
+        AUTO,
+        AUTO_CLEAR_PENDING,
+        NORMAL,
+        VIBRANIUM
     }
 
     private Player resolvePlayer(PlayerRef playerRef) {

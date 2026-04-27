@@ -24,6 +24,7 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
                     .build();
 
     private boolean showBackShield;
+    private boolean vibraniumBackShield;
     private boolean dirty;
     private boolean pendingApply;
     private boolean pendingModelReset;
@@ -42,6 +43,20 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
         }
 
         showBackShield = value;
+        dirty = true;
+        return true;
+    }
+
+    public boolean shouldUseVibraniumBackShield() {
+        return vibraniumBackShield;
+    }
+
+    public boolean updateVibraniumBackShield(boolean value) {
+        if (vibraniumBackShield == value) {
+            return false;
+        }
+
+        vibraniumBackShield = value;
         dirty = true;
         return true;
     }
@@ -121,6 +136,7 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
     public ShieldCapBackStateComponent clone() {
         ShieldCapBackStateComponent copy = new ShieldCapBackStateComponent();
         copy.showBackShield = showBackShield;
+        copy.vibraniumBackShield = vibraniumBackShield;
         copy.dirty = dirty;
         copy.pendingApply = pendingApply;
         copy.pendingModelReset = pendingModelReset;
@@ -138,12 +154,13 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
             return false;
         }
 
-        return showBackShield == that.showBackShield;
+        return showBackShield == that.showBackShield
+                && vibraniumBackShield == that.vibraniumBackShield;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(showBackShield);
+        return Objects.hash(showBackShield, vibraniumBackShield);
     }
 
     public static ComponentType<EntityStore, ShieldCapBackStateComponent> getComponentType() {

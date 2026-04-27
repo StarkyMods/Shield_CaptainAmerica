@@ -20,6 +20,7 @@ import com.hypixel.hytale.server.core.modules.projectile.config.ProjectileConfig
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.TargetUtil;
 import org.bson.BsonDocument;
+import org.bson.BsonString;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,8 +29,13 @@ import java.util.UUID;
 public final class ShieldCapThrow extends SimpleInstantInteraction {
     private static final String MAIN_HAND_ITEM_ID = "Weapon_Shield_CaptainAmerica_Starky";
     private static final String LEFT_HAND_ITEM_ID = "Weapon_ShieldLeft_CaptainAmerica_Starky";
+    private static final String VIBRANIUM_MAIN_HAND_ITEM_ID = "Weapon_Shield_Vibranium_Starky";
+    private static final String VIBRANIUM_LEFT_HAND_ITEM_ID = "Weapon_ShieldLeft_Vibranium_Starky";
     private static final String THROWN_ITEM_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig";
+    private static final String VIBRANIUM_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Silver";
+    private static final String VARIANT_METADATA_KEY = "ShieldCapVariant";
+    private static final String VIBRANIUM_VARIANT_VALUE = "Vibranium";
     private static final double DURABILITY_COST = 0.21d;
 
     @Nonnull
@@ -47,34 +53,36 @@ public final class ShieldCapThrow extends SimpleInstantInteraction {
     protected void firstRun(@Nonnull InteractionType type,
                             @Nonnull InteractionContext context,
                             @Nonnull CooldownHandler cooldownHandler) {
-        if (!swapHeldShieldItem(context, THROWN_ITEM_ID)) {
+        ThrowLaunchInfo launchInfo = swapHeldShieldItem(context, THROWN_ITEM_ID);
+        if (launchInfo == null) {
             markFailed(context);
             return;
         }
-        if (!launchProjectile(context, PROJECTILE_CONFIG_ID)) {
+        if (!launchProjectile(context, launchInfo.projectileConfigId)) {
             markFailed(context);
         }
     }
 
-    private boolean swapHeldShieldItem(@Nonnull InteractionContext context, @Nonnull String targetItemId) {
+    @Nullable
+    private ThrowLaunchInfo swapHeldShieldItem(@Nonnull InteractionContext context, @Nonnull String targetItemId) {
         CommandBuffer<EntityStore> commandBuffer = context.getCommandBuffer();
         if (commandBuffer == null) {
-            return false;
+            return null;
         }
 
         Ref<EntityStore> ref = context.getEntity();
         if (ref == null || !ref.isValid()) {
-            return false;
+            return null;
         }
 
         Object component = commandBuffer.getComponent(ref, Player.getComponentType());
         if (!(component instanceof Player player)) {
-            return false;
+            return null;
         }
 
         Inventory inventory = player.getInventory();
         if (inventory == null) {
-            return false;
+            return null;
         }
 
         byte activeHotbarSlot = inventory.getActiveHotbarSlot();
@@ -82,7 +90,14 @@ public final class ShieldCapThrow extends SimpleInstantInteraction {
         if (isValidSlot(hotbarContainer, activeHotbarSlot)) {
             ItemStack mainHandStack = hotbarContainer.getItemStack(activeHotbarSlot);
             if (matchesId(mainHandStack, MAIN_HAND_ITEM_ID)) {
-                return replaceItemInSlot(hotbarContainer, activeHotbarSlot, mainHandStack, targetItemId, DURABILITY_COST);
+                return replaceItemInSlot(hotbarContainer, activeHotbarSlot, mainHandStack, targetItemId, DURABILITY_COST, ShieldVariant.NORMAL)
+                        ? ShieldVariant.NORMAL.toLaunchInfo()
+                        : null;
+            }
+            if (matchesId(mainHandStack, VIBRANIUM_MAIN_HAND_ITEM_ID)) {
+                return replaceItemInSlot(hotbarContainer, activeHotbarSlot, mainHandStack, targetItemId, DURABILITY_COST, ShieldVariant.VIBRANIUM)
+                        ? ShieldVariant.VIBRANIUM.toLaunchInfo()
+                        : null;
             }
         }
 
@@ -91,18 +106,26 @@ public final class ShieldCapThrow extends SimpleInstantInteraction {
         if (isValidSlot(utilityContainer, activeUtilitySlot)) {
             ItemStack leftHandStack = utilityContainer.getItemStack(activeUtilitySlot);
             if (matchesId(leftHandStack, LEFT_HAND_ITEM_ID)) {
-                return replaceItemInSlot(utilityContainer, activeUtilitySlot, leftHandStack, targetItemId, DURABILITY_COST);
+                return replaceItemInSlot(utilityContainer, activeUtilitySlot, leftHandStack, targetItemId, DURABILITY_COST, ShieldVariant.NORMAL)
+                        ? ShieldVariant.NORMAL.toLaunchInfo()
+                        : null;
+            }
+            if (matchesId(leftHandStack, VIBRANIUM_LEFT_HAND_ITEM_ID)) {
+                return replaceItemInSlot(utilityContainer, activeUtilitySlot, leftHandStack, targetItemId, DURABILITY_COST, ShieldVariant.VIBRANIUM)
+                        ? ShieldVariant.VIBRANIUM.toLaunchInfo()
+                        : null;
             }
         }
 
-        return false;
+        return null;
     }
 
     private boolean replaceItemInSlot(@Nonnull ItemContainer container,
                                       byte slot,
                                       @Nonnull ItemStack sourceItem,
                                       @Nonnull String targetItemId,
-                                      double durabilityCost) {
+                                      double durabilityCost,
+                                      @Nonnull ShieldVariant variant) {
         if (sourceItem.isEmpty()) {
             return false;
         }
@@ -115,6 +138,14 @@ public final class ShieldCapThrow extends SimpleInstantInteraction {
             } catch (Exception ignored) {
                 copiedMetadata = null;
             }
+        }
+        if (copiedMetadata == null) {
+            copiedMetadata = new BsonDocument();
+        }
+        if (variant == ShieldVariant.VIBRANIUM) {
+            copiedMetadata.put(VARIANT_METADATA_KEY, new BsonString(VIBRANIUM_VARIANT_VALUE));
+        } else {
+            copiedMetadata.remove(VARIANT_METADATA_KEY);
         }
 
         ItemStack newItem = new ItemStack(targetItemId, 1, copiedMetadata);
@@ -195,6 +226,29 @@ public final class ShieldCapThrow extends SimpleInstantInteraction {
         return stackItemId.equals(itemId)
                 || stackItemId.endsWith("." + itemId)
                 || stackItemId.contains(itemId);
+    }
+
+    private enum ShieldVariant {
+        NORMAL(PROJECTILE_CONFIG_ID),
+        VIBRANIUM(VIBRANIUM_PROJECTILE_CONFIG_ID);
+
+        private final String projectileConfigId;
+
+        ShieldVariant(String projectileConfigId) {
+            this.projectileConfigId = projectileConfigId;
+        }
+
+        private ThrowLaunchInfo toLaunchInfo() {
+            return new ThrowLaunchInfo(projectileConfigId);
+        }
+    }
+
+    private static final class ThrowLaunchInfo {
+        private final String projectileConfigId;
+
+        private ThrowLaunchInfo(String projectileConfigId) {
+            this.projectileConfigId = projectileConfigId;
+        }
     }
 
     private void markFailed(@Nonnull InteractionContext context) {

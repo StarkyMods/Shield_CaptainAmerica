@@ -1,6 +1,6 @@
 {
   "Model": "Items/Weapons/StarkyMods/starkyshieldcaptainamericaprojectile.blockymodel",
-  "Texture": "Items/Weapons/StarkyMods/starkyshieldcaptainamerica.png",
+  "Texture": "Items/Weapons/StarkyMods/starkyshieldcaptainamericasilver.png",
   "HitBox": {
     "Min": {
       "X": -0.4,

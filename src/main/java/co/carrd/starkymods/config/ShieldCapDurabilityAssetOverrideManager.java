@@ -20,11 +20,17 @@ public final class ShieldCapDurabilityAssetOverrideManager {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final String PRIMARY_ID = "Weapon_Shield_CaptainAmerica_Starky";
     private static final String LEFT_ID = "Weapon_ShieldLeft_CaptainAmerica_Starky";
+    private static final String VIBRANIUM_PRIMARY_ID = "Weapon_Shield_Vibranium_Starky";
+    private static final String VIBRANIUM_LEFT_ID = "Weapon_ShieldLeft_Vibranium_Starky";
     private static final String THROWN_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String PRIMARY_ASSET_PATH =
             "Server/Item/Items/Weapon/Shield/Weapon_Shield_CaptainAmerica_Starky.json";
     private static final String LEFT_ASSET_PATH =
             "Server/Item/Items/Weapon/Shield/Weapon_ShieldLeft_CaptainAmerica_Starky.json";
+    private static final String VIBRANIUM_PRIMARY_ASSET_PATH =
+            "Server/Item/Items/Weapon/Shield/Weapon_Shield_Vibranium_Starky.json";
+    private static final String VIBRANIUM_LEFT_ASSET_PATH =
+            "Server/Item/Items/Weapon/Shield/Weapon_ShieldLeft_Vibranium_Starky.json";
     private static final String THROWN_ASSET_PATH =
             "Server/Item/Items/Weapon_ShieldCap_Thrown_Starky.json";
 
@@ -39,7 +45,7 @@ public final class ShieldCapDurabilityAssetOverrideManager {
 
         int maxDurability = Math.max(0, craftConfig.weaponMaxDurability);
         try {
-            File outputFolder = new File(ShieldCapCraftConfigManager.getCraftConfigFile().getParentFile(), "generated");
+            File outputFolder = ShieldCapConfigPaths.getGeneratedFolder();
             if (!outputFolder.exists()) {
                 outputFolder.mkdirs();
             }
@@ -47,6 +53,8 @@ public final class ShieldCapDurabilityAssetOverrideManager {
             List<RawAsset<String>> itemAssets = new ArrayList<>();
             addItemOverride(itemAssets, PRIMARY_ID, PRIMARY_ASSET_PATH, maxDurability, outputFolder.toPath());
             addItemOverride(itemAssets, LEFT_ID, LEFT_ASSET_PATH, maxDurability, outputFolder.toPath());
+            addItemOverride(itemAssets, VIBRANIUM_PRIMARY_ID, VIBRANIUM_PRIMARY_ASSET_PATH, maxDurability, outputFolder.toPath());
+            addItemOverride(itemAssets, VIBRANIUM_LEFT_ID, VIBRANIUM_LEFT_ASSET_PATH, maxDurability, outputFolder.toPath());
             addItemOverride(itemAssets, THROWN_ID, THROWN_ASSET_PATH, maxDurability, outputFolder.toPath());
 
             if (itemAssets.isEmpty()) {
