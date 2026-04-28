@@ -114,14 +114,17 @@ public final class ShieldCapThrowHomingService {
     private static final double PROJECTILE_CLASH_TOUCH_DISTANCE = 1.6;
     private static final String SHIELDCAP_PROJECTILE_ASSET_ID = "ShieldCap_Projectile";
     private static final String SHIELDCAP_VIBRANIUM_PROJECTILE_ASSET_ID = "ShieldCap_Vibranium_Projectile";
+    private static final String SHIELDCAP_CARTER_PROJECTILE_ASSET_ID = "ShieldCap_Carter_Projectile";
     private static final String MJOLNIR_PROJECTILE_ASSET_ID = "Mjolnir";
     private static final String FOREIGN_PROJECTILE_ASSET_PREFIX = "Mjolnir";
     private static final String THROW_KICK_ROOT_ID = "Root_ShieldCap_Throw_Kick";
     private static final String THROW_KICK_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Throw_Kick";
     private static final String THROW_KICK_VIBRANIUM_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Throw_Kick_Silver";
+    private static final String THROW_KICK_CARTER_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Throw_Kick_Carter";
     private static final String THROWN_ITEM_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String VARIANT_METADATA_KEY = "ShieldCapVariant";
     private static final String VIBRANIUM_VARIANT_VALUE = "Vibranium";
+    private static final String CARTER_VARIANT_VALUE = "Carter";
     private static final String RETURN_CALLING_ROOT_ID = "Root_ShieldCap_Return_Calling_Internal";
     private static final String RETURN_CALLING_CLEAR_ROOT_ID = "Root_ShieldCap_Return_Calling_Clear_Internal";
     private static final String NORMAL_IMPACT_SOUND_ID = "SFX_ShieldCap_Hit";
@@ -4353,69 +4356,88 @@ public final class ShieldCapThrowHomingService {
 
     private static boolean isShieldCapProjectileAssetName(String projectileAssetName) {
         return SHIELDCAP_PROJECTILE_ASSET_ID.equals(projectileAssetName)
-                || SHIELDCAP_VIBRANIUM_PROJECTILE_ASSET_ID.equals(projectileAssetName);
+                || SHIELDCAP_VIBRANIUM_PROJECTILE_ASSET_ID.equals(projectileAssetName)
+                || SHIELDCAP_CARTER_PROJECTILE_ASSET_ID.equals(projectileAssetName);
     }
 
     private static String resolveThrowKickProjectileConfigId(CommandBuffer<EntityStore> commandBuffer,
                                                              Ref<EntityStore> ownerRef) {
-        return hasVibraniumThrownShield(commandBuffer, ownerRef)
-                ? THROW_KICK_VIBRANIUM_PROJECTILE_CONFIG_ID
-                : THROW_KICK_PROJECTILE_CONFIG_ID;
+        String variant = findThrownShieldVariant(commandBuffer, ownerRef);
+        if (VIBRANIUM_VARIANT_VALUE.equals(variant)) {
+            return THROW_KICK_VIBRANIUM_PROJECTILE_CONFIG_ID;
+        }
+        if (CARTER_VARIANT_VALUE.equals(variant)) {
+            return THROW_KICK_CARTER_PROJECTILE_CONFIG_ID;
+        }
+        return THROW_KICK_PROJECTILE_CONFIG_ID;
     }
 
-    private static boolean hasVibraniumThrownShield(CommandBuffer<EntityStore> commandBuffer,
-                                                    Ref<EntityStore> ownerRef) {
+    private static String findThrownShieldVariant(CommandBuffer<EntityStore> commandBuffer,
+                                                  Ref<EntityStore> ownerRef) {
         if (commandBuffer == null || ownerRef == null || !ownerRef.isValid()) {
-            return false;
+            return null;
         }
 
         Player player = commandBuffer.getComponent(ownerRef, Player.getComponentType());
         if (player == null || player.getInventory() == null) {
-            return false;
+            return null;
         }
 
         Inventory inventory = player.getInventory();
-        return hasVibraniumThrownShield(inventory.getHotbar())
-                || hasVibraniumThrownShield(inventory.getUtility())
-                || hasVibraniumThrownShield(inventory.getStorage())
-                || hasVibraniumThrownShield(inventory.getBackpack())
-                || hasVibraniumThrownShield(inventory.getTools());
+        String variant = findThrownShieldVariant(inventory.getHotbar());
+        if (variant != null) {
+            return variant;
+        }
+        variant = findThrownShieldVariant(inventory.getUtility());
+        if (variant != null) {
+            return variant;
+        }
+        variant = findThrownShieldVariant(inventory.getStorage());
+        if (variant != null) {
+            return variant;
+        }
+        variant = findThrownShieldVariant(inventory.getBackpack());
+        if (variant != null) {
+            return variant;
+        }
+        return findThrownShieldVariant(inventory.getTools());
     }
 
-    private static boolean hasVibraniumThrownShield(ItemContainer container) {
+    private static String findThrownShieldVariant(ItemContainer container) {
         if (container == null) {
-            return false;
+            return null;
         }
 
         for (short slot = 0; slot < container.getCapacity(); slot++) {
             ItemStack stack = container.getItemStack(slot);
-            if (isVibraniumThrownShield(stack)) {
-                return true;
+            String variant = getThrownShieldVariant(stack);
+            if (variant != null) {
+                return variant;
             }
         }
-        return false;
+        return null;
     }
 
-    private static boolean isVibraniumThrownShield(ItemStack stack) {
+    private static String getThrownShieldVariant(ItemStack stack) {
         if (stack == null || stack.isEmpty()) {
-            return false;
+            return null;
         }
 
         String itemId = stack.getItemId();
         if (itemId == null || itemId.isBlank()
                 || !(itemId.equals(THROWN_ITEM_ID) || itemId.endsWith("." + THROWN_ITEM_ID) || itemId.contains(THROWN_ITEM_ID))) {
-            return false;
+            return null;
         }
 
         BsonDocument metadata = stack.getMetadata();
         if (metadata == null || !metadata.containsKey(VARIANT_METADATA_KEY)) {
-            return false;
+            return null;
         }
 
         try {
-            return VIBRANIUM_VARIANT_VALUE.equals(metadata.getString(VARIANT_METADATA_KEY, new BsonString("")).getValue());
+            return metadata.getString(VARIANT_METADATA_KEY, new BsonString("")).getValue();
         } catch (Exception ignored) {
-            return false;
+            return null;
         }
     }
 

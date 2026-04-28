@@ -30,9 +30,11 @@ import java.util.UUID;
 public class ShieldCapThrowHomingLaunchConfigProjectile extends SimpleInstantInteraction {
     private static final String NORMAL_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig";
     private static final String VIBRANIUM_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Silver";
+    private static final String CARTER_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Carter";
     private static final String THROWN_ITEM_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String VARIANT_METADATA_KEY = "ShieldCapVariant";
     private static final String VIBRANIUM_VARIANT_VALUE = "Vibranium";
+    private static final String CARTER_VARIANT_VALUE = "Carter";
 
     @Nonnull
     public static final BuilderCodec<ShieldCapThrowHomingLaunchConfigProjectile> CODEC =
@@ -94,63 +96,82 @@ public class ShieldCapThrowHomingLaunchConfigProjectile extends SimpleInstantInt
     }
 
     private String resolveConfigId(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> ownerRef) {
-        if (NORMAL_PROJECTILE_CONFIG_ID.equals(config) && hasVibraniumThrownShield(commandBuffer, ownerRef)) {
-            return VIBRANIUM_PROJECTILE_CONFIG_ID;
+        if (NORMAL_PROJECTILE_CONFIG_ID.equals(config)) {
+            String variant = findThrownShieldVariant(commandBuffer, ownerRef);
+            if (VIBRANIUM_VARIANT_VALUE.equals(variant)) {
+                return VIBRANIUM_PROJECTILE_CONFIG_ID;
+            }
+            if (CARTER_VARIANT_VALUE.equals(variant)) {
+                return CARTER_PROJECTILE_CONFIG_ID;
+            }
         }
         return config;
     }
 
-    private boolean hasVibraniumThrownShield(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> ownerRef) {
+    private String findThrownShieldVariant(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> ownerRef) {
         if (commandBuffer == null || ownerRef == null || !ownerRef.isValid()) {
-            return false;
+            return null;
         }
 
         Player player = commandBuffer.getComponent(ownerRef, Player.getComponentType());
         if (player == null || player.getInventory() == null) {
-            return false;
+            return null;
         }
 
         Inventory inventory = player.getInventory();
-        return hasVibraniumThrownShield(inventory.getHotbar())
-                || hasVibraniumThrownShield(inventory.getUtility())
-                || hasVibraniumThrownShield(inventory.getStorage())
-                || hasVibraniumThrownShield(inventory.getBackpack())
-                || hasVibraniumThrownShield(inventory.getTools());
+        String variant = findThrownShieldVariant(inventory.getHotbar());
+        if (variant != null) {
+            return variant;
+        }
+        variant = findThrownShieldVariant(inventory.getUtility());
+        if (variant != null) {
+            return variant;
+        }
+        variant = findThrownShieldVariant(inventory.getStorage());
+        if (variant != null) {
+            return variant;
+        }
+        variant = findThrownShieldVariant(inventory.getBackpack());
+        if (variant != null) {
+            return variant;
+        }
+        return findThrownShieldVariant(inventory.getTools());
     }
 
-    private boolean hasVibraniumThrownShield(ItemContainer container) {
+    private String findThrownShieldVariant(ItemContainer container) {
         if (container == null) {
-            return false;
+            return null;
         }
 
         for (short slot = 0; slot < container.getCapacity(); slot++) {
-            if (isVibraniumThrownShield(container.getItemStack(slot))) {
-                return true;
+            String variant = getThrownShieldVariant(container.getItemStack(slot));
+            if (variant != null) {
+                return variant;
             }
         }
-        return false;
+        return null;
     }
 
-    private boolean isVibraniumThrownShield(ItemStack stack) {
+    private String getThrownShieldVariant(ItemStack stack) {
         if (stack == null || stack.isEmpty()) {
-            return false;
+            return null;
         }
 
         String itemId = stack.getItemId();
         if (itemId == null || itemId.isBlank()
                 || !(itemId.equals(THROWN_ITEM_ID) || itemId.endsWith("." + THROWN_ITEM_ID) || itemId.contains(THROWN_ITEM_ID))) {
-            return false;
+            return null;
         }
 
         BsonDocument metadata = stack.getMetadata();
         if (metadata == null || !metadata.containsKey(VARIANT_METADATA_KEY)) {
-            return false;
+            return null;
         }
 
         try {
-            return VIBRANIUM_VARIANT_VALUE.equals(metadata.getString(VARIANT_METADATA_KEY, new BsonString("")).getValue());
+            return metadata.getString(VARIANT_METADATA_KEY, new BsonString("")).getValue();
         } catch (Exception ignored) {
-            return false;
+            return null;
         }
     }
 }

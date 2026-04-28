@@ -24,7 +24,7 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
                     .build();
 
     private boolean showBackShield;
-    private boolean vibraniumBackShield;
+    private String backShieldVariant = "Normal";
     private boolean dirty;
     private boolean pendingApply;
     private boolean pendingModelReset;
@@ -48,15 +48,28 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
     }
 
     public boolean shouldUseVibraniumBackShield() {
-        return vibraniumBackShield;
+        return "Vibranium".equals(backShieldVariant);
+    }
+
+    public boolean shouldUseCarterBackShield() {
+        return "Carter".equals(backShieldVariant);
     }
 
     public boolean updateVibraniumBackShield(boolean value) {
-        if (vibraniumBackShield == value) {
+        return updateBackShieldVariant(value ? "Vibranium" : "Normal");
+    }
+
+    public String getBackShieldVariant() {
+        return backShieldVariant;
+    }
+
+    public boolean updateBackShieldVariant(String value) {
+        String normalized = value == null || value.isBlank() ? "Normal" : value;
+        if (Objects.equals(backShieldVariant, normalized)) {
             return false;
         }
 
-        vibraniumBackShield = value;
+        backShieldVariant = normalized;
         dirty = true;
         return true;
     }
@@ -136,7 +149,7 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
     public ShieldCapBackStateComponent clone() {
         ShieldCapBackStateComponent copy = new ShieldCapBackStateComponent();
         copy.showBackShield = showBackShield;
-        copy.vibraniumBackShield = vibraniumBackShield;
+        copy.backShieldVariant = backShieldVariant;
         copy.dirty = dirty;
         copy.pendingApply = pendingApply;
         copy.pendingModelReset = pendingModelReset;
@@ -155,12 +168,12 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
         }
 
         return showBackShield == that.showBackShield
-                && vibraniumBackShield == that.vibraniumBackShield;
+                && Objects.equals(backShieldVariant, that.backShieldVariant);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(showBackShield, vibraniumBackShield);
+        return Objects.hash(showBackShield, backShieldVariant);
     }
 
     public static ComponentType<EntityStore, ShieldCapBackStateComponent> getComponentType() {

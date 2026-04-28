@@ -24,6 +24,8 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
     private static final String LEFT_SHIELD_ID = "Weapon_ShieldLeft_CaptainAmerica_Starky";
     private static final String VIBRANIUM_MAIN_SHIELD_ID = "Weapon_Shield_Vibranium_Starky";
     private static final String VIBRANIUM_LEFT_SHIELD_ID = "Weapon_ShieldLeft_Vibranium_Starky";
+    private static final String CARTER_MAIN_SHIELD_ID = "Weapon_Shield_CaptainCarter_Starky";
+    private static final String CARTER_LEFT_SHIELD_ID = "Weapon_ShieldLeft_CaptainCarter_Starky";
 
     @Nonnull
     public static final BuilderCodec<ShieldCapRefreshVisualsInteraction> CODEC =
@@ -68,13 +70,24 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
 
     private boolean isSwapFromRefresh() {
         return refreshMode != null
-                && ("SwapFrom".equalsIgnoreCase(refreshMode)
+                && (refreshMode.toLowerCase().startsWith("swapfrom")
                 || "FromHand".equalsIgnoreCase(refreshMode));
     }
 
     private ShieldCapVisualSyncService.BackShieldPreference resolveBackShieldPreference(Player player) {
         if (player == null || player.getInventory() == null) {
             return ShieldCapVisualSyncService.BackShieldPreference.AUTO;
+        }
+        if (refreshMode != null) {
+            if (refreshMode.toLowerCase().contains("normal")) {
+                return ShieldCapVisualSyncService.BackShieldPreference.NORMAL;
+            }
+            if (refreshMode.toLowerCase().contains("vibranium")) {
+                return ShieldCapVisualSyncService.BackShieldPreference.VIBRANIUM;
+            }
+            if (refreshMode.toLowerCase().contains("carter")) {
+                return ShieldCapVisualSyncService.BackShieldPreference.CARTER;
+            }
         }
 
         Inventory inventory = player.getInventory();
@@ -86,6 +99,9 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
         }
         if (isVibraniumShield(activeMain) || isVibraniumShield(activeLeft)) {
             return ShieldCapVisualSyncService.BackShieldPreference.VIBRANIUM;
+        }
+        if (isCarterShield(activeMain) || isCarterShield(activeLeft)) {
+            return ShieldCapVisualSyncService.BackShieldPreference.CARTER;
         }
         return ShieldCapVisualSyncService.BackShieldPreference.AUTO;
     }
@@ -106,6 +122,10 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
 
     private boolean isVibraniumShield(ItemStack stack) {
         return matchesId(stack, VIBRANIUM_MAIN_SHIELD_ID) || matchesId(stack, VIBRANIUM_LEFT_SHIELD_ID);
+    }
+
+    private boolean isCarterShield(ItemStack stack) {
+        return matchesId(stack, CARTER_MAIN_SHIELD_ID) || matchesId(stack, CARTER_LEFT_SHIELD_ID);
     }
 
     private boolean matchesId(ItemStack stack, String itemId) {

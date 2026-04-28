@@ -48,12 +48,14 @@ public final class ShieldCapBackModelSystems {
             "Items/Weapons/StarkyMods/starkyshieldcaptainamerica.png";
     private static final String BACK_ATTACHMENT_VIBRANIUM_TEXTURE =
             "Items/Weapons/StarkyMods/starkyshieldcaptainamericasilver.png";
+    private static final String BACK_ATTACHMENT_CARTER_TEXTURE =
+            "Items/Weapons/StarkyMods/starkyshieldcaptainamericacarter.png";
     private static final String LEGACY_BACK_ATTACHMENT_TEXTURE =
             "Items/Weapons/StarkyMods/starkyshieldcaptainamericaback_attachment.png";
     private static final String SIMPLIFIED_HAIRCUT_MODEL =
             "Characters/Haircuts/HairbaseGeneric.blockymodel";
     private static final String LOG_PREFIX = "[ShieldCapBackModelDebug] ";
-    private static final boolean DEBUG_VISUALS = true;
+    private static final boolean DEBUG_VISUALS = false;
 
     private ShieldCapBackModelSystems() {
     }
@@ -181,12 +183,12 @@ public final class ShieldCapBackModelSystems {
                     ? cloneModelWithAttachments(preparedBaseModel, preparedBaseModel.getAttachments())
                     : preparedBaseModel;
             boolean useCapeShieldModel = hasCapeEquipped(playerSkinComponent);
-            boolean useVibraniumTexture = state.shouldUseVibraniumBackShield();
+            String backShieldVariant = state.getBackShieldVariant();
             Model shieldModel = buildShieldCapModel(
                     preparedBaseModel,
                     preserveRuntimeState,
                     useCapeShieldModel,
-                    useVibraniumTexture
+                    backShieldVariant
             );
             state.setPendingApply(false);
             state.setAwaitingNaturalModel(false);
@@ -197,7 +199,7 @@ public final class ShieldCapBackModelSystems {
                     + " | currentModel=" + summarizeModel(currentModel)
                     + " | preparedBaseModel=" + summarizeModel(preparedBaseModel)
                     + " | useCapeShieldModel=" + useCapeShieldModel
-                    + " | useVibraniumTexture=" + useVibraniumTexture
+                    + " | backShieldVariant=" + backShieldVariant
                     + " | preserveRuntimeState=" + preserveRuntimeState
                     + " | shieldModel=" + summarizeModel(shieldModel));
             chunk.setComponent(entityIndex, ModelComponent.getComponentType(), new ModelComponent(shieldModel));
@@ -210,17 +212,17 @@ public final class ShieldCapBackModelSystems {
         }
 
         private Model buildShieldCapModel(Model baseModel) {
-            return buildShieldCapModel(baseModel, false, false, false);
+            return buildShieldCapModel(baseModel, false, false, "Normal");
         }
 
         private Model buildShieldCapModel(Model baseModel, boolean mutateInPlace) {
-            return buildShieldCapModel(baseModel, mutateInPlace, false, false);
+            return buildShieldCapModel(baseModel, mutateInPlace, false, "Normal");
         }
 
         private Model buildShieldCapModel(Model baseModel,
                                           boolean mutateInPlace,
                                           boolean useCapeShieldModel,
-                                          boolean useVibraniumTexture) {
+                                          String backShieldVariant) {
             List<ModelAttachment> attachments = new ArrayList<>();
             ModelAttachment[] baseAttachments = baseModel.getAttachments();
             if (baseAttachments != null) {
@@ -233,7 +235,7 @@ public final class ShieldCapBackModelSystems {
 
             attachments.add(new ModelAttachment(
                     resolveBackAttachmentModel(useCapeShieldModel),
-                    resolveBackAttachmentTexture(useVibraniumTexture),
+                    resolveBackAttachmentTexture(backShieldVariant),
                     null,
                     null,
                     1.0
@@ -250,8 +252,14 @@ public final class ShieldCapBackModelSystems {
             return useCapeShieldModel ? BACK_ATTACHMENT_CAPE_MODEL : BACK_ATTACHMENT_MODEL;
         }
 
-        private String resolveBackAttachmentTexture(boolean useVibraniumTexture) {
-            return useVibraniumTexture ? BACK_ATTACHMENT_VIBRANIUM_TEXTURE : BACK_ATTACHMENT_TEXTURE;
+        private String resolveBackAttachmentTexture(String backShieldVariant) {
+            if ("Vibranium".equals(backShieldVariant)) {
+                return BACK_ATTACHMENT_VIBRANIUM_TEXTURE;
+            }
+            if ("Carter".equals(backShieldVariant)) {
+                return BACK_ATTACHMENT_CARTER_TEXTURE;
+            }
+            return BACK_ATTACHMENT_TEXTURE;
         }
 
         private boolean hasCapeEquipped(PlayerSkinComponent playerSkinComponent) {
@@ -998,6 +1006,7 @@ public final class ShieldCapBackModelSystems {
                     || BACK_ATTACHMENT_CAPE_MODEL.equals(attachment.getModel()))
                     && (BACK_ATTACHMENT_TEXTURE.equals(attachment.getTexture())
                     || BACK_ATTACHMENT_VIBRANIUM_TEXTURE.equals(attachment.getTexture())
+                    || BACK_ATTACHMENT_CARTER_TEXTURE.equals(attachment.getTexture())
                     || LEGACY_BACK_ATTACHMENT_TEXTURE.equals(attachment.getTexture()));
         }
 
@@ -1363,7 +1372,7 @@ public final class ShieldCapBackModelSystems {
         private static void load() {
             Path assetsZip = resolveAssetsZipPath();
             if (assetsZip == null) {
-                System.out.println(LOG_PREFIX + "official character creator data unavailable | assetsZip=missing");
+                debugStatic("official character creator data unavailable | assetsZip=missing");
                 haircutFallbacks = Map.of();
                 headAccessoryRules = Map.of();
                 return;
@@ -1376,12 +1385,12 @@ public final class ShieldCapBackModelSystems {
                 readHeadAccessoryRules(zipFile, loadedHeadAccessoryRules);
                 haircutFallbacks = Map.copyOf(loadedHaircutFallbacks);
                 headAccessoryRules = Map.copyOf(loadedHeadAccessoryRules);
-                System.out.println(LOG_PREFIX + "official character creator data loaded"
+                debugStatic("official character creator data loaded"
                         + " | assetsZip=" + assetsZip
                         + " | haircutFallbacks=" + haircutFallbacks
                         + " | headAccessoryRules=" + headAccessoryRules.size());
             } catch (Throwable throwable) {
-                System.out.println(LOG_PREFIX + "official character creator data load failed"
+                debugStatic("official character creator data load failed"
                         + " | assetsZip=" + assetsZip
                         + " | reason=" + throwable.getClass().getSimpleName()
                         + ": " + throwable.getMessage());
@@ -1471,6 +1480,12 @@ public final class ShieldCapBackModelSystems {
                 return null;
             }
             return element.getAsString();
+        }
+    }
+
+    private static void debugStatic(String message) {
+        if (DEBUG_VISUALS) {
+            System.out.println(LOG_PREFIX + message);
         }
     }
 

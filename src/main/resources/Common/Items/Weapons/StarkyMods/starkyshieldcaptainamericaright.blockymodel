@@ -1638,7 +1638,7 @@
                               "shape": {
                                 "type": "box",
                                 "offset": {"x": -0.09674, "y": 0.45, "z": 0},
-                                "stretch": {"x": 1.625, "y": 1.0375, "z": 1},
+                                "stretch": {"x": 1.625, "y": 1.025, "z": 1},
                                 "settings": {
                                   "isPiece": false,
                                   "size": {"x": 1, "y": 0.5, "z": 6},
@@ -1690,7 +1690,7 @@
                               "shape": {
                                 "type": "box",
                                 "offset": {"x": -0.09674, "y": 0.45, "z": 0},
-                                "stretch": {"x": 1.6625, "y": 1.025, "z": 1},
+                                "stretch": {"x": 1.6625, "y": 1.0125, "z": 1},
                                 "settings": {
                                   "isPiece": false,
                                   "size": {"x": 1, "y": 0.5, "z": 6},
@@ -1898,7 +1898,7 @@
                               "shape": {
                                 "type": "box",
                                 "offset": {"x": 0, "y": 0.45, "z": -0.09674},
-                                "stretch": {"x": 1, "y": 1.0125, "z": 1.5},
+                                "stretch": {"x": 1, "y": 1.05, "z": 1.5},
                                 "settings": {
                                   "isPiece": false,
                                   "size": {"x": 6, "y": 0.5, "z": 1},
@@ -1950,7 +1950,7 @@
                               "shape": {
                                 "type": "box",
                                 "offset": {"x": 0, "y": 0.45, "z": -0.09674},
-                                "stretch": {"x": 1, "y": 1.05, "z": 1.5},
+                                "stretch": {"x": 1, "y": 1.0375, "z": 1.5},
                                 "settings": {
                                   "isPiece": false,
                                   "size": {"x": 6, "y": 0.5, "z": 1},

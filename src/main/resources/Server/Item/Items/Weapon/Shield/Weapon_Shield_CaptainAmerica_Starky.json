@@ -49,7 +49,7 @@
                     },
                     {
                       "Type": "ShieldCap_Refresh_Java",
-                      "RefreshMode": "SwapFrom",
+                      "RefreshMode": "SwapFromNormal",
                       "RunTime": 0,
                       "CancelOnItemChange": false
                     },

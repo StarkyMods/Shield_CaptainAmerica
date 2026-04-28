@@ -22,6 +22,8 @@ public final class ShieldCapDurabilityAssetOverrideManager {
     private static final String LEFT_ID = "Weapon_ShieldLeft_CaptainAmerica_Starky";
     private static final String VIBRANIUM_PRIMARY_ID = "Weapon_Shield_Vibranium_Starky";
     private static final String VIBRANIUM_LEFT_ID = "Weapon_ShieldLeft_Vibranium_Starky";
+    private static final String CARTER_PRIMARY_ID = "Weapon_Shield_CaptainCarter_Starky";
+    private static final String CARTER_LEFT_ID = "Weapon_ShieldLeft_CaptainCarter_Starky";
     private static final String THROWN_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String PRIMARY_ASSET_PATH =
             "Server/Item/Items/Weapon/Shield/Weapon_Shield_CaptainAmerica_Starky.json";
@@ -31,6 +33,10 @@ public final class ShieldCapDurabilityAssetOverrideManager {
             "Server/Item/Items/Weapon/Shield/Weapon_Shield_Vibranium_Starky.json";
     private static final String VIBRANIUM_LEFT_ASSET_PATH =
             "Server/Item/Items/Weapon/Shield/Weapon_ShieldLeft_Vibranium_Starky.json";
+    private static final String CARTER_PRIMARY_ASSET_PATH =
+            "Server/Item/Items/Weapon/Shield/Weapon_Shield_CaptainCarter_Starky.json";
+    private static final String CARTER_LEFT_ASSET_PATH =
+            "Server/Item/Items/Weapon/Shield/Weapon_ShieldLeft_CaptainCarter_Starky.json";
     private static final String THROWN_ASSET_PATH =
             "Server/Item/Items/Weapon_ShieldCap_Thrown_Starky.json";
 
@@ -55,6 +61,8 @@ public final class ShieldCapDurabilityAssetOverrideManager {
             addItemOverride(itemAssets, LEFT_ID, LEFT_ASSET_PATH, maxDurability, outputFolder.toPath());
             addItemOverride(itemAssets, VIBRANIUM_PRIMARY_ID, VIBRANIUM_PRIMARY_ASSET_PATH, maxDurability, outputFolder.toPath());
             addItemOverride(itemAssets, VIBRANIUM_LEFT_ID, VIBRANIUM_LEFT_ASSET_PATH, maxDurability, outputFolder.toPath());
+            addItemOverride(itemAssets, CARTER_PRIMARY_ID, CARTER_PRIMARY_ASSET_PATH, maxDurability, outputFolder.toPath());
+            addItemOverride(itemAssets, CARTER_LEFT_ID, CARTER_LEFT_ASSET_PATH, maxDurability, outputFolder.toPath());
             addItemOverride(itemAssets, THROWN_ID, THROWN_ASSET_PATH, maxDurability, outputFolder.toPath());
 
             if (itemAssets.isEmpty()) {

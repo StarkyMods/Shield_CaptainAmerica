@@ -66,6 +66,7 @@ import co.carrd.starkymods.visuals.ShieldCapBackModelSystems;
 import co.carrd.starkymods.visuals.ShieldCapBackShieldDamageReductionSystem;
 import co.carrd.starkymods.visuals.ShieldCapBackStateComponent;
 import co.carrd.starkymods.visuals.ShieldCapReturnReticleInjector;
+import co.carrd.starkymods.visuals.ShieldCapUtilityQuickSwapSystem;
 import co.carrd.starkymods.visuals.ShieldCapVisualSyncService;
 import co.carrd.starkymods.interactions.ShieldCapReturnKickInputService;
 import com.hypixel.hytale.component.ComponentType;
@@ -365,6 +366,7 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new ShieldCapMjolnirGuardWieldImpactSystem());
         getEntityStoreRegistry().registerSystem(new ShieldCapGuardCreativeFallRollTickSystem());
         getEntityStoreRegistry().registerSystem(new ShieldCapBackShieldDamageReductionSystem());
+        getEntityStoreRegistry().registerSystem(new ShieldCapUtilityQuickSwapSystem());
         visualSyncService.register(this);
         returnKickInputService.register(this);
         returnReticleInjector.register(this);

@@ -5,7 +5,7 @@
   },
   "Model": "Items/Weapons/StarkyMods/starkyshieldcaptainamericaleft.blockymodel",
   "Texture": "Items/Weapons/StarkyMods/starkyshieldcaptainamerica.png",
-  "Icon": "Icons/ItemsGenerated/Weapon_Shield_Vibranium_Starky.png",
+  "Icon": "Icons/ItemsGenerated/Weapon_Shield_CaptainAmerica_Starky.png",
   "Quality": "ShieldCap_Quality",
   "ItemLevel": 100,
   "Scale": 2.8,
@@ -44,7 +44,7 @@
                     },
                     {
                       "Type": "ShieldCap_Refresh_Java",
-                      "RefreshMode": "SwapFrom",
+                      "RefreshMode": "SwapFromNormal",
                       "RunTime": 0,
                       "CancelOnItemChange": false
                     },
