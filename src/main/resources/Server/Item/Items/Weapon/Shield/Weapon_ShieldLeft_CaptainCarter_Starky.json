@@ -117,6 +117,9 @@
     ],
     "Family": [
       "Shield"
+    ],
+    "PP_Signature_Gain": [
+       "25"
     ]
   },
   "Reticle": "DefaultMelee",

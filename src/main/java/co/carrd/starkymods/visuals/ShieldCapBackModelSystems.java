@@ -18,10 +18,15 @@ import com.hypixel.hytale.server.core.cosmetics.PlayerSkin;
 import com.hypixel.hytale.server.core.cosmetics.PlayerSkinPart;
 import com.hypixel.hytale.server.core.cosmetics.PlayerSkinPartTexture;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
+import com.hypixel.hytale.server.core.modules.entity.player.PlayerSettings;
 import com.hypixel.hytale.server.core.modules.entity.player.PlayerSkinComponent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.protocol.ItemArmor;
+import com.hypixel.hytale.protocol.ItemArmorSlot;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,9 +34,11 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -120,6 +127,22 @@ public final class ShieldCapBackModelSystems {
             Player player = chunk.getComponent(entityIndex, Player.getComponentType());
             String playerId = resolvePlayerDebugId(player);
             Model appearanceModel = createAppearanceModel(player, playerSkinComponent);
+            String appearanceSignature = buildModelSignature(appearanceModel);
+            boolean activeShieldBaseMismatch = state.shouldShowBackShield()
+                    && hasActiveShieldAttachment
+                    && appearanceModel != null
+                    && !areModelsVisuallyEquivalent(removeShieldCapAttachment(currentModel), appearanceModel);
+            if (state.shouldShowBackShield()
+                    && hasActiveShieldAttachment
+                    && !state.isPendingApply()
+                    && (state.updateAppearanceSignature(appearanceSignature) || activeShieldBaseMismatch)) {
+                state.clearNaturalBaseModel();
+                state.clearPendingBaseModel();
+                state.rebuild();
+                dirty = true;
+            } else if (!state.shouldShowBackShield()) {
+                state.updateAppearanceSignature(appearanceSignature);
+            }
 
             if (!dirty) {
                 rememberNaturalBaseModel(state, currentModel, appearanceModel);
@@ -197,6 +220,7 @@ public final class ShieldCapBackModelSystems {
             debug("apply back shield | player=" + playerId
                     + " | baseModel=" + summarizeModel(baseModel)
                     + " | currentModel=" + summarizeModel(currentModel)
+                    + " | appearanceModel=" + summarizeModel(appearanceModel)
                     + " | preparedBaseModel=" + summarizeModel(preparedBaseModel)
                     + " | useCapeShieldModel=" + useCapeShieldModel
                     + " | backShieldVariant=" + backShieldVariant
@@ -297,6 +321,9 @@ public final class ShieldCapBackModelSystems {
                 return naturalBaseModel != null ? removeShieldCapAttachment(naturalBaseModel) : appearanceModel;
             }
 
+            if (hasShieldCapAttachment(currentModel)) {
+                return appearanceModel;
+            }
             if (isLikelyUninitializedPlayerModel(currentModel, appearanceModel)) {
                 return naturalBaseModel != null ? removeShieldCapAttachment(naturalBaseModel) : appearanceModel;
             }
@@ -427,15 +454,22 @@ public final class ShieldCapBackModelSystems {
             if (playerSkinComponent == null || playerSkinComponent.getPlayerSkin() == null) {
                 return baseModel;
             }
+            PlayerSettings playerSettings =
+                    store.getComponent(player.getPlayerRef().getReference(), PlayerSettings.getComponentType());
 
             PlayerSkin skin = skinFromProtocol(playerSkinComponent.getPlayerSkin());
             CosmeticRegistry registry = CosmeticsModule.get().getRegistry();
             String playerId = resolvePlayerDebugId(player);
+            Set<ItemArmorSlot> visibleArmorSlots = collectVisibleArmorSlots(player, playerSettings);
 
             Model model = baseModel;
             List<ModelAttachment> attachments = new ArrayList<>();
 
             for (CosmeticType type : CosmeticType.values()) {
+                if (isCosmeticTypeHiddenByVisibleArmor(type, visibleArmorSlots)) {
+                    continue;
+                }
+
                 PlayerSkin.PlayerSkinPartId partId = getSkinPartForType(type, skin);
                 if (partId == null || partId.getAssetId() == null) {
                     continue;
@@ -474,6 +508,7 @@ public final class ShieldCapBackModelSystems {
             debug("rebuild appearance"
                     + " | player=" + playerId
                     + " | skinAccessories=" + summarizeSkinAccessories(playerSkinComponent)
+                    + " | visibleArmorSlots=" + visibleArmorSlots
                     + " | baseAttachments=" + summarizeAttachments(baseModel.getAttachments())
                     + " | rebuiltAttachments=" + summarizeAttachments(attachments));
 
@@ -501,6 +536,83 @@ public final class ShieldCapBackModelSystems {
                     model.getPhobia(),
                     model.getPhobiaModelAssetId()
             );
+        }
+
+        private Set<ItemArmorSlot> collectVisibleArmorSlots(Player player, PlayerSettings playerSettings) {
+            if (player == null || player.getInventory() == null) {
+                return EnumSet.noneOf(ItemArmorSlot.class);
+            }
+
+            return collectVisibleArmorSlots(player.getInventory().getArmor(), playerSettings);
+        }
+
+        private Set<ItemArmorSlot> collectVisibleArmorSlots(ItemContainer armorContainer, PlayerSettings playerSettings) {
+            Set<ItemArmorSlot> visibleSlots = EnumSet.noneOf(ItemArmorSlot.class);
+            if (armorContainer == null) {
+                return visibleSlots;
+            }
+
+            for (short slot = 0; slot < armorContainer.getCapacity(); slot++) {
+                ItemStack stack = armorContainer.getItemStack(slot);
+                if (ItemStack.isEmpty(stack)
+                        || stack.getItem() == null
+                        || stack.getItem().getArmor() == null
+                        || stack.getItem().getArmor().toPacket() == null) {
+                    continue;
+                }
+
+                ItemArmor armor = stack.getItem().getArmor().toPacket();
+                if (isArmorSlotVisible(armor.armorSlot, playerSettings)) {
+                    visibleSlots.add(armor.armorSlot);
+                }
+            }
+            return visibleSlots;
+        }
+
+        private boolean isArmorSlotVisible(ItemArmorSlot armorSlot, PlayerSettings playerSettings) {
+            if (armorSlot == null || playerSettings == null) {
+                return true;
+            }
+            if (armorSlot == ItemArmorSlot.Head) {
+                return !playerSettings.hideHelmet();
+            }
+            if (armorSlot == ItemArmorSlot.Chest) {
+                return !playerSettings.hideCuirass();
+            }
+            if (armorSlot == ItemArmorSlot.Hands) {
+                return !playerSettings.hideGauntlets();
+            }
+            if (armorSlot == ItemArmorSlot.Legs) {
+                return !playerSettings.hidePants();
+            }
+            return true;
+        }
+
+        private boolean isCosmeticTypeHiddenByVisibleArmor(CosmeticType type, Set<ItemArmorSlot> visibleArmorSlots) {
+            if (type == null || visibleArmorSlots == null || visibleArmorSlots.isEmpty()) {
+                return false;
+            }
+
+            if (visibleArmorSlots.contains(ItemArmorSlot.Head)
+                    && (type == CosmeticType.HAIRCUTS
+                    || type == CosmeticType.EARS
+                    || type == CosmeticType.FACIAL_HAIR
+                    || type == CosmeticType.HEAD_ACCESSORY
+                    || type == CosmeticType.FACE_ACCESSORY
+                    || type == CosmeticType.EAR_ACCESSORY)) {
+                return true;
+            }
+            if (visibleArmorSlots.contains(ItemArmorSlot.Chest)
+                    && (type == CosmeticType.UNDERTOPS || type == CosmeticType.OVERTOPS)) {
+                return true;
+            }
+            if (visibleArmorSlots.contains(ItemArmorSlot.Hands) && type == CosmeticType.GLOVES) {
+                return true;
+            }
+            return visibleArmorSlots.contains(ItemArmorSlot.Legs)
+                    && (type == CosmeticType.PANTS
+                    || type == CosmeticType.OVERPANTS
+                    || type == CosmeticType.SHOES);
         }
 
         private ModelAttachment[] capturePreservedExtraAttachments(Model currentModel, Model appearanceModel) {
@@ -1039,7 +1151,6 @@ public final class ShieldCapBackModelSystems {
         private boolean haveEquivalentAttachments(Model currentModel, Model appearanceModel) {
             ModelAttachment[] currentAttachments = currentModel.getAttachments();
             ModelAttachment[] appearanceAttachments = appearanceModel.getAttachments();
-
             int currentCount = currentAttachments == null ? 0 : currentAttachments.length;
             int appearanceCount = appearanceAttachments == null ? 0 : appearanceAttachments.length;
             if (currentCount != appearanceCount) {
@@ -1270,6 +1381,24 @@ public final class ShieldCapBackModelSystems {
                     + ",texture=" + model.getTexture()
                     + ",gradient=" + model.getGradientSet() + "/" + model.getGradientId()
                     + ",attachments=" + summarizeAttachments(model.getAttachments());
+        }
+
+        private String buildModelSignature(Model model) {
+            if (model == null) {
+                return "null";
+            }
+
+            return String.valueOf(model.getModelAssetId())
+                    + '|'
+                    + model.getModel()
+                    + '|'
+                    + model.getTexture()
+                    + '|'
+                    + model.getGradientSet()
+                    + '|'
+                    + model.getGradientId()
+                    + '|'
+                    + summarizeAttachments(model.getAttachments());
         }
 
         private String summarizeAttachments(ModelAttachment[] attachments) {
