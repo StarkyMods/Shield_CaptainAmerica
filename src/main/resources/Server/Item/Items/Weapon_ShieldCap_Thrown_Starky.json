@@ -21,6 +21,9 @@
   "Tags": {
     "Type": [
       "Weapon"
+    ],
+    "MMO_Weapon_Type": [
+      "BLUNT"
     ]
   },
   "ItemEntity": {

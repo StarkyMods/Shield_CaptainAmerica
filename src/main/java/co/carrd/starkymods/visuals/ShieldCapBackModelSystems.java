@@ -128,14 +128,34 @@ public final class ShieldCapBackModelSystems {
             String playerId = resolvePlayerDebugId(player);
             Model appearanceModel = createAppearanceModel(player, playerSkinComponent);
             String appearanceSignature = buildModelSignature(appearanceModel);
+            Model currentBaseModel = removeShieldCapAttachment(currentModel);
+            boolean currentUsesManagedAppearanceBase = hasSameBaseVisual(currentBaseModel, appearanceModel);
             boolean activeShieldBaseMismatch = state.shouldShowBackShield()
                     && hasActiveShieldAttachment
                     && appearanceModel != null
-                    && !areModelsVisuallyEquivalent(removeShieldCapAttachment(currentModel), appearanceModel);
+                    && currentUsesManagedAppearanceBase
+                    && !areModelsVisuallyEquivalent(currentBaseModel, appearanceModel);
             if (state.shouldShowBackShield()
                     && hasActiveShieldAttachment
                     && !state.isPendingApply()
-                    && (state.updateAppearanceSignature(appearanceSignature) || activeShieldBaseMismatch)) {
+                    && activeShieldBaseMismatch) {
+                state.clearNaturalBaseModel();
+                state.clearPendingBaseModel();
+                state.setPendingApply(true);
+                state.updateAppearanceSignature(appearanceSignature);
+                state.rebuild();
+                chunk.setComponent(
+                        entityIndex,
+                        ModelComponent.getComponentType(),
+                        new ModelComponent(appearanceModel)
+                );
+                playerSkinComponent.setNetworkOutdated();
+                return;
+            }
+            if (state.shouldShowBackShield()
+                    && hasActiveShieldAttachment
+                    && !state.isPendingApply()
+                    && state.updateAppearanceSignature(appearanceSignature)) {
                 state.clearNaturalBaseModel();
                 state.clearPendingBaseModel();
                 state.rebuild();
@@ -322,7 +342,8 @@ public final class ShieldCapBackModelSystems {
             }
 
             if (hasShieldCapAttachment(currentModel)) {
-                return appearanceModel;
+                Model normalizedCurrent = removeShieldCapAttachment(currentModel);
+                return hasSameBaseVisual(normalizedCurrent, appearanceModel) ? appearanceModel : normalizedCurrent;
             }
             if (isLikelyUninitializedPlayerModel(currentModel, appearanceModel)) {
                 return naturalBaseModel != null ? removeShieldCapAttachment(naturalBaseModel) : appearanceModel;
@@ -433,6 +454,16 @@ public final class ShieldCapBackModelSystems {
             }
 
             return haveEquivalentAttachments(currentModel, appearanceModel);
+        }
+
+        private boolean hasSameBaseVisual(Model left, Model right) {
+            return left != null
+                    && right != null
+                    && stringEquals(left.getModelAssetId(), right.getModelAssetId())
+                    && stringEquals(left.getModel(), right.getModel())
+                    && stringEquals(left.getTexture(), right.getTexture())
+                    && stringEquals(left.getGradientSet(), right.getGradientSet())
+                    && stringEquals(left.getGradientId(), right.getGradientId());
         }
 
         private Model rebuildHytaleAppearanceModel(Player player, Model baseModel) {

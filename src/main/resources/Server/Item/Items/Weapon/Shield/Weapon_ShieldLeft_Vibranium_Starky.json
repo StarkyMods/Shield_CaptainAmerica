@@ -120,6 +120,9 @@
     ],
     "PP_Signature_Gain": [
        "25"
+    ],
+    "MMO_Weapon_Type": [
+      "BLUNT"
     ]
   },
   "Reticle": "DefaultMelee",
