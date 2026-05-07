@@ -1,5 +1,6 @@
 package co.carrd.starkymods.visuals;
 
+import co.carrd.starkymods.config.ShieldCapConfigManager;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -50,6 +51,9 @@ public final class ShieldCapBackShieldDamageReductionSystem extends DamageEventS
                        CommandBuffer<EntityStore> commandBuffer,
                        Damage damage) {
         if (damage == null || damage.isCancelled()) {
+            return;
+        }
+        if (!ShieldCapConfigManager.isDamageFromTheBackResistanceEnabled()) {
             return;
         }
 

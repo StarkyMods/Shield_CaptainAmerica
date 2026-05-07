@@ -13,6 +13,12 @@ public class ShieldCapCraft {
     @SerializedName("Weapon Max Durability")
     public Integer weaponMaxDurability = null;
 
+    @SerializedName("Mod Compatibility")
+    public Boolean modCompatibility = true;
+
+    @SerializedName("Note")
+    public List<String> modCompatibilityNote = new ArrayList<>();
+
     public List<IngredientEntry> Input = new ArrayList<>();
 
     public int TimeSeconds = 4;

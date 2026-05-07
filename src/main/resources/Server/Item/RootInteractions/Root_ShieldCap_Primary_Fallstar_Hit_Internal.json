@@ -1,5 +1,8 @@
 {
   "Interactions": [
-    "ShieldCap_Primary_Fallstar_Hit"
+    {
+      "Type": "ShieldCapConfigCheck",
+      "Next": "ShieldCap_Primary_Fallstar_Hit"
+    }
   ]
 }

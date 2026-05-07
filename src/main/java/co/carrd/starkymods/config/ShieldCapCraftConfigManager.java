@@ -14,11 +14,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public final class ShieldCapCraftConfigManager {
     private static final String CRAFT_COMMENT = "If you wish, customize Cap Shield crafting recipe to your liking.";
+    private static final List<String> CRAFT_MOD_COMPATIBILITY_NOTE = Arrays.asList(
+            "If true, this will automatically modify some of these ingredients",
+            "and quantities if EndgameQoL mod is installed and is active.",
+            "And every time you start the world/server this file will be rewritten.",
+            "So if you want to keep your custom recipe active, turn this to false."
+    );
     private static final File FOLDER = ShieldCapConfigPaths.getFolder();
     private static final File CRAFT_CONFIG_FILE = new File(FOLDER, "shieldcapcraft.json");
     private static final String SHIELD_RECIPE_ID = "ShieldCap_Craft";
@@ -66,6 +73,10 @@ public final class ShieldCapCraftConfigManager {
         return config;
     }
 
+    public static ShieldCapCraft getConfigSnapshot() {
+        return cloneCraft(getConfig());
+    }
+
     public static File getCraftConfigFile() {
         return CRAFT_CONFIG_FILE;
     }
@@ -102,6 +113,18 @@ public final class ShieldCapCraftConfigManager {
         }
     }
 
+    public static void saveCraftState(ShieldCapCraft updatedConfig) {
+        config = updatedConfig == null ? createDefault() : cloneCraft(updatedConfig);
+        normalizeCraft(config);
+        save();
+    }
+
+    public static void resetCraftToDefaults() {
+        config = createDefault();
+        normalizeCraft(config);
+        save();
+    }
+
     public static boolean reloadCraftIfValid() {
         try {
             ShieldCapCraft parsed = parseCraftFile();
@@ -116,6 +139,45 @@ public final class ShieldCapCraftConfigManager {
         }
     }
 
+    public static boolean isCraftCompatibilityProfileEnabled() {
+        return getConfig() == null || !Boolean.FALSE.equals(getConfig().modCompatibility);
+    }
+
+    public static boolean applyEndgameCraftCompatibilityProfile() {
+        ShieldCapCraft current = getConfig();
+        if (current == null) {
+            current = createDefault();
+        }
+
+        ShieldCapCraft desiredCraft = cloneCraft(current);
+        desiredCraft.Input = new ArrayList<>();
+        desiredCraft.Input.add(new ShieldCapCraft.IngredientEntry("Ingredient_Bar_Prisma", 50));
+        desiredCraft.Input.add(new ShieldCapCraft.IngredientEntry("Ingredient_Bar_Onyxium", 5));
+        desiredCraft.Input.add(new ShieldCapCraft.IngredientEntry("Ingredient_Bar_Mithril", 10));
+        desiredCraft.Input.add(new ShieldCapCraft.IngredientEntry("Ingredient_Leather_Prismic", 15));
+        desiredCraft.Input.add(new ShieldCapCraft.IngredientEntry("Alpha_Rex_Leather", 1));
+        desiredCraft.BenchRequirements = new ArrayList<>();
+        desiredCraft.BenchRequirements.add(createBench("Endgame_Bench", 0, "Endgame_Armor_Prisma"));
+        desiredCraft.Bench = cloneBench(desiredCraft.BenchRequirements.get(0));
+
+        boolean changed = !craftRecipeFieldsEqual(current, desiredCraft);
+        current.Input = cloneIngredients(desiredCraft.Input);
+        current.TimeSeconds = desiredCraft.TimeSeconds;
+        current.RequiredMemoriesLevel = desiredCraft.RequiredMemoriesLevel;
+        current.BenchRequirements = cloneBenchList(desiredCraft.BenchRequirements);
+        current.Bench = cloneBench(desiredCraft.Bench);
+        current.modCompatibility = true;
+        current.modCompatibilityNote = new ArrayList<>(CRAFT_MOD_COMPATIBILITY_NOTE);
+
+        if (normalizeCraft(current)) {
+            changed = true;
+        }
+        if (changed) {
+            save();
+        }
+        return changed;
+    }
+
     private static ShieldCapCraft createDefault() {
         ShieldCapCraft fromRecipe = createDefaultFromRecipeAsset();
         ShieldCapCraft craft = fromRecipe != null ? fromRecipe : createDefaultHardcoded();
@@ -124,6 +186,12 @@ public final class ShieldCapCraftConfigManager {
         }
         if (craft.weaponMaxDurability == null) {
             craft.weaponMaxDurability = readDefaultWeaponMaxDurability();
+        }
+        if (craft.modCompatibility == null) {
+            craft.modCompatibility = true;
+        }
+        if (craft.modCompatibilityNote == null || craft.modCompatibilityNote.isEmpty()) {
+            craft.modCompatibilityNote = new ArrayList<>(CRAFT_MOD_COMPATIBILITY_NOTE);
         }
         return craft;
     }
@@ -236,6 +304,14 @@ public final class ShieldCapCraftConfigManager {
             target.weaponMaxDurability = 0;
             changed = true;
         }
+        if (target.modCompatibility == null) {
+            target.modCompatibility = true;
+            changed = true;
+        }
+        if (target.modCompatibilityNote == null || target.modCompatibilityNote.isEmpty()) {
+            target.modCompatibilityNote = new ArrayList<>(CRAFT_MOD_COMPATIBILITY_NOTE);
+            changed = true;
+        }
 
         if (target.Input == null) {
             target.Input = cloneIngredients(defaults.Input);
@@ -293,6 +369,17 @@ public final class ShieldCapCraftConfigManager {
         JsonObject root = new JsonObject();
         root.addProperty("Comment", source.comment == null || source.comment.isBlank() ? CRAFT_COMMENT : source.comment);
         root.addProperty("Weapon Max Durability", source.weaponMaxDurability == null ? 0 : Math.max(0, source.weaponMaxDurability));
+        root.addProperty("Mod Compatibility", source.modCompatibility == null || source.modCompatibility);
+        JsonArray note = new JsonArray();
+        List<String> noteLines = source.modCompatibilityNote == null || source.modCompatibilityNote.isEmpty()
+                ? CRAFT_MOD_COMPATIBILITY_NOTE
+                : source.modCompatibilityNote;
+        for (String line : noteLines) {
+            if (line != null) {
+                note.add(line);
+            }
+        }
+        root.add("Note", note);
 
         JsonArray input = new JsonArray();
         if (source.Input != null) {
@@ -434,6 +521,39 @@ public final class ShieldCapCraftConfigManager {
         return copy;
     }
 
+    private static ShieldCapCraft cloneCraft(ShieldCapCraft source) {
+        ShieldCapCraft copy = new ShieldCapCraft();
+        ShieldCapCraft effective = source == null ? createDefault() : source;
+        copy.comment = effective.comment;
+        copy.weaponMaxDurability = effective.weaponMaxDurability;
+        copy.modCompatibility = effective.modCompatibility;
+        copy.modCompatibilityNote = effective.modCompatibilityNote == null
+                ? new ArrayList<>()
+                : new ArrayList<>(effective.modCompatibilityNote);
+        copy.Input = cloneIngredients(effective.Input);
+        copy.TimeSeconds = effective.TimeSeconds;
+        copy.RequiredMemoriesLevel = effective.RequiredMemoriesLevel;
+        copy.BenchRequirements = new ArrayList<>();
+        if (effective.BenchRequirements != null) {
+            for (ShieldCapCraft.BenchConfig bench : effective.BenchRequirements) {
+                copy.BenchRequirements.add(cloneBench(bench));
+            }
+        }
+        copy.Bench = cloneBench(effective.Bench);
+        return copy;
+    }
+
+    private static List<ShieldCapCraft.BenchConfig> cloneBenchList(List<ShieldCapCraft.BenchConfig> source) {
+        List<ShieldCapCraft.BenchConfig> copy = new ArrayList<>();
+        if (source == null) {
+            return copy;
+        }
+        for (ShieldCapCraft.BenchConfig bench : source) {
+            copy.add(cloneBench(bench));
+        }
+        return copy;
+    }
+
     private static ShieldCapCraft.BenchConfig cloneBench(ShieldCapCraft.BenchConfig source) {
         ShieldCapCraft.BenchConfig bench = new ShieldCapCraft.BenchConfig();
         if (source == null) {
@@ -468,5 +588,60 @@ public final class ShieldCapCraftConfigManager {
         return Objects.equals(left.Id, right.Id)
                 && left.RequiredTierLevel == right.RequiredTierLevel
                 && Objects.equals(left.Categories, right.Categories);
+    }
+
+    private static boolean craftRecipeFieldsEqual(ShieldCapCraft left, ShieldCapCraft right) {
+        if (left == right) {
+            return true;
+        }
+        if (left == null || right == null) {
+            return false;
+        }
+        return ingredientsEqual(left.Input, right.Input)
+                && left.TimeSeconds == right.TimeSeconds
+                && left.RequiredMemoriesLevel == right.RequiredMemoriesLevel
+                && benchListsEqual(getEffectiveBenches(left), getEffectiveBenches(right))
+                && benchEquals(left.Bench, right.Bench);
+    }
+
+    private static boolean ingredientsEqual(List<ShieldCapCraft.IngredientEntry> left,
+                                            List<ShieldCapCraft.IngredientEntry> right) {
+        if (left == right) {
+            return true;
+        }
+        if (left == null || right == null || left.size() != right.size()) {
+            return false;
+        }
+        for (int i = 0; i < left.size(); i++) {
+            ShieldCapCraft.IngredientEntry leftEntry = left.get(i);
+            ShieldCapCraft.IngredientEntry rightEntry = right.get(i);
+            if (leftEntry == rightEntry) {
+                continue;
+            }
+            if (leftEntry == null || rightEntry == null) {
+                return false;
+            }
+            if (!Objects.equals(leftEntry.ItemId, rightEntry.ItemId)
+                    || leftEntry.Quantity != rightEntry.Quantity) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean benchListsEqual(List<ShieldCapCraft.BenchConfig> left,
+                                           List<ShieldCapCraft.BenchConfig> right) {
+        if (left == right) {
+            return true;
+        }
+        if (left == null || right == null || left.size() != right.size()) {
+            return false;
+        }
+        for (int i = 0; i < left.size(); i++) {
+            if (!benchEquals(left.get(i), right.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

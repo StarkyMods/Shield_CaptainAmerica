@@ -11,7 +11,10 @@
       "Interactions": [
         {
           "Type": "ShieldCap_Sprint_Condition_Java",
-          "Next": "ShieldCap_Primary_Sprint_Hit",
+          "Next": {
+            "Type": "ShieldCapConfigCheck",
+            "Next": "ShieldCap_Primary_Sprint_Hit"
+          },
           "Failed": {
             "Type": "Replace",
             "Var": "ShieldCap_Guard_Bash",

@@ -1,6 +1,7 @@
 package co.carrd.starkymods;
 
 import co.carrd.starkymods.commands.ShieldCapCraftCommand;
+import co.carrd.starkymods.commands.ShieldCapConfigCommand;
 import co.carrd.starkymods.config.ShieldCapConfigManager;
 import co.carrd.starkymods.config.ShieldCapCraftConfigManager;
 import co.carrd.starkymods.config.ShieldCapCraftHotReloadService;
@@ -19,6 +20,7 @@ import co.carrd.starkymods.interactions.ShieldCapPerfectParryBridgeService;
 import co.carrd.starkymods.interactions.ShieldCapSprintCondition;
 import co.carrd.starkymods.interactions.ShieldCapNotSprintingCondition;
 import co.carrd.starkymods.interactions.ShieldCapGuardInactiveCondition;
+import co.carrd.starkymods.interactions.ShieldCapConfigCheck;
 import co.carrd.starkymods.interactions.ShieldCapGuardFallDamageReductionSystem;
 import co.carrd.starkymods.interactions.ShieldCapKickPushKnockbackImmunitySystem;
 import co.carrd.starkymods.interactions.ShieldCapKickPushKnockbackImmunityTickSystem;
@@ -74,6 +76,8 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.hypixel.hytale.common.plugin.PluginIdentifier;
+import com.hypixel.hytale.server.core.plugin.PluginManager;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
@@ -130,6 +134,10 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         getEventRegistry().registerGlobal(PlayerReadyEvent.class, ShieldCapUpdateCheckListener::onPlayerReady);
         ShieldCapRecipeOverrideManager.register(this);
         this.getCommandRegistry().registerCommand(new ShieldCapCraftCommand());
+        this.getCommandRegistry().registerCommand(new ShieldCapConfigCommand("capshield", false));
+        this.getCommandRegistry().registerCommand(new ShieldCapConfigCommand("capshieldsettings", true));
+        this.getCommandRegistry().registerCommand(new ShieldCapConfigCommand("capshieldmod", false));
+        this.getCommandRegistry().registerCommand(new ShieldCapConfigCommand("capshieldmodsettings", true));
         shieldCapBackStateComponentType =
                 getEntityStoreRegistry().registerComponent(
                         ShieldCapBackStateComponent.class,
@@ -221,6 +229,11 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
                 "ShieldCap_Not_Sprinting_Condition_Java",
                 ShieldCapNotSprintingCondition.class,
                 ShieldCapNotSprintingCondition.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCapConfigCheck",
+                ShieldCapConfigCheck.class,
+                ShieldCapConfigCheck.CODEC
         );
         getCodecRegistry(Interaction.CODEC).register(
                 "ShieldCap_Guard_Inactive_Condition_Java",
@@ -377,12 +390,27 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
     @Override
     protected void start() {
         super.start();
-        ShieldCapRecipeOverrideManager.applyConfiguredRecipe();
+        applyShieldCapCraftOverrides("start()");
         ShieldCapDurabilityAssetOverrideManager.applyConfiguredDurabilityAssets();
         Integer configuredMaxDurability =
                 ShieldCapCraftConfigManager.getConfig() != null ? ShieldCapCraftConfigManager.getConfig().weaponMaxDurability : null;
         ShieldCapDurabilityLiveUpdater.applyEverywhereLoaded(configuredMaxDurability);
         craftHotReloadService.start();
+    }
+
+    private void applyShieldCapCraftOverrides(String source) {
+        if (ShieldCapCraftConfigManager.isCraftCompatibilityProfileEnabled() && isEndgameQoLActive()) {
+            craftHotReloadService.markInternalCraftConfigWrite();
+            ShieldCapCraftConfigManager.applyEndgameCraftCompatibilityProfile();
+            System.out.println("[ShieldCap] Applying Endgame&QoL craft compatibility from " + source + ".");
+        }
+        ShieldCapRecipeOverrideManager.applyConfiguredRecipe();
+    }
+
+    private boolean isEndgameQoLActive() {
+        PluginManager pluginManager = PluginManager.get();
+        return pluginManager != null
+                && pluginManager.getPlugin(new PluginIdentifier("Config", "Endgame&QoL")) != null;
     }
 
     @Override
@@ -398,3 +426,4 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         super.shutdown();
     }
 }
+

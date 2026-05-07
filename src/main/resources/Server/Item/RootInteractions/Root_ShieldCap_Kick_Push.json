@@ -4,7 +4,10 @@
     "Id": "ShieldCapKickPush"
   },
   "Interactions": [
-    "ShieldCap_Kick_Push"
+    {
+      "Type": "ShieldCapConfigCheck",
+      "Next": "ShieldCap_Kick_Push"
+    }
   ],
   "RequireNewClick": true
 }

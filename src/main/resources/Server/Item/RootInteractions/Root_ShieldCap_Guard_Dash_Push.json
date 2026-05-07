@@ -1,6 +1,9 @@
 {
   "Interactions": [
-    "ShieldCap_Guard_Dash_Push",
+    {
+      "Type": "ShieldCapConfigCheck",
+      "Next": "ShieldCap_Guard_Dash_Push"
+    },
     "ShieldCap_Clear_Guard_Movement_Lock"
   ],
   "RequireNewClick": false

@@ -1,6 +1,9 @@
 {
   "RequireNewClick": true,
   "Interactions": [
-    "ShieldCap_Signature_Furious_Onslaught"
+    {
+      "Type": "ShieldCapConfigCheck",
+      "Next": "ShieldCap_Signature_Furious_Onslaught"
+    }
   ]
 }

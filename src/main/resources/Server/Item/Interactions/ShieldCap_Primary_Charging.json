@@ -10,6 +10,9 @@
   },
   "Next": {
     "0": "ShieldCap_Primary_Chain",
-    "0.5": "ShieldCap_Primary_Throw_Conditions"
+    "0.5": {
+      "Type": "ShieldCapConfigCheck",
+      "Next": "ShieldCap_Primary_Throw_Conditions"
+    }
   }
 }

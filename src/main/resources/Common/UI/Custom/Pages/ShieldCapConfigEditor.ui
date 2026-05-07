@@ -1,0 +1,1547 @@
+$Common = "../Common.ui";
+
+@TitleStyle = LabelStyle(FontSize: 26, TextColor: #ffe6e6, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@TabLabelStyle = LabelStyle(FontSize: 15, TextColor: #ffcfcf, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@TabButtonStyle = TextButtonStyle(Default: (Background: #341515, LabelStyle: @TabLabelStyle), Hovered: (Background: #421d1d, LabelStyle: @TabLabelStyle), Pressed: (Background: #522323, LabelStyle: @TabLabelStyle), Disabled: (Background: #341515(0.6), LabelStyle: @TabLabelStyle));
+@ApplyLabelStyle = LabelStyle(FontSize: 14, TextColor: #ffe6e6, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@ApplyButtonStyle = TextButtonStyle(Default: (Background: #5a1e1e, LabelStyle: @ApplyLabelStyle), Hovered: (Background: #772828, LabelStyle: @ApplyLabelStyle), Pressed: (Background: #481a1a, LabelStyle: @ApplyLabelStyle), Disabled: (Background: #5a1e1e(0.6), LabelStyle: @ApplyLabelStyle));
+@SectionLabelStyle = LabelStyle(FontSize: 19, TextColor: #d39f9f, RenderBold: true, LetterSpacing: 1, RenderUppercase: true);
+@BodyTextStyle = LabelStyle(FontSize: 15, TextColor: #a87f7f, Wrap: true);
+@CenteredBodyTextStyle = LabelStyle(FontSize: 15, TextColor: #cfa7a7, Wrap: true, HorizontalAlignment: Center);
+@HomeLargeTitleStyle = LabelStyle(FontSize: 22, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@HomeCardHeaderStyle = LabelStyle(FontSize: 10, TextColor: #f9e6e6, RenderBold: true, LetterSpacing: 1, HorizontalAlignment: Center);
+@HomeCardTitleStyle = LabelStyle(FontSize: 18, TextColor: #ffffff, RenderBold: true, Wrap: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@HomeCardTagStyle = LabelStyle(FontSize: 11, TextColor: #ff8989, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@HomeCardBodyStyle = LabelStyle(FontSize: 12, TextColor: #e8bdbd, Wrap: true, HorizontalAlignment: Center);
+@RowLabelStyle = LabelStyle(FontSize: 14, TextColor: #ddb3b3, VerticalAlignment: Center);
+@NoteTextStyle = LabelStyle(FontSize: 14, TextColor: #a37b7b, Wrap: true);
+@VersionTextStyle = LabelStyle(FontSize: 13, TextColor: #d8b0b0, RenderBold: true, VerticalAlignment: Center);
+@NumberFieldStyle = (FontSize: 14, TextColor: #ffe6e6);
+@NumberFieldPlaceholderStyle = (FontSize: 14, TextColor: #956b6b);
+@TextFieldStyle = @NumberFieldStyle;
+@TextFieldPlaceholderStyle = @NumberFieldPlaceholderStyle;
+@RemoveLabelStyle = LabelStyle(FontSize: 14, TextColor: #f2dada, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@RemoveButtonStyle = TextButtonStyle(Default: (Background: #3a1c1c, LabelStyle: @RemoveLabelStyle), Hovered: (Background: #4a2323, LabelStyle: @RemoveLabelStyle), Pressed: (Background: #2a1414, LabelStyle: @RemoveLabelStyle), Disabled: (Background: #3a1c1c(0.6), LabelStyle: @RemoveLabelStyle));
+@AddButtonStyle = TextButtonStyle(Default: (Background: #3d1e1e, LabelStyle: @ApplyLabelStyle), Hovered: (Background: #4b2424, LabelStyle: @ApplyLabelStyle), Pressed: (Background: #371818, LabelStyle: @ApplyLabelStyle), Disabled: (Background: #3d1e1e(0.6), LabelStyle: @ApplyLabelStyle));
+@ControlBindingLabelStyle = LabelStyle(FontSize: 14, TextColor: #ffe6e6, HorizontalAlignment: Center, VerticalAlignment: Center);
+@ControlBindingButtonStyle = TextButtonStyle(Default: (Background: #200d0d, LabelStyle: @ControlBindingLabelStyle), Hovered: (Background: #2d1414, LabelStyle: @ControlBindingLabelStyle), Pressed: (Background: #180909, LabelStyle: @ControlBindingLabelStyle), Disabled: (Background: #200d0d(0.6), LabelStyle: @ControlBindingLabelStyle));
+@HomeTabButtonStyle = ButtonStyle(Default: (Background: "../Home_Icon.png"), Hovered: (Background: "../Home_Icon_OnTop.png"), Pressed: (Background: "../Home_Icon_OnTop.png"), Disabled: (Background: "../Home_Icon.png"));
+@HomeLinkedCardButtonStyle = ButtonStyle(Default: (Background: #1f0b0b(0.92)), Hovered: (Background: #352020(0.96)), Pressed: (Background: #452626(0.98)), Disabled: (Background: #1f0b0b(0.6)));
+@CompatibilityLinkedCardButtonStyle = ButtonStyle(Default: (Background: #1f0b0b(0.92)), Hovered: (Background: #382020(0.96)), Pressed: (Background: #4a2828(0.98)), Disabled: (Background: #1f0b0b(0.6)));
+@MenuMiniLabelStyle = LabelStyle(FontSize: 11, TextColor: #ffe7e7, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@MenuMiniButtonStyle = TextButtonStyle(Default: (Background: #5a1e1e, LabelStyle: @MenuMiniLabelStyle), Hovered: (Background: #733030, LabelStyle: @MenuMiniLabelStyle), Pressed: (Background: #421616, LabelStyle: @MenuMiniLabelStyle), Disabled: (Background: #5a1e1e(0.6), LabelStyle: @MenuMiniLabelStyle));
+@CloseButtonLabelStyle = LabelStyle(FontSize: 12, TextColor: #ffe7e7, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@CloseButtonStyle = TextButtonStyle(Default: (Background: #5a1e1e, LabelStyle: @CloseButtonLabelStyle), Hovered: (Background: #733030, LabelStyle: @CloseButtonLabelStyle), Pressed: (Background: #421616, LabelStyle: @CloseButtonLabelStyle), Disabled: (Background: #5a1e1e(0.6), LabelStyle: @CloseButtonLabelStyle));
+
+Group {
+    Anchor: (Width: 900, Height: 640);
+    Background: #140a0a(0.94);
+    LayoutMode: Top;
+    Padding: (Full: 18);
+
+    TextButton #CloseUIButton {
+        Anchor: (Width: 24, Height: 24, Left: -12, Top: -12);
+        Text: "X";
+        Style: @CloseButtonStyle;
+    }
+
+    Group {
+        LayoutMode: Left;
+        Anchor: (Height: 18);
+
+        Label #VersionLabel {
+            Anchor: (Width: 90, Height: 18);
+            Text: "?.?.?";
+            Style: @VersionTextStyle;
+        }
+
+        Group { FlexWeight: 1; }
+    }
+
+    Group { Anchor: (Height: 0); }
+
+    Group #HeaderRow {
+        LayoutMode: Left;
+        Anchor: (Height: 34);
+
+        Group {
+            Anchor: (Width: 0);
+        }
+
+        Group {
+            FlexWeight: 1;
+            LayoutMode: Top;
+            Anchor: (Height: 34);
+
+            Label #TitleLabel {
+                Anchor: (Height: 22);
+                Text: "STARKY'S CAP'S SHIELD MENU";
+                Style: @TitleStyle;
+            }
+        }
+
+        Group {
+            LayoutMode: Top;
+            Anchor: (Width: 54, Height: 34);
+
+            Group #HeaderLogo {
+                Anchor: (Width: 51, Height: 51, Top: -14);
+                Background: (TexturePath: "../Starky_S_Logo_White.png");
+            }
+        }
+    }
+
+    Group { Anchor: (Height: 2); }
+
+    Group #TabRow {
+        LayoutMode: Center;
+        Anchor: (Height: 62);
+
+        Group #TabHome {
+            LayoutMode: Top;
+            Anchor: (Width: 68, Height: 62);
+
+            Button #TabHomeButton {
+                Anchor: (Width: 56, Height: 56, Left: 6);
+                Style: @HomeTabButtonStyle;
+
+                Group #TabHomeIcon {
+                    Anchor: (Width: 56, Height: 56);
+                    Background: #000000(0);
+                }
+
+                Group #TabHomeActive {
+                    Anchor: (Width: 56, Height: 3, Top: 53);
+                    Background: #ff5959;
+                    Visible: false;
+                }
+            }
+        }
+
+        Group { Anchor: (Width: 2); }
+
+        Group #TabMain {
+            LayoutMode: Top;
+            Anchor: (Width: 152, Height: 54);
+
+            TextButton #TabMainButton {
+                Anchor: (Width: 152, Height: 30, Top: 12);
+                Text: "CONFIG";
+                Style: @TabButtonStyle;
+            }
+
+            Group #TabMainActive {
+                Anchor: (Height: 3);
+                Background: #ff5959;
+                Visible: false;
+            }
+        }
+
+        Group { Anchor: (Width: 8); }
+
+        Group #TabCraft {
+            LayoutMode: Top;
+            Anchor: (Width: 152, Height: 54);
+
+            TextButton #TabCraftButton {
+                Anchor: (Width: 152, Height: 30, Top: 12);
+                Text: "CRAFTING";
+                Style: @TabButtonStyle;
+            }
+
+            Group #TabCraftActive {
+                Anchor: (Height: 3);
+                Background: #ff5959;
+                Visible: false;
+            }
+        }
+
+        Group { Anchor: (Width: 8); }
+
+        Group #TabDamage {
+            LayoutMode: Top;
+            Anchor: (Width: 152, Height: 54);
+
+            TextButton #TabDamageButton {
+                Anchor: (Width: 152, Height: 30, Top: 12);
+                Text: "DAMAGES";
+                Style: @TabButtonStyle;
+            }
+
+            Group #TabDamageActive {
+                Anchor: (Height: 3);
+                Background: #ff5959;
+                Visible: false;
+            }
+        }
+
+        Group { Anchor: (Width: 8); }
+
+        Group #TabCompatibility {
+            LayoutMode: Top;
+            Anchor: (Width: 152, Height: 54);
+
+            TextButton #TabCompatibilityButton {
+                Anchor: (Width: 152, Height: 30, Top: 12);
+                Text: "COMPATIBILITY";
+                Style: @TabButtonStyle;
+            }
+
+            Group #TabCompatibilityActive {
+                Anchor: (Height: 3);
+                Background: #ff5959;
+                Visible: false;
+            }
+        }
+    }
+
+    Group { Anchor: (Height: 10); }
+    Group { Anchor: (Height: 1); Background: #472626; }
+    Group { Anchor: (Height: 10); }
+
+    Group #HomeTab {
+        LayoutMode: Top;
+        FlexWeight: 1;
+        Visible: false;
+        Padding: (Horizontal: 24);
+
+        Group {
+            LayoutMode: Middle;
+            Anchor: (Height: 14);
+
+            Group { FlexWeight: 1; }
+
+            Group {
+                LayoutMode: Left;
+                Anchor: (Width: 862, Height: 20);
+
+                Group {
+                    Anchor: (Width: 76, Height: 14);
+                    Label {
+                        Anchor: (Width: 68, Height: 20, Left: 6, Top: -6);
+                        Text: "HOME";
+                        Style: @SectionLabelStyle;
+                    }
+                }
+
+                Group { Anchor: (Width: 786); }
+            }
+
+            Group { FlexWeight: 1; }
+        }
+        
+        Group #HomeScroll {
+            FlexWeight: 1;
+            LayoutMode: TopScrolling;
+            ScrollbarStyle: $Common.@DefaultScrollbarStyle;
+
+            Group {
+                LayoutMode: Middle;
+                Anchor: (Height: 300);
+
+                Group { FlexWeight: 1; }
+
+                Group {
+                    Anchor: (Width: 529, Height: 300);
+                    Background: (TexturePath: "../Starky_Shield_Wallpaper.png");
+                }
+
+                Group { FlexWeight: 1; }
+            }
+
+            Group { Anchor: (Height: 14); }
+
+            Group {
+                LayoutMode: Middle;
+                Anchor: (Height: 44);
+
+                Group { FlexWeight: 1; }
+
+                Label {
+                    Anchor: (Width: 640, Height: 44);
+                    Text: "Inspired from Marvel Captain America's Shield, this is a custom weapon with lots of custom attacks, throws, behaviours, skills, abilities, sounds and FX!";
+                    Style: @CenteredBodyTextStyle;
+                }
+
+                Group { FlexWeight: 1; }
+            }
+
+            Group { Anchor: (Height: 10); }
+
+            Group {
+                LayoutMode: Middle;
+                Anchor: (Height: 30);
+
+                Group { FlexWeight: 1; }
+
+                Group {
+                    LayoutMode: Left;
+                    Anchor: (Width: 484, Height: 30);
+
+                    TextButton #HomeWebsiteButton {
+                        Anchor: (Width: 156, Height: 30);
+                        Text: "STARKYMODS";
+                        Style: @TabButtonStyle;
+                    }
+
+                    Group { Anchor: (Width: 8); }
+
+                    TextButton #HomeDiscordButton {
+                        Anchor: (Width: 156, Height: 30);
+                        Text: "DISCORD";
+                        Style: @TabButtonStyle;
+                    }
+
+                    Group { Anchor: (Width: 8); }
+
+                    TextButton #HomeCurseforgeButton {
+                        Anchor: (Width: 156, Height: 30);
+                        Text: "CURSEFORGE";
+                        Style: @TabButtonStyle;
+                    }
+                }
+
+                Group { FlexWeight: 1; }
+            }
+
+            Group { Anchor: (Height: 10); }
+
+            Group {
+                LayoutMode: Middle;
+                Anchor: (Height: 40);
+
+                Group { FlexWeight: 1; }
+
+                Label {
+                    Anchor: (Width: 620, Height: 40);
+                    Text: "We do not have a wiki for this mod yet. For now, you can see how to use Cap's Shield at the mod description in CurseForge.";
+                    Style: @CenteredBodyTextStyle;
+                }
+
+                Group { FlexWeight: 1; }
+            }
+
+            Group { Anchor: (Height: 12); }
+
+            Group {
+                LayoutMode: Middle;
+                Anchor: (Height: 28);
+
+                Group { FlexWeight: 1; }
+
+                Label {
+                    Anchor: (Width: 360, Height: 28);
+                    Text: "MORE BY STARKYMODS";
+                    Style: @HomeLargeTitleStyle;
+                }
+
+                Group { FlexWeight: 1; }
+            }
+
+            Group { Anchor: (Height: 10); }
+
+            Group #HomeMoreRow1 {
+                LayoutMode: Left;
+                Anchor: (Height: 188);
+
+                Group { FlexWeight: 1; }
+
+                Group {
+                    LayoutMode: Left;
+                    Anchor: (Width: 714, Height: 188);
+
+                    Button #HomeCard1 {
+                        Anchor: (Width: 230, Height: 188, Right: 12);
+                        LayoutMode: Top;
+                        Style: @HomeLinkedCardButtonStyle;
+                        Padding: (Full: 14);
+
+                        Group {
+                            LayoutMode: Middle;
+                            Anchor: (Height: 114, Bottom: 12);
+                            Group {
+                                Anchor: (Width: 202, Height: 114);
+                                Background: (TexturePath: "../Starky_Mjolnir_Wallpaper.png");
+                            }
+                        }
+                        Group { FlexWeight: 1; }
+                        Label { Text: "Starky's Mjolnir"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
+                    }
+
+                    Group { Anchor: (Width: 12); }
+
+                    Button #HomeCard2 {
+                        Anchor: (Width: 230, Height: 188, Right: 12);
+                        LayoutMode: Top;
+                        Style: @HomeLinkedCardButtonStyle;
+                        Padding: (Full: 14);
+
+                        Group {
+                            LayoutMode: Middle;
+                            Anchor: (Height: 114, Bottom: 12);
+                            Group {
+                                Anchor: (Width: 202, Height: 114);
+                                Background: (TexturePath: "../HyVoiceZoo_Wallpaper.png");
+                            }
+                        }
+                        Group { FlexWeight: 1; }
+                        Label { Text: "Hy Voice Zoo"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
+                    }
+
+                    Group { Anchor: (Width: 12); }
+
+                    Button #HomeCard3 {
+                        Anchor: (Width: 230, Height: 188);
+                        LayoutMode: Top;
+                        Style: @HomeLinkedCardButtonStyle;
+                        Padding: (Full: 14);
+
+                        Group {
+                            LayoutMode: Middle;
+                            Anchor: (Height: 114, Bottom: 12);
+                            Group {
+                                Anchor: (Width: 202, Height: 114);
+                                Background: (TexturePath: "../Starky_RayGun_Wallpaper.png");
+                            }
+                        }
+                        Group { FlexWeight: 1; }
+                        Label { Text: "Starky's RayGun"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
+                    }
+                }
+
+                Group { FlexWeight: 1; }
+            }
+
+            Group { Anchor: (Height: 12); }
+
+            Group #HomeMoreRow2 {
+                LayoutMode: Left;
+                Anchor: (Height: 188);
+
+                Group { FlexWeight: 1; }
+
+                Group {
+                    LayoutMode: Left;
+                    Anchor: (Width: 714, Height: 188);
+
+                    Button #HomeCard4 {
+                        Anchor: (Width: 230, Height: 188, Right: 12);
+                        LayoutMode: Top;
+                        Style: @HomeLinkedCardButtonStyle;
+                        Padding: (Full: 14);
+
+                        Group {
+                            LayoutMode: Middle;
+                            Anchor: (Height: 114, Bottom: 12);
+                            Group {
+                                Anchor: (Width: 202, Height: 114);
+                                Background: (TexturePath: "../Starky_ThunderGun_Wallpaper.png");
+                            }
+                        }
+                        Group { FlexWeight: 1; }
+                        Label { Text: "Starky's ThunderGun"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
+                    }
+
+                    Group { Anchor: (Width: 12); }
+
+                    Button #HomeCard5 {
+                        Anchor: (Width: 230, Height: 188);
+                        LayoutMode: Top;
+                        Style: @HomeLinkedCardButtonStyle;
+                        Padding: (Full: 14);
+
+                        Group {
+                            LayoutMode: Middle;
+                            Anchor: (Height: 114, Bottom: 12);
+                            Group {
+                                Anchor: (Width: 202, Height: 114);
+                                Background: (TexturePath: "../FartGun_Wallpaper.png");
+                            }
+                        }
+                        Group { FlexWeight: 1; }
+                        Label { Text: "The Fart Gun"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
+                    }
+
+                    Group { Anchor: (Width: 12); }
+
+                    Button #HomeCard6 {
+                        Anchor: (Width: 230, Height: 188);
+                        LayoutMode: Top;
+                        Style: @HomeLinkedCardButtonStyle;
+                        Padding: (Full: 14);
+
+                        Group {
+                            LayoutMode: Middle;
+                            Anchor: (Height: 114, Bottom: 12);
+                            Group {
+                                Anchor: (Width: 202, Height: 114);
+                                Background: (TexturePath: "../CustomSkinKeeper_Wallpaper.png");
+                            }
+                        }
+                        Group { FlexWeight: 1; }
+                        Label { Text: "Custom Skin Keeper"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
+                    }
+                }
+
+                Group { FlexWeight: 1; }
+            }
+
+            Group { Anchor: (Height: 12); }
+
+            Group #HomeMoreRow3 {
+                LayoutMode: Left;
+                Anchor: (Height: 188);
+
+                Group { FlexWeight: 1; }
+
+                Group {
+                    LayoutMode: Left;
+                    Anchor: (Width: 714, Height: 188);
+
+                    Group {
+                        Anchor: (Width: 230, Height: 188, Right: 12);
+                    }
+
+                    Group { Anchor: (Width: 12); }
+
+                    Button #HomeCard7 {
+                        Anchor: (Width: 230, Height: 188);
+                        LayoutMode: Top;
+                        Style: @HomeLinkedCardButtonStyle;
+                        Padding: (Full: 14);
+
+                        Group {
+                            LayoutMode: Middle;
+                            Anchor: (Height: 114, Bottom: 12);
+                            Group {
+                                Anchor: (Width: 202, Height: 114);
+                                Background: (TexturePath: "../BlockingItems_Wallpaper.png");
+                            }
+                        }
+                        Group { FlexWeight: 1; }
+                        Label { Text: "Blocking Items"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
+                    }
+
+                    Group { Anchor: (Width: 12); }
+
+                    Group {
+                        Anchor: (Width: 230, Height: 188);
+                    }
+                }
+
+                Group { FlexWeight: 1; }
+            }
+
+            Group { Anchor: (Height: 18); }
+        }
+    }
+
+    Group #MainTab {
+        LayoutMode: Top;
+        FlexWeight: 1;
+        Visible: true;
+        Padding: (Horizontal: 24);
+
+        Label {
+            Text: "CAP'S SHIELD CONFIG";
+            Anchor: (Height: 20);
+            Style: @SectionLabelStyle;
+        }
+        Group { Anchor: (Height: 4); }
+
+        Label {
+            Text: "Toggle abilities and general behavior for CAP'S SHIELD.";
+            Anchor: (Height: 26);
+            Style: @BodyTextStyle;
+        }
+
+        Group { Anchor: (Height: 6); }
+
+        Group #MainScroll {
+            FlexWeight: 1;
+            LayoutMode: TopScrolling;
+            ScrollbarStyle: $Common.@DefaultScrollbarStyle;
+
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                TextButton #ResetMainButton { Anchor: (Width: 92, Height: 24); Text: "Reset"; Style: @RemoveButtonStyle; }
+            }
+            Group { Anchor: (Height: 8); }
+
+            Label { Text: "GENERAL"; Anchor: (Height: 20); Style: @SectionLabelStyle; }
+            Group { Anchor: (Height: 6); }
+
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #AllowCraftingToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Allow Shield Craft"; Style: @RowLabelStyle; }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #KeepSignatureEnergyToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Shield keeps Signature Energy when swapped"; Style: @RowLabelStyle; }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #VisualShieldInPlayersBackToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Visual Shield in player back"; Style: @RowLabelStyle; }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #FallResistanceWhenBlockingToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Fall Resistance when blocking"; Style: @RowLabelStyle; }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #DamageFromBackResistanceToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Damage from the Back Resistance"; Style: @RowLabelStyle; }
+            }
+
+            Group { Anchor: (Height: 12); }
+            Label { Text: "ATTACKS & ABILITIES"; Anchor: (Height: 20); Style: @SectionLabelStyle; }
+            Group { Anchor: (Height: 4); }
+            Label #MainConfigNote { Text: ""; Anchor: (Height: 10); Style: @NoteTextStyle; }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #DoubleJumpToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Double Jump (disabling this includes the FallStar Attack)"; Style: @RowLabelStyle; }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #FallStarAttackToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "FallStar Attack"; Style: @RowLabelStyle; }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #GuardBashToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Guard Bash"; Style: @RowLabelStyle; }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #GuardBashPushLaunchToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Guard Bash Push Launch"; Style: @RowLabelStyle; }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #SprintAttackToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Sprint Attack"; Style: @RowLabelStyle; }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #KickPushAttackToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Kick Push Attack"; Style: @RowLabelStyle; }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #ThrowToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Throw"; Style: @RowLabelStyle; }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #ThrowLeftHandToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Throw Left Hand"; Style: @RowLabelStyle; }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #FuriousOnslaughtToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Furious Onslaught"; Style: @RowLabelStyle; }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #GuardBashShockwaveMjolnirToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Guard Bash Shockwave with Mjolnir"; Style: @RowLabelStyle; }
+            }
+        }
+        Group { Anchor: (Height: 10); }
+
+        Group {
+            LayoutMode: Left;
+            Anchor: (Height: 32);
+
+            Group { FlexWeight: 1; }
+            TextButton #SaveMainButton {
+                Anchor: (Width: 140, Height: 32);
+                Text: "Apply";
+                Style: @ApplyButtonStyle;
+            }
+        }
+    }
+
+    Group #CraftTab {
+        LayoutMode: Top;
+        FlexWeight: 1;
+        Visible: false;
+        Padding: (Horizontal: 24);
+
+        Label { Text: "CAP'S SHIELD CRAFTING"; Anchor: (Height: 20); Style: @SectionLabelStyle; }
+        Group { Anchor: (Height: 4); }
+        Label { Text: "Edit crafting recipe inputs, bench requirements, and durability."; Anchor: (Height: 26); Style: @BodyTextStyle; }
+        Label #CraftCommentText { Text: ""; Anchor: (Height: 44); Style: @NoteTextStyle; }
+        Group { Anchor: (Height: 6); }
+
+        Group #CraftScroll {
+            FlexWeight: 1;
+            LayoutMode: TopScrolling;
+            ScrollbarStyle: $Common.@DefaultScrollbarStyle;
+
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                TextButton #ResetCraftButton { Anchor: (Width: 92, Height: 24); Text: "Reset"; Style: @RemoveButtonStyle; }
+            }
+            Group { Anchor: (Height: 8); }
+
+            Label { Text: "GENERAL"; Anchor: (Height: 20); Style: @SectionLabelStyle; }
+            Group { Anchor: (Height: 6); }
+
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                Label { FlexWeight: 1; Text: "Weapon Max Durability"; Style: @RowLabelStyle; }
+                NumberField #WeaponMaxDurabilityInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                Label { FlexWeight: 1; Text: "Craft Time Seconds"; Style: @RowLabelStyle; }
+                NumberField #CraftTimeSecondsInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                Label { FlexWeight: 1; Text: "Required Bench Tier"; Style: @RowLabelStyle; }
+                NumberField #CraftBenchTierInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                Label { FlexWeight: 1; Text: "Required Memories Level"; Style: @RowLabelStyle; }
+                NumberField #CraftRequiredMemoriesInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+
+            Group { Anchor: (Height: 12); }
+            Label { Text: "INGREDIENTS"; Anchor: (Height: 20); Style: @SectionLabelStyle; }
+            Group { Anchor: (Height: 6); }
+
+            Group #IngredientRow1 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                TextButton #IngredientRemove1 { Anchor: (Width: 18, Height: 18); Text: "X"; Style: @RemoveButtonStyle; }
+                Group { Anchor: (Width: 6); }
+                TextField #IngredientId1 { FlexWeight: 1; Anchor: (Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @TextFieldStyle; PlaceholderStyle: @TextFieldPlaceholderStyle; }
+                Group { Anchor: (Width: 8); }
+                NumberField #IngredientQuantity1 { Anchor: (Width: 120, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+            Group #IngredientRow2 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                TextButton #IngredientRemove2 { Anchor: (Width: 18, Height: 18); Text: "X"; Style: @RemoveButtonStyle; }
+                Group { Anchor: (Width: 6); }
+                TextField #IngredientId2 { FlexWeight: 1; Anchor: (Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @TextFieldStyle; PlaceholderStyle: @TextFieldPlaceholderStyle; }
+                Group { Anchor: (Width: 8); }
+                NumberField #IngredientQuantity2 { Anchor: (Width: 120, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+            Group #IngredientRow3 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                TextButton #IngredientRemove3 { Anchor: (Width: 18, Height: 18); Text: "X"; Style: @RemoveButtonStyle; }
+                Group { Anchor: (Width: 6); }
+                TextField #IngredientId3 { FlexWeight: 1; Anchor: (Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @TextFieldStyle; PlaceholderStyle: @TextFieldPlaceholderStyle; }
+                Group { Anchor: (Width: 8); }
+                NumberField #IngredientQuantity3 { Anchor: (Width: 120, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+            Group #IngredientRow4 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                TextButton #IngredientRemove4 { Anchor: (Width: 18, Height: 18); Text: "X"; Style: @RemoveButtonStyle; }
+                Group { Anchor: (Width: 6); }
+                TextField #IngredientId4 { FlexWeight: 1; Anchor: (Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @TextFieldStyle; PlaceholderStyle: @TextFieldPlaceholderStyle; }
+                Group { Anchor: (Width: 8); }
+                NumberField #IngredientQuantity4 { Anchor: (Width: 120, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+            Group #IngredientRow5 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                TextButton #IngredientRemove5 { Anchor: (Width: 18, Height: 18); Text: "X"; Style: @RemoveButtonStyle; }
+                Group { Anchor: (Width: 6); }
+                TextField #IngredientId5 { FlexWeight: 1; Anchor: (Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @TextFieldStyle; PlaceholderStyle: @TextFieldPlaceholderStyle; }
+                Group { Anchor: (Width: 8); }
+                NumberField #IngredientQuantity5 { Anchor: (Width: 120, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+            Group #IngredientRow6 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                TextButton #IngredientRemove6 { Anchor: (Width: 18, Height: 18); Text: "X"; Style: @RemoveButtonStyle; }
+                Group { Anchor: (Width: 6); }
+                TextField #IngredientId6 { FlexWeight: 1; Anchor: (Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @TextFieldStyle; PlaceholderStyle: @TextFieldPlaceholderStyle; }
+                Group { Anchor: (Width: 8); }
+                NumberField #IngredientQuantity6 { Anchor: (Width: 120, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+            Group #IngredientRow7 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                TextButton #IngredientRemove7 { Anchor: (Width: 18, Height: 18); Text: "X"; Style: @RemoveButtonStyle; }
+                Group { Anchor: (Width: 6); }
+                TextField #IngredientId7 { FlexWeight: 1; Anchor: (Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @TextFieldStyle; PlaceholderStyle: @TextFieldPlaceholderStyle; }
+                Group { Anchor: (Width: 8); }
+                NumberField #IngredientQuantity7 { Anchor: (Width: 120, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+            Group #IngredientRow8 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                TextButton #IngredientRemove8 { Anchor: (Width: 18, Height: 18); Text: "X"; Style: @RemoveButtonStyle; }
+                Group { Anchor: (Width: 6); }
+                TextField #IngredientId8 { FlexWeight: 1; Anchor: (Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @TextFieldStyle; PlaceholderStyle: @TextFieldPlaceholderStyle; }
+                Group { Anchor: (Width: 8); }
+                NumberField #IngredientQuantity8 { Anchor: (Width: 120, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+            Group #IngredientRow9 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                TextButton #IngredientRemove9 { Anchor: (Width: 18, Height: 18); Text: "X"; Style: @RemoveButtonStyle; }
+                Group { Anchor: (Width: 6); }
+                TextField #IngredientId9 { FlexWeight: 1; Anchor: (Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @TextFieldStyle; PlaceholderStyle: @TextFieldPlaceholderStyle; }
+                Group { Anchor: (Width: 8); }
+                NumberField #IngredientQuantity9 { Anchor: (Width: 120, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+            Group #IngredientRow10 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                TextButton #IngredientRemove10 { Anchor: (Width: 18, Height: 18); Text: "X"; Style: @RemoveButtonStyle; }
+                Group { Anchor: (Width: 6); }
+                TextField #IngredientId10 { FlexWeight: 1; Anchor: (Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @TextFieldStyle; PlaceholderStyle: @TextFieldPlaceholderStyle; }
+                Group { Anchor: (Width: 8); }
+                NumberField #IngredientQuantity10 { Anchor: (Width: 120, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+            Group #IngredientRow11 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                TextButton #IngredientRemove11 { Anchor: (Width: 18, Height: 18); Text: "X"; Style: @RemoveButtonStyle; }
+                Group { Anchor: (Width: 6); }
+                TextField #IngredientId11 { FlexWeight: 1; Anchor: (Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @TextFieldStyle; PlaceholderStyle: @TextFieldPlaceholderStyle; }
+                Group { Anchor: (Width: 8); }
+                NumberField #IngredientQuantity11 { Anchor: (Width: 120, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+            Group #IngredientRow12 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                TextButton #IngredientRemove12 { Anchor: (Width: 18, Height: 18); Text: "X"; Style: @RemoveButtonStyle; }
+                Group { Anchor: (Width: 6); }
+                TextField #IngredientId12 { FlexWeight: 1; Anchor: (Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @TextFieldStyle; PlaceholderStyle: @TextFieldPlaceholderStyle; }
+                Group { Anchor: (Width: 8); }
+                NumberField #IngredientQuantity12 { Anchor: (Width: 120, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
+
+            Group { Anchor: (Height: 6); }
+            TextButton #AddIngredientButton {
+                Anchor: (Width: 180, Height: 26);
+                Text: "+ Add Ingredient";
+                Style: @AddButtonStyle;
+            }
+
+            Group { Anchor: (Height: 12); }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #CraftModCompatibilityToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Mod Compatibility"; Style: @RowLabelStyle; }
+            }
+            Group { Anchor: (Height: 4); }
+            Label #CraftConfigNote { Text: ""; Anchor: (Height: 112); Style: @NoteTextStyle; }
+            Group { Anchor: (Height: 28); }
+        }
+
+        Group { Anchor: (Height: 10); }
+
+        Group {
+            LayoutMode: Left;
+            Anchor: (Height: 32);
+
+            Group { FlexWeight: 1; }
+            TextButton #SaveCraftButton {
+                Anchor: (Width: 140, Height: 32);
+                Text: "Apply";
+                Style: @ApplyButtonStyle;
+            }
+        }
+    }
+
+    Group #DamageTab {
+        LayoutMode: Top;
+        FlexWeight: 1;
+        Visible: false;
+        Padding: (Horizontal: 24);
+
+        Label { Text: "DAMAGE CONFIG"; Anchor: (Height: 20); Style: @SectionLabelStyle; }
+        Group { Anchor: (Height: 4); }
+        Label { Text: "Edit damage values, knockback forces and launch forces."; Anchor: (Height: 26); Style: @BodyTextStyle; }
+        Group { Anchor: (Height: 6); }
+
+        Group #DamageScroll {
+            FlexWeight: 1;
+            LayoutMode: TopScrolling;
+            ScrollbarStyle: $Common.@DefaultScrollbarStyle;
+
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                TextButton #ResetDamageButton { Anchor: (Width: 92, Height: 24); Text: "Reset"; Style: @RemoveButtonStyle; }
+            }
+            Group { Anchor: (Height: 8); }
+
+            Label { Text: "DAMAGE VALUES"; Anchor: (Height: 20); Style: @SectionLabelStyle; }
+            Group { Anchor: (Height: 6); }
+
+            Group #DamageRow1 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel1 { FlexWeight: 1; Text: "Damage 1"; Style: @RowLabelStyle; }
+                NumberField #DamageValue1 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow2 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel2 { FlexWeight: 1; Text: "Damage 2"; Style: @RowLabelStyle; }
+                NumberField #DamageValue2 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow3 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel3 { FlexWeight: 1; Text: "Damage 3"; Style: @RowLabelStyle; }
+                NumberField #DamageValue3 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow4 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel4 { FlexWeight: 1; Text: "Damage 4"; Style: @RowLabelStyle; }
+                NumberField #DamageValue4 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow5 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel5 { FlexWeight: 1; Text: "Damage 5"; Style: @RowLabelStyle; }
+                NumberField #DamageValue5 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow6 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel6 { FlexWeight: 1; Text: "Damage 6"; Style: @RowLabelStyle; }
+                NumberField #DamageValue6 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow7 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel7 { FlexWeight: 1; Text: "Damage 7"; Style: @RowLabelStyle; }
+                NumberField #DamageValue7 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow8 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel8 { FlexWeight: 1; Text: "Damage 8"; Style: @RowLabelStyle; }
+                NumberField #DamageValue8 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow9 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel9 { FlexWeight: 1; Text: "Damage 9"; Style: @RowLabelStyle; }
+                NumberField #DamageValue9 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow10 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel10 { FlexWeight: 1; Text: "Damage 10"; Style: @RowLabelStyle; }
+                NumberField #DamageValue10 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow11 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel11 { FlexWeight: 1; Text: "Damage 11"; Style: @RowLabelStyle; }
+                NumberField #DamageValue11 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow12 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel12 { FlexWeight: 1; Text: "Damage 12"; Style: @RowLabelStyle; }
+                NumberField #DamageValue12 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow13 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel13 { FlexWeight: 1; Text: "Damage 13"; Style: @RowLabelStyle; }
+                NumberField #DamageValue13 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow14 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel14 { FlexWeight: 1; Text: "Damage 14"; Style: @RowLabelStyle; }
+                NumberField #DamageValue14 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow15 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel15 { FlexWeight: 1; Text: "Damage 15"; Style: @RowLabelStyle; }
+                NumberField #DamageValue15 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow16 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel16 { FlexWeight: 1; Text: "Damage 16"; Style: @RowLabelStyle; }
+                NumberField #DamageValue16 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow17 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel17 { FlexWeight: 1; Text: "Damage 17"; Style: @RowLabelStyle; }
+                NumberField #DamageValue17 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow18 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel18 { FlexWeight: 1; Text: "Damage 18"; Style: @RowLabelStyle; }
+                NumberField #DamageValue18 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow19 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel19 { FlexWeight: 1; Text: "Damage 19"; Style: @RowLabelStyle; }
+                NumberField #DamageValue19 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow20 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel20 { FlexWeight: 1; Text: "Damage 20"; Style: @RowLabelStyle; }
+                NumberField #DamageValue20 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow21 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel21 { FlexWeight: 1; Text: "Damage 21"; Style: @RowLabelStyle; }
+                NumberField #DamageValue21 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow22 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel22 { FlexWeight: 1; Text: "Damage 22"; Style: @RowLabelStyle; }
+                NumberField #DamageValue22 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow23 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel23 { FlexWeight: 1; Text: "Damage 23"; Style: @RowLabelStyle; }
+                NumberField #DamageValue23 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow24 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel24 { FlexWeight: 1; Text: "Damage 24"; Style: @RowLabelStyle; }
+                NumberField #DamageValue24 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow25 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel25 { FlexWeight: 1; Text: "Damage 25"; Style: @RowLabelStyle; }
+                NumberField #DamageValue25 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow26 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel26 { FlexWeight: 1; Text: "Damage 26"; Style: @RowLabelStyle; }
+                NumberField #DamageValue26 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow27 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel27 { FlexWeight: 1; Text: "Damage 27"; Style: @RowLabelStyle; }
+                NumberField #DamageValue27 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow28 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel28 { FlexWeight: 1; Text: "Damage 28"; Style: @RowLabelStyle; }
+                NumberField #DamageValue28 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow29 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel29 { FlexWeight: 1; Text: "Damage 29"; Style: @RowLabelStyle; }
+                NumberField #DamageValue29 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow30 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel30 { FlexWeight: 1; Text: "Damage 30"; Style: @RowLabelStyle; }
+                NumberField #DamageValue30 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow31 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel31 { FlexWeight: 1; Text: "Damage 31"; Style: @RowLabelStyle; }
+                NumberField #DamageValue31 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow32 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel32 { FlexWeight: 1; Text: "Damage 32"; Style: @RowLabelStyle; }
+                NumberField #DamageValue32 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow33 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel33 { FlexWeight: 1; Text: "Damage 33"; Style: @RowLabelStyle; }
+                NumberField #DamageValue33 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow34 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel34 { FlexWeight: 1; Text: "Damage 34"; Style: @RowLabelStyle; }
+                NumberField #DamageValue34 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow35 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel35 { FlexWeight: 1; Text: "Damage 35"; Style: @RowLabelStyle; }
+                NumberField #DamageValue35 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow36 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel36 { FlexWeight: 1; Text: "Damage 36"; Style: @RowLabelStyle; }
+                NumberField #DamageValue36 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow37 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel37 { FlexWeight: 1; Text: "Damage 37"; Style: @RowLabelStyle; }
+                NumberField #DamageValue37 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow38 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel38 { FlexWeight: 1; Text: "Damage 38"; Style: @RowLabelStyle; }
+                NumberField #DamageValue38 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow39 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel39 { FlexWeight: 1; Text: "Damage 39"; Style: @RowLabelStyle; }
+                NumberField #DamageValue39 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group #DamageRow40 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label #DamageLabel40 { FlexWeight: 1; Text: "Damage 40"; Style: @RowLabelStyle; }
+                NumberField #DamageValue40 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+
+            Group { Anchor: (Height: 12); }
+            Group { Anchor: (Height: 6); }
+
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                Label { FlexWeight: 1; Text: "Overcharged Duration"; Style: @RowLabelStyle; }
+                NumberField #OverchargedDurationInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+
+            Group { Anchor: (Height: 12); }
+            Label { Text: "LAUNCH FORCES"; Anchor: (Height: 20); Style: @SectionLabelStyle; }
+            Group { Anchor: (Height: 6); }
+
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                Label { FlexWeight: 1; Text: "Launcher Force"; Style: @RowLabelStyle; }
+                NumberField #LauncherForceInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                Label { FlexWeight: 1; Text: "Glider Force"; Style: @RowLabelStyle; }
+                NumberField #GliderForceInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                Label { FlexWeight: 1; Text: "PowerSwing Knockback Force"; Style: @RowLabelStyle; }
+                NumberField #PowerSwingKnockbackForceInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
+            }
+
+            Group { Anchor: (Height: 12); }
+            Label { Text: "COMPATIBILITY"; Anchor: (Height: 20); Style: @SectionLabelStyle; }
+            Group { Anchor: (Height: 6); }
+
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #DamageModCompatibilityToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Mod Compatibility"; Style: @RowLabelStyle; }
+            }
+            Group { Anchor: (Height: 4); }
+            Label #DamageConfigNote { Text: ""; Anchor: (Height: 112); Style: @NoteTextStyle; }
+            Group { Anchor: (Height: 28); }
+        }
+
+        Group { Anchor: (Height: 10); }
+
+        Group {
+            LayoutMode: Left;
+            Anchor: (Height: 32);
+
+            Group { FlexWeight: 1; }
+            TextButton #SaveDamageButton {
+                Anchor: (Width: 140, Height: 32);
+                Text: "Apply";
+                Style: @ApplyButtonStyle;
+            }
+        }
+    }
+
+    Group #CompatibilityTab {
+        LayoutMode: Top;
+        FlexWeight: 1;
+        Visible: false;
+        Padding: (Horizontal: 24);
+
+        Label { Text: "COMPATIBILITY"; Anchor: (Height: 20); Style: @SectionLabelStyle; }
+        Group { Anchor: (Height: 4); }
+        Label { Text: "Partners and recommended mods that fit really well with CAP'S SHIELD."; Anchor: (Height: 26); Style: @BodyTextStyle; }
+        Label { Text: "These are Optional Integrations — All Auto-Detected."; Anchor: (Height: 22); Style: @NoteTextStyle; }
+        Group { Anchor: (Height: 6); }
+
+        Group #CompatibilityScroll {
+            FlexWeight: 1;
+            LayoutMode: TopScrolling;
+            ScrollbarStyle: $Common.@DefaultScrollbarStyle;
+
+            Group #CompatibilityPartnersSection {
+                LayoutMode: Top;
+
+                Group {
+                    LayoutMode: Left;
+                    Anchor: (Width: 767, Height: 132);
+
+                    Button #CompatibilityShieldCard {
+                        Anchor: (Width: 700, Height: 132, Right: 8);
+                        Style: @CompatibilityLinkedCardButtonStyle;
+                        Padding: (Full: 12);
+
+                        Group {
+                            LayoutMode: Left;
+                            Anchor: (Width: 676, Height: 108);
+
+                            Group {
+                                Anchor: (Width: 88, Height: 88, Right: 14);
+                                Background: (TexturePath: "../Starky_Mjolnir_Icon.png");
+                            }
+
+                            Group {
+                                LayoutMode: Top;
+                                Anchor: (Width: 574, Height: 108);
+
+                                Label {
+                                    Text: "STARKY'S MJOLNIR - SPECIAL COMPATIBILITY";
+                                    Anchor: (Height: 22, Bottom: 6);
+                                    Style: (FontSize: 17, TextColor: #ffffff, RenderBold: true, Wrap: true, VerticalAlignment: Center);
+                                }
+
+                                Label {
+                                    Text: "Adds the Thor's Hammer MJOLNIR from Marvel with lots of attacks, skills, etc. If installed and active, the player can execute special attacks, skills, throws and more by equipping Mjolnir(right hand) and the Shield(left hand).";
+                                    Anchor: (Height: 80);
+                                    Style: (FontSize: 14, TextColor: #e4bfbf, Wrap: true);
+                                }
+                            }
+                        }
+                    }
+
+                    TextButton #CompatibilityShieldMenuButton {
+                        Anchor: (Width: 59, Height: 22);
+                        Text: "MENU";
+                        Style: @MenuMiniButtonStyle;
+                    }
+                }
+
+                Group { Anchor: (Height: 16); }
+
+                Group {
+                    LayoutMode: Top;
+                    Background: #1f0b0b(0.88);
+                    Padding: (Full: 18);
+
+                    Label {
+                        Text: "MOD PARTNERS";
+                        Anchor: (Height: 24);
+                        Style: (FontSize: 18, TextColor: #ffffff, RenderBold: true);
+                    }
+
+                    Group { Anchor: (Height: 6); }
+
+                    Label {
+                        Text: "External mod partners.";
+                        Style: (FontSize: 13, TextColor: #e4bfbf, Wrap: true);
+                    }
+                }
+
+                Group { Anchor: (Height: 18); }
+
+                Group #CompatibilityPartnersRow1 {
+                    LayoutMode: Left;
+                    Anchor: (Height: 360);
+
+                    Group { FlexWeight: 1; }
+
+                    Group {
+                        LayoutMode: Left;
+                        Anchor: (Width: 656, Height: 360);
+
+                        Group {
+                            LayoutMode: Top;
+                            Anchor: (Width: 322, Height: 360, Right: 12);
+
+                            Group {
+                                LayoutMode: Left;
+                                Anchor: (Width: 322, Height: 360);
+
+                                Group {
+                                    LayoutMode: Top;
+                                    Anchor: (Width: 59, Height: 360, Right: 8);
+
+                                    TextButton #CompatibilityPartnerMenuButton {
+                                        Anchor: (Width: 59, Height: 22);
+                                        Text: "MENU";
+                                        Style: @MenuMiniButtonStyle;
+                                    }
+                                }
+
+                                Button #CompatibilityPartnerCard {
+                                    Anchor: (Width: 255, Height: 360);
+                                    LayoutMode: Top;
+                                    Style: @CompatibilityLinkedCardButtonStyle;
+                                    Padding: (Full: 14);
+
+                                    Group {
+                                        Anchor: (Height: 112, Bottom: 12);
+                                        Background: (TexturePath: "../EndlessLevelingImage.png");
+                                    }
+
+                                    Label {
+                                        Text: "Endless Leveling";
+                                        Anchor: (Height: 28, Bottom: 8);
+                                        Style: (FontSize: 22, TextColor: #ffffff, RenderBold: true, Wrap: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+                                    }
+
+                                    Label {
+                                        Text: "External Mod Partner";
+                                        Anchor: (Height: 18, Bottom: 8);
+                                        Style: (FontSize: 11, TextColor: #ff8989, RenderBold: true, VerticalAlignment: Center, HorizontalAlignment: Center);
+                                    }
+
+                                    Label {
+                                        Text: "RPG System featuring races, classes, skills, dungeons, abilities, augments, etc. If installed and active, all Cap's Shield damages will be automatically increased if (Mod Compatibility) is ON in DAMAGES. Also, Cap's Shield Maximum Signature Energy will be increased from 70 to 560 points. Best class for Cap's Shields is Vanguard.";
+                                        FlexWeight: 1;
+                                        Style: (FontSize: 12, TextColor: #e8bdbd, Wrap: true, HorizontalAlignment: Center);
+                                    }
+                                }
+                            }
+                        }
+
+                        Group { Anchor: (Width: 12); }
+
+                        Group {
+                            LayoutMode: Top;
+                            Anchor: (Width: 322, Height: 360);
+
+                            Group {
+                                LayoutMode: Left;
+                                Anchor: (Width: 322, Height: 276);
+
+                                Button #CompatibilityCard2 {
+                                    Anchor: (Width: 255, Height: 282);
+                                    LayoutMode: Top;
+                                    Style: @CompatibilityLinkedCardButtonStyle;
+                                    Padding: (Full: 14);
+
+                                    Group {
+                                        Anchor: (Height: 112, Bottom: 12);
+                                        Background: (TexturePath: "../PerfectParriesImage.png");
+                                    }
+
+                                    Label {
+                                        Text: "Perfect Parries";
+                                        Anchor: (Height: 28, Bottom: 8);
+                                        Style: (FontSize: 22, TextColor: #ffffff, RenderBold: true, Wrap: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+                                    }
+
+                                    Label {
+                                        Text: "External Mod Partner";
+                                        Anchor: (Height: 18, Bottom: 8);
+                                        Style: (FontSize: 11, TextColor: #ff8989, RenderBold: true, VerticalAlignment: Center, HorizontalAlignment: Center);
+                                    }
+
+                                    Label {
+                                        Text: "Adds parries to the combat system. If installed and active, Cap's Shield will be able to parry enemy attacks in a unique way performing a shockway that pushes enemies back!";
+                                        FlexWeight: 1;
+                                        Style: (FontSize: 12, TextColor: #e8bdbd, Wrap: true, HorizontalAlignment: Center);
+                                    }
+                                }
+
+                                Group {
+                                    LayoutMode: Top;
+                                    Anchor: (Width: 59, Height: 276, Left: 8);
+
+                                    TextButton #CompatibilityCard2MenuButton {
+                                        Anchor: (Width: 59, Height: 22);
+                                        Text: "MENU";
+                                        Style: @MenuMiniButtonStyle;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Group { FlexWeight: 1; }
+                }
+
+                Group { Anchor: (Height: 12); }
+
+                Group #CompatibilityPartnersRow2 {
+                    LayoutMode: Left;
+                    Anchor: (Height: 310);
+
+                    Group { FlexWeight: 1; }
+
+                    Group {
+                        LayoutMode: Left;
+                        Anchor: (Width: 656, Height: 310);
+
+                        Group {
+                            LayoutMode: Top;
+                            Anchor: (Width: 322, Height: 310, Right: 12);
+
+                            Group {
+                                LayoutMode: Left;
+                                Anchor: (Width: 322, Height: 293);
+
+                                Group {
+                                    LayoutMode: Top;
+                                    Anchor: (Width: 59, Height: 293, Right: 8);
+
+                                    TextButton #CompatibilityCard1MenuButton {
+                                        Anchor: (Width: 59, Height: 22);
+                                        Text: "MENU";
+                                        Style: @MenuMiniButtonStyle;
+                                    }
+                                }
+
+                                Button #CompatibilityCard1 {
+                                    Anchor: (Width: 255, Height: 293);
+                                    LayoutMode: Top;
+                                    Style: @CompatibilityLinkedCardButtonStyle;
+                                    Padding: (Full: 14);
+
+                                    Group {
+                                        Anchor: (Height: 112, Bottom: 12);
+                                        Background: (TexturePath: "../ZephyrImage.png");
+                                    }
+
+                                    Label {
+                                        Text: "Zephyr";
+                                        Anchor: (Height: 28, Bottom: 8);
+                                        Style: (FontSize: 22, TextColor: #ffffff, RenderBold: true, Wrap: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+                                    }
+
+                                    Label {
+                                        Text: "External Mod Partner";
+                                        Anchor: (Height: 18, Bottom: 8);
+                                        Style: (FontSize: 11, TextColor: #ff8989, RenderBold: true, VerticalAlignment: Center, HorizontalAlignment: Center);
+                                    }
+
+                                    Label {
+                                        Text: "Unique movement mod including dodges/dashes, double jumps, wall jumps, etc. If installed and active, the player with Cap's Shield will be able to dodge/dash with the Ability 3 key and will be able to wall jump with left click!";
+                                        FlexWeight: 1;
+                                        Style: (FontSize: 12, TextColor: #e8bdbd, Wrap: true, HorizontalAlignment: Center);
+                                    }
+                                }
+                            }
+                        }
+
+                        Group { Anchor: (Width: 12); }
+
+                        Group {
+                            LayoutMode: Top;
+                            Anchor: (Width: 322, Height: 310);
+
+                            Group {
+                                LayoutMode: Left;
+                                Anchor: (Width: 322, Height: 307);
+
+                                Button #CompatibilityCard3 {
+                                    Anchor: (Width: 255, Height: 307);
+                                    LayoutMode: Top;
+                                    Style: @CompatibilityLinkedCardButtonStyle;
+                                    Padding: (Full: 14);
+
+                                    Group {
+                                        Anchor: (Height: 112, Bottom: 12);
+                                        Background: (TexturePath: "../PerfectDodgesImage.png");
+                                    }
+
+                                    Label {
+                                        Text: "Perfect Dodges";
+                                        Anchor: (Height: 28, Bottom: 8);
+                                        Style: (FontSize: 22, TextColor: #ffffff, RenderBold: true, Wrap: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+                                    }
+
+                                    Label {
+                                        Text: "External Mod Partner";
+                                        Anchor: (Height: 18, Bottom: 8);
+                                        Style: (FontSize: 11, TextColor: #ff8989, RenderBold: true, VerticalAlignment: Center, HorizontalAlignment: Center);
+                                    }
+
+                                    Label {
+                                        Text: "Adds dodges/dashes to the game, useful for combat. If installed and active, the player with Cap's Shield will be able to dodge/dash with the Ability 3 key. If Zephyr mod is active too, its dodge/dash will execute instead.";
+                                        FlexWeight: 1;
+                                        Style: (FontSize: 12, TextColor: #e8bdbd, Wrap: true, HorizontalAlignment: Center);
+                                    }
+                                }
+
+                                Group {
+                                    LayoutMode: Top;
+                                    Anchor: (Width: 59, Height: 307, Left: 8);
+
+                                    TextButton #CompatibilityCard3MenuButton {
+                                        Anchor: (Width: 59, Height: 22);
+                                        Text: "MENU";
+                                        Style: @MenuMiniButtonStyle;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Group { FlexWeight: 1; }
+                }
+            }
+
+            Group { Anchor: (Height: 10); }
+
+            Group #CompatibilityMoreSection {
+                LayoutMode: Top;
+
+                Group {
+                    LayoutMode: Top;
+                    Background: #1f0b0b(0.88);
+                    Padding: (Full: 18);
+
+                    Label {
+                        Text: "MORE RECOMMENDATIONS";
+                        Anchor: (Height: 24);
+                        Style: (FontSize: 18, TextColor: #ffffff, RenderBold: true);
+                    }
+
+                    Group { Anchor: (Height: 6); }
+
+                    Label {
+                        Text: "Recommended external mods that will make Cap's Shield feel even better";
+                        Style: (FontSize: 13, TextColor: #e4bfbf, Wrap: true);
+                    }
+                }
+
+                Group { Anchor: (Height: 18); }
+
+                Group #CompatibilityRecommendationRow2 {
+                    LayoutMode: Left;
+                    Anchor: (Height: 295);
+
+                    Group { FlexWeight: 1; }
+
+                    Group {
+                        LayoutMode: Left;
+                        Anchor: (Width: 744, Height: 295);
+
+                    Group {
+                        LayoutMode: Top;
+                        Anchor: (Width: 240, Height: 295, Right: 12);
+
+                    Group #CompatibilityCard4 {
+                        Anchor: (Width: 240, Height: 295);
+                        LayoutMode: Top;
+                        Background: #1f0b0b(0.92);
+                        Padding: (Full: 14);
+
+                        Group {
+                            LayoutMode: Middle;
+                            Anchor: (Height: 60, Bottom: 12);
+                            Background: #502323;
+                            Padding: (Left: 12, Right: 12, Top: 10, Bottom: 10);
+
+                            Group {
+                                LayoutMode: Top;
+                                Anchor: (Width: 180, Height: 40);
+
+                                Label { Text: "RECOMMENDED"; Anchor: (Height: 16); Style: (FontSize: 10, TextColor: #f9e6e6, RenderBold: true, LetterSpacing: 1, HorizontalAlignment: Center); }
+                                Group { Anchor: (Height: 8); }
+                                Label { Text: "MAJOR DUNGEONS"; Anchor: (Height: 18); Style: (FontSize: 18, TextColor: #ffffff, RenderBold: true, Wrap: true, VerticalAlignment: Center, HorizontalAlignment: Center); }
+                            }
+                        }
+
+                        Label { Text: "External Mod"; Anchor: (Height: 18, Bottom: 6); Style: (FontSize: 11, TextColor: #ff8989, RenderBold: true, VerticalAlignment: Center, HorizontalAlignment: Center); }
+                        Label { Text: "Adds custom dungeons and more. If installed and active, all Cap's Shield damages will be automatically increased if (Mod Compatibility) is ON in DAMAGES. In these dungeons, Cap's Shield will have some different behaviours and different configured features (for a better balanced experience)."; FlexWeight: 1; Style: (FontSize: 12, TextColor: #e8bdbd, Wrap: true, HorizontalAlignment: Center); }
+                    }
+
+                    Group { FlexWeight: 1; }
+                    }
+
+                    Group { Anchor: (Width: 12); }
+
+                    Group {
+                        LayoutMode: Top;
+                        Anchor: (Width: 240, Height: 295, Right: 12);
+
+                    Group #CompatibilityCard5 {
+                        Anchor: (Width: 240, Height: 262);
+                        LayoutMode: Top;
+                        Background: #1f0b0b(0.92);
+                        Padding: (Full: 14);
+
+                        Group {
+                            LayoutMode: Middle;
+                            Anchor: (Height: 60, Bottom: 12);
+                            Background: #4d2727;
+                            Padding: (Left: 12, Right: 12, Top: 10, Bottom: 10);
+
+                            Group {
+                                LayoutMode: Top;
+                                Anchor: (Width: 180, Height: 40);
+
+                                Label { Text: "RECOMMENDED"; Anchor: (Height: 16); Style: (FontSize: 10, TextColor: #e6eff9, RenderBold: true, LetterSpacing: 1, HorizontalAlignment: Center); }
+                                Group { Anchor: (Height: 8); }
+                                Label { Text: "Endgame & QoL"; Anchor: (Height: 18); Style: (FontSize: 18, TextColor: #ffffff, RenderBold: true, Wrap: true, VerticalAlignment: Center, HorizontalAlignment: Center); }
+                            }
+                        }
+
+                        Label { Text: "External Mod"; Anchor: (Height: 18, Bottom: 6); Style: (FontSize: 11, TextColor: #ff8989, RenderBold: true, VerticalAlignment: Center, HorizontalAlignment: Center); }
+                        Label { Text: "Adds new content to the endgame progression of Hytale. If installed and active, all Cap's Shield damages will be automatically increased if (Mod Compatibility) is ON in DAMAGES. And also, Cap's Shield Crafting Recipe will be automatically modified to be much harder if (Mod Compatibility) is ON in CRAFTING."; FlexWeight: 1; Style: (FontSize: 12, TextColor: #e8bdbd, Wrap: true, HorizontalAlignment: Center); }
+                    }
+
+                    Group { FlexWeight: 1; }
+                    }
+
+                    Group { Anchor: (Width: 12); }
+
+                    Group {
+                        LayoutMode: Top;
+                        Anchor: (Width: 240, Height: 295);
+
+                    Group #CompatibilityCard6 {
+                        Anchor: (Width: 240, Height: 185);
+                        LayoutMode: Top;
+                        Background: #1f0b0b(0.92);
+                        Padding: (Full: 14);
+
+                        Group {
+                            LayoutMode: Middle;
+                            Anchor: (Height: 60, Bottom: 12);
+                            Background: #501d1d;
+                            Padding: (Left: 12, Right: 12, Top: 10, Bottom: 10);
+
+                            Group {
+                                LayoutMode: Top;
+                                Anchor: (Width: 180, Height: 40);
+
+                                Label { Text: "RECOMMENDED"; Anchor: (Height: 16); Style: (FontSize: 10, TextColor: #f9e6e6, RenderBold: true, LetterSpacing: 1, HorizontalAlignment: Center); }
+                                Group { Anchor: (Height: 8); }
+                                Label { Text: "Simple Enchantments"; Anchor: (Height: 18); Style: (FontSize: 16, TextColor: #ffffff, RenderBold: true, Wrap: true, VerticalAlignment: Center, HorizontalAlignment: Center); }
+                            }
+                        }
+
+                        Label { Text: "External Mod"; Anchor: (Height: 18, Bottom: 6); Style: (FontSize: 11, TextColor: #ff8989, RenderBold: true, VerticalAlignment: Center, HorizontalAlignment: Center); }
+                        Label { Text: "Adds a variety of echantments. Cap's Shield can be enchanted and will always keep its enchantments as intended (even when Thrown)."; FlexWeight: 1; Style: (FontSize: 12, TextColor: #e8bdbd, Wrap: true, HorizontalAlignment: Center); }
+                    }
+
+                    Group { FlexWeight: 1; }
+                    }
+                    }
+
+                    Group { FlexWeight: 1; }
+                }
+            }
+
+            Group { Anchor: (Height: 20); }
+        }
+    }
+}
+
+

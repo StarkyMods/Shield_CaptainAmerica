@@ -1,5 +1,8 @@
 {
   "Interactions": [
-    "ShieldCap_Primary_Double_Jump"
+    {
+      "Type": "ShieldCapConfigCheck",
+      "Next": "ShieldCap_Primary_Double_Jump"
+    }
   ]
 }
