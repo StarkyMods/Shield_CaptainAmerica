@@ -124,13 +124,14 @@ public class ShieldCapDamageHotReloadService {
             if (!pendingReload.get()) {
                 return;
             }
+            var previous = ShieldCapDamageConfigManager.getConfigSnapshot();
             if (!ShieldCapDamageConfigManager.reloadDamagesIfValid()) {
                 nextRetryAtMillis = System.currentTimeMillis() + 1000L;
                 System.out.println("[ShieldCap] Live damage reload waiting: shieldcapdamages.json is invalid.");
                 return;
             }
             markInternalDamageConfigWrite();
-            boolean markerWritten = ShieldCapDamageConfigManager.disableDamageCompatibilityProfileAndSave();
+            boolean markerWritten = ShieldCapDamageConfigManager.disableDamageCompatibilityProfileIfValuesChangedAndSave(previous);
             if (!ShieldCapDamageAssetGenerator.generateAndReload()) {
                 nextRetryAtMillis = System.currentTimeMillis() + 1000L;
                 System.out.println("[ShieldCap] Live damage reload failed to apply assets, retry scheduled.");
@@ -139,7 +140,7 @@ public class ShieldCapDamageHotReloadService {
             pendingReload.set(false);
             nextRetryAtMillis = 0L;
             if (markerWritten) {
-                System.out.println("[ShieldCap] External damage override remembered, Mod Compatibility is now false in shieldcapdamages.json.");
+                System.out.println("[ShieldCap] Damage/force override detected, Mod Compatibility is now false in shieldcapdamages.json.");
             }
             System.out.println("[ShieldCap] Live damage reload applied from shieldcapdamages.json.");
             if (!suppressMessagesForPendingReload.get()) {

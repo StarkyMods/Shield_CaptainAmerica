@@ -188,8 +188,20 @@ public final class ShieldCapDamageConfigManager {
     }
 
     public static void saveDamagesFromUi(ShieldCapDamages updated) {
+        saveDamagesFromUi(updated, true);
+    }
+
+    public static void saveDamagesFromUi(ShieldCapDamages updated, boolean autoDisableCompatibilityOnValueChange) {
+        ShieldCapDamages previous = cloneDamages(config);
         config = updated == null ? createDefault() : cloneDamages(updated);
         normalize(config);
+        if (autoDisableCompatibilityOnValueChange
+                && damageValuesOrForcesChanged(previous, config)
+                && !Boolean.FALSE.equals(config.modCompatibility)) {
+            config.modCompatibility = false;
+            config.modCompatibilityNote = new ArrayList<>(MOD_COMPATIBILITY_NOTE);
+            config.legacyDisableCompatibilityProfiles = null;
+        }
         save();
     }
 
@@ -233,6 +245,22 @@ public final class ShieldCapDamageConfigManager {
             load();
         }
         if (config == null || Boolean.FALSE.equals(config.modCompatibility)) {
+            return false;
+        }
+        config.modCompatibility = false;
+        config.modCompatibilityNote = new ArrayList<>(MOD_COMPATIBILITY_NOTE);
+        config.legacyDisableCompatibilityProfiles = null;
+        save();
+        return true;
+    }
+
+    public static boolean disableDamageCompatibilityProfileIfValuesChangedAndSave(ShieldCapDamages previous) {
+        if (config == null) {
+            load();
+        }
+        if (config == null
+                || Boolean.FALSE.equals(config.modCompatibility)
+                || !damageValuesOrForcesChanged(previous, config)) {
             return false;
         }
         config.modCompatibility = false;
@@ -624,6 +652,14 @@ public final class ShieldCapDamageConfigManager {
             }
         }
         return true;
+    }
+
+    private static boolean damageValuesOrForcesChanged(ShieldCapDamages previous, ShieldCapDamages current) {
+        if (previous == null || current == null) {
+            return false;
+        }
+        return !mapsEqual(previous.damageValues, current.damageValues)
+                || !mapsEqual(previous.launchForces, current.launchForces);
     }
 
     private static DamageDefinition damage(String displayKey, String... interactionVars) {

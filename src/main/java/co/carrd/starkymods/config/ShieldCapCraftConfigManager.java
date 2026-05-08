@@ -122,8 +122,19 @@ public final class ShieldCapCraftConfigManager {
     }
 
     public static void saveCraftState(ShieldCapCraft updatedConfig) {
+        saveCraftState(updatedConfig, true);
+    }
+
+    public static void saveCraftState(ShieldCapCraft updatedConfig, boolean autoDisableCompatibilityOnValueChange) {
+        ShieldCapCraft previous = cloneCraft(config);
         config = updatedConfig == null ? createDefault() : cloneCraft(updatedConfig);
         normalizeCraft(config);
+        if (autoDisableCompatibilityOnValueChange
+                && craftRecipeFieldsChanged(previous, config)
+                && !Boolean.FALSE.equals(config.modCompatibility)) {
+            config.modCompatibility = false;
+            config.modCompatibilityNote = new ArrayList<>(CRAFT_MOD_COMPATIBILITY_NOTE);
+        }
         save();
     }
 
@@ -149,6 +160,22 @@ public final class ShieldCapCraftConfigManager {
 
     public static boolean isCraftCompatibilityProfileEnabled() {
         return getConfig() == null || !Boolean.FALSE.equals(getConfig().modCompatibility);
+    }
+
+    public static boolean disableCraftCompatibilityProfileIfRecipeChangedAndSave(ShieldCapCraft previous) {
+        if (config == null) {
+            load();
+        }
+        if (config == null
+                || Boolean.FALSE.equals(config.modCompatibility)
+                || !craftRecipeFieldsChanged(previous, config)) {
+            return false;
+        }
+
+        config.modCompatibility = false;
+        config.modCompatibilityNote = new ArrayList<>(CRAFT_MOD_COMPATIBILITY_NOTE);
+        save();
+        return true;
     }
 
     public static boolean hasEndgameBenchRequirement() {
@@ -659,10 +686,15 @@ public final class ShieldCapCraftConfigManager {
             return false;
         }
         return ingredientsEqual(left.Input, right.Input)
+                && Objects.equals(left.weaponMaxDurability, right.weaponMaxDurability)
                 && left.TimeSeconds == right.TimeSeconds
                 && left.RequiredMemoriesLevel == right.RequiredMemoriesLevel
                 && benchListsEqual(getEffectiveBenches(left), getEffectiveBenches(right))
                 && benchEquals(left.Bench, right.Bench);
+    }
+
+    private static boolean craftRecipeFieldsChanged(ShieldCapCraft previous, ShieldCapCraft current) {
+        return previous != null && current != null && !craftRecipeFieldsEqual(previous, current);
     }
 
     private static boolean ingredientsEqual(List<ShieldCapCraft.IngredientEntry> left,

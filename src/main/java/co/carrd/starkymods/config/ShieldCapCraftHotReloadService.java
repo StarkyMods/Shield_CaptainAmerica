@@ -139,12 +139,15 @@ public class ShieldCapCraftHotReloadService {
                 return;
             }
 
+            ShieldCapCraft previous = ShieldCapCraftConfigManager.getConfigSnapshot();
             boolean loaded = ShieldCapCraftConfigManager.reloadCraftIfValid();
             if (!loaded) {
                 nextRetryAtMillis = System.currentTimeMillis() + 1000L;
                 System.out.println("[ShieldCap] Live craft reload waiting: shieldcapcraft.json is invalid, keeping current recipe.");
                 return;
             }
+            markInternalCraftConfigWrite();
+            boolean markerWritten = ShieldCapCraftConfigManager.disableCraftCompatibilityProfileIfRecipeChangedAndSave(previous);
 
             boolean recipeApplied = ShieldCapRecipeOverrideManager.applyConfiguredRecipe();
             boolean durabilityAssetsApplied = ShieldCapDurabilityAssetOverrideManager.applyConfiguredDurabilityAssets();
@@ -163,6 +166,9 @@ public class ShieldCapCraftHotReloadService {
 
             pendingReload.set(false);
             nextRetryAtMillis = 0L;
+            if (markerWritten) {
+                System.out.println("[ShieldCap] Craft override detected, Mod Compatibility is now false in shieldcapcraft.json.");
+            }
             System.out.println("[ShieldCap] Live craft reload applied from shieldcapcraft.json.");
             if (!suppressMessagesForPendingReload.get()) {
                 broadcastToOpPlayers("Updated shieldcapcraft.json loaded.");

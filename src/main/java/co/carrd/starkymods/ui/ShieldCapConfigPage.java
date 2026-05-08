@@ -237,7 +237,7 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
                 }
                 ShieldCapCraft defaults = ShieldCapCraftConfigManager.createDefaultCraftConfigSnapshot();
                 defaults.modCompatibility = data.craftModCompatibility;
-                ShieldCapCraftConfigManager.saveCraftState(defaults);
+                ShieldCapCraftConfigManager.saveCraftState(defaults, false);
                 if (data.craftModCompatibility && isEndgameQoLActive()) {
                     ShieldCapCraftConfigManager.applyEndgameCraftCompatibilityProfile();
                 }
@@ -256,7 +256,7 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
                         ? ShieldCapDamageConfigManager.createDamageConfigSnapshotForProfile(plugin.getActiveDamageCompatibilityProfile())
                         : ShieldCapDamageConfigManager.createDefault();
                 defaults.modCompatibility = data.damageModCompatibility;
-                ShieldCapDamageConfigManager.saveDamagesFromUi(defaults);
+                ShieldCapDamageConfigManager.saveDamagesFromUi(defaults, false);
                 applyDamageHotReloadAsync();
                 sendMessage("Damages reset. Live reload applied.");
                 rebuild();
