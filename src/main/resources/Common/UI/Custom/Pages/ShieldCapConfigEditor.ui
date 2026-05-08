@@ -94,7 +94,7 @@ Group {
     Group { Anchor: (Height: 2); }
 
     Group #TabRow {
-        LayoutMode: Center;
+        LayoutMode: Left;
         Anchor: (Height: 62);
 
         Group #TabHome {
@@ -122,10 +122,11 @@ Group {
 
         Group #TabMain {
             LayoutMode: Top;
-            Anchor: (Width: 152, Height: 54);
+            Anchor: (Height: 54);
+            FlexWeight: 1;
 
             TextButton #TabMainButton {
-                Anchor: (Width: 152, Height: 30, Top: 12);
+                Anchor: (Height: 30, Top: 12);
                 Text: "CONFIG";
                 Style: @TabButtonStyle;
             }
@@ -141,10 +142,11 @@ Group {
 
         Group #TabCraft {
             LayoutMode: Top;
-            Anchor: (Width: 152, Height: 54);
+            Anchor: (Height: 54);
+            FlexWeight: 1;
 
             TextButton #TabCraftButton {
-                Anchor: (Width: 152, Height: 30, Top: 12);
+                Anchor: (Height: 30, Top: 12);
                 Text: "CRAFTING";
                 Style: @TabButtonStyle;
             }
@@ -160,10 +162,11 @@ Group {
 
         Group #TabDamage {
             LayoutMode: Top;
-            Anchor: (Width: 152, Height: 54);
+            Anchor: (Height: 54);
+            FlexWeight: 1;
 
             TextButton #TabDamageButton {
-                Anchor: (Width: 152, Height: 30, Top: 12);
+                Anchor: (Height: 30, Top: 12);
                 Text: "DAMAGES";
                 Style: @TabButtonStyle;
             }
@@ -179,10 +182,11 @@ Group {
 
         Group #TabCompatibility {
             LayoutMode: Top;
-            Anchor: (Width: 152, Height: 54);
+            Anchor: (Height: 54);
+            FlexWeight: 1;
 
             TextButton #TabCompatibilityButton {
-                Anchor: (Width: 152, Height: 30, Top: 12);
+                Anchor: (Height: 30, Top: 12);
                 Text: "COMPATIBILITY";
                 Style: @TabButtonStyle;
             }
@@ -703,6 +707,10 @@ Group {
                 Label { FlexWeight: 1; Text: "Required Bench Tier"; Style: @RowLabelStyle; }
                 NumberField #CraftBenchTierInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
             }
+            Group #CraftEndgameBenchTierRow { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
+                Label { FlexWeight: 1; Text: "Endgame Bench Tier"; Style: @RowLabelStyle; }
+                NumberField #CraftEndgameBenchTierInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
+            }
             Group { LayoutMode: Left; Anchor: (Height: 24);
                 Label { FlexWeight: 1; Text: "Required Memories Level"; Style: @RowLabelStyle; }
                 NumberField #CraftRequiredMemoriesInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 0, Step: 1); }
@@ -926,6 +934,11 @@ Group {
                 Label #DamageLabel18 { FlexWeight: 1; Text: "Damage 18"; Style: @RowLabelStyle; }
                 NumberField #DamageValue18 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
             }
+
+            Group { Anchor: (Height: 12); }
+            Label { Text: "KNOCKBACK AND LAUNCH FORCES"; Anchor: (Height: 20); Style: @SectionLabelStyle; }
+            Group { Anchor: (Height: 6); }
+
             Group #DamageRow19 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
                 Label #DamageLabel19 { FlexWeight: 1; Text: "Damage 19"; Style: @RowLabelStyle; }
                 NumberField #DamageValue19 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
@@ -962,6 +975,19 @@ Group {
                 Label #DamageLabel27 { FlexWeight: 1; Text: "Damage 27"; Style: @RowLabelStyle; }
                 NumberField #DamageValue27 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
             }
+
+            Group { Anchor: (Height: 12); }
+            Label { Text: "COMPATIBILITY"; Anchor: (Height: 20); Style: @SectionLabelStyle; }
+            Group { Anchor: (Height: 6); }
+
+            Group { LayoutMode: Left; Anchor: (Height: 24);
+                CheckBox #DamageModCompatibilityToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
+                Group { Anchor: (Width: 8); }
+                Label { FlexWeight: 1; Text: "Mod Compatibility"; Style: @RowLabelStyle; }
+            }
+            Group { Anchor: (Height: 4); }
+            Label #DamageConfigNote { Text: ""; Anchor: (Height: 112); Style: @NoteTextStyle; }
+
             Group #DamageRow28 { LayoutMode: Left; Anchor: (Height: 24); Visible: false;
                 Label #DamageLabel28 { FlexWeight: 1; Text: "Damage 28"; Style: @RowLabelStyle; }
                 NumberField #DamageValue28 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
@@ -1014,43 +1040,6 @@ Group {
                 Label #DamageLabel40 { FlexWeight: 1; Text: "Damage 40"; Style: @RowLabelStyle; }
                 NumberField #DamageValue40 { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
             }
-
-            Group { Anchor: (Height: 12); }
-            Group { Anchor: (Height: 6); }
-
-            Group { LayoutMode: Left; Anchor: (Height: 24);
-                Label { FlexWeight: 1; Text: "Overcharged Duration"; Style: @RowLabelStyle; }
-                NumberField #OverchargedDurationInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
-            }
-
-            Group { Anchor: (Height: 12); }
-            Label { Text: "LAUNCH FORCES"; Anchor: (Height: 20); Style: @SectionLabelStyle; }
-            Group { Anchor: (Height: 6); }
-
-            Group { LayoutMode: Left; Anchor: (Height: 24);
-                Label { FlexWeight: 1; Text: "Launcher Force"; Style: @RowLabelStyle; }
-                NumberField #LauncherForceInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
-            }
-            Group { LayoutMode: Left; Anchor: (Height: 24);
-                Label { FlexWeight: 1; Text: "Glider Force"; Style: @RowLabelStyle; }
-                NumberField #GliderForceInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
-            }
-            Group { LayoutMode: Left; Anchor: (Height: 24);
-                Label { FlexWeight: 1; Text: "PowerSwing Knockback Force"; Style: @RowLabelStyle; }
-                NumberField #PowerSwingKnockbackForceInput { Anchor: (Width: 140, Height: 24); Background: #200d0d; Padding: (Horizontal: 6); Style: @NumberFieldStyle; PlaceholderStyle: @NumberFieldPlaceholderStyle; Format: (MaxDecimalPlaces: 2, Step: 0.1); }
-            }
-
-            Group { Anchor: (Height: 12); }
-            Label { Text: "COMPATIBILITY"; Anchor: (Height: 20); Style: @SectionLabelStyle; }
-            Group { Anchor: (Height: 6); }
-
-            Group { LayoutMode: Left; Anchor: (Height: 24);
-                CheckBox #DamageModCompatibilityToggle { Anchor: (Width: 18, Height: 18); Background: #371c1c; Padding: (Full: 2); Style: $Common.@DefaultCheckBoxStyle; }
-                Group { Anchor: (Width: 8); }
-                Label { FlexWeight: 1; Text: "Mod Compatibility"; Style: @RowLabelStyle; }
-            }
-            Group { Anchor: (Height: 4); }
-            Label #DamageConfigNote { Text: ""; Anchor: (Height: 112); Style: @NoteTextStyle; }
             Group { Anchor: (Height: 28); }
         }
 

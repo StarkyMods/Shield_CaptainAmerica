@@ -5,8 +5,11 @@ import co.carrd.starkymods.config.ShieldCapConfig;
 import co.carrd.starkymods.config.ShieldCapConfigManager;
 import co.carrd.starkymods.config.ShieldCapCraft;
 import co.carrd.starkymods.config.ShieldCapCraftConfigManager;
+import co.carrd.starkymods.config.ShieldCapDamageConfigManager;
+import co.carrd.starkymods.config.ShieldCapDamages;
 import co.carrd.starkymods.config.ShieldCapDurabilityAssetOverrideManager;
 import co.carrd.starkymods.config.ShieldCapDurabilityLiveUpdater;
+import co.carrd.starkymods.damage.ShieldCapDamageAssetGenerator;
 import co.carrd.starkymods.recipe.ShieldCapRecipeOverrideManager;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -37,7 +40,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfigPage.PageEventData> {
     private static final String SETTINGS_UI_PATH = "Pages/ShieldCapConfigEditor.ui";
@@ -49,6 +54,11 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
     private static final String COMPATIBILITY_TAB = "compatibility";
     private static final String MANIFEST_PATH = "manifest.json";
     private static final int MAX_INGREDIENT_ROWS = 12;
+    private static final int MAX_DAMAGE_ROWS = 40;
+    private static final String NORMAL_BENCH_ID = "Armor_Bench";
+    private static final String NORMAL_BENCH_CATEGORY = "Weapon_Shield";
+    private static final String ENDGAME_BENCH_ID = "Endgame_Bench";
+    private static final String ENDGAME_BENCH_CATEGORY = "Endgame_Armor_Prisma";
 
     private static final String HOME_STARKYMODS_URL = "https://starkymods.carrd.co/";
     private static final String HOME_DISCORD_URL = "https://discord.gg/twWWmtnp82";
@@ -110,16 +120,19 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         commands.set("#CompatibilityTab.Visible", COMPATIBILITY_TAB.equals(activeTab));
 
         applyMainConfigToUI(commands);
+        refreshCraftConfigForDisplay();
         applyCraftConfigToUI(commands);
+        refreshDamageConfigForDisplay();
+        applyDamageConfigToUI(commands);
         if (!editable) {
             applyReadOnlyState(commands);
         }
 
-        bind(events, "#TabHomeButton", "tab:" + HOME_TAB);
-        bind(events, "#TabMainButton", "tab:" + CONFIG_TAB);
-        bind(events, "#TabCraftButton", "tab:" + CRAFT_TAB);
-        bind(events, "#TabDamageButton", "tab:" + DAMAGE_TAB);
-        bind(events, "#TabCompatibilityButton", "tab:" + COMPATIBILITY_TAB);
+        events.addEventBinding(CustomUIEventBindingType.Activating, "#TabHomeButton", buildEventData("tab:" + HOME_TAB));
+        events.addEventBinding(CustomUIEventBindingType.Activating, "#TabMainButton", buildEventData("tab:" + CONFIG_TAB));
+        events.addEventBinding(CustomUIEventBindingType.Activating, "#TabCraftButton", buildEventData("tab:" + CRAFT_TAB));
+        events.addEventBinding(CustomUIEventBindingType.Activating, "#TabDamageButton", buildEventData("tab:" + DAMAGE_TAB));
+        events.addEventBinding(CustomUIEventBindingType.Activating, "#TabCompatibilityButton", buildEventData("tab:" + COMPATIBILITY_TAB));
         bind(events, "#CloseUIButton", "close");
 
         bind(events, "#HomeWebsiteButton", "home:link:starkymods");
@@ -155,9 +168,14 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         }
         String action = data.action.trim();
         if (action.startsWith("tab:")) {
-            syncIngredientDraftFromData(data);
+            if (CRAFT_TAB.equals(activeTab)) {
+                syncIngredientDraftFromData(data);
+            }
             String tab = action.substring("tab:".length()).trim();
             if (!tab.isBlank()) {
+                if (CRAFT_TAB.equals(tab) && !CRAFT_TAB.equals(activeTab)) {
+                    craftIngredientDraft = null;
+                }
                 activeTab = tab;
                 rebuild();
             }
@@ -193,6 +211,12 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
                 rebuild();
                 return;
             }
+            if (DAMAGE_TAB.equals(tab) && editable) {
+                applyDamageConfig(data);
+                sendMessage("Damages saved. Live reload applied.");
+                rebuild();
+                return;
+            }
             sendMessage("This SHIELDCAP UI tab is not connected yet.");
             rebuild();
             return;
@@ -201,17 +225,40 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
             String tab = action.substring("reset:".length()).trim();
             if (CONFIG_TAB.equals(tab) && editable) {
                 ShieldCapConfigManager.resetMainConfigToDefaults();
-                ShieldCapRecipeOverrideManager.applyConfiguredRecipe();
                 refreshPlayerVisuals(store, ref);
                 sendMessage("Config reset. Live reload applied.");
                 rebuild();
                 return;
             }
             if (CRAFT_TAB.equals(tab) && editable) {
-                ShieldCapCraftConfigManager.resetCraftToDefaults();
+                StarkyShieldCaptainAmerica plugin = StarkyShieldCaptainAmerica.getInstance();
+                if (plugin != null) {
+                    plugin.markInternalCraftConfigWrite();
+                }
+                ShieldCapCraft defaults = ShieldCapCraftConfigManager.createDefaultCraftConfigSnapshot();
+                defaults.modCompatibility = data.craftModCompatibility;
+                ShieldCapCraftConfigManager.saveCraftState(defaults);
+                if (data.craftModCompatibility && isEndgameQoLActive()) {
+                    ShieldCapCraftConfigManager.applyEndgameCraftCompatibilityProfile();
+                }
                 craftIngredientDraft = cloneIngredients(ShieldCapCraftConfigManager.getConfig().Input);
-                applyCraftHotReload();
+                applyCraftHotReloadAsync();
                 sendMessage("Crafting reset. Live reload applied.");
+                rebuild();
+                return;
+            }
+            if (DAMAGE_TAB.equals(tab) && editable) {
+                StarkyShieldCaptainAmerica plugin = StarkyShieldCaptainAmerica.getInstance();
+                if (plugin != null) {
+                    plugin.markInternalDamageConfigWrite();
+                }
+                ShieldCapDamages defaults = data.damageModCompatibility && plugin != null
+                        ? ShieldCapDamageConfigManager.createDamageConfigSnapshotForProfile(plugin.getActiveDamageCompatibilityProfile())
+                        : ShieldCapDamageConfigManager.createDefault();
+                defaults.modCompatibility = data.damageModCompatibility;
+                ShieldCapDamageConfigManager.saveDamagesFromUi(defaults);
+                applyDamageHotReloadAsync();
+                sendMessage("Damages reset. Live reload applied.");
                 rebuild();
                 return;
             }
@@ -230,23 +277,43 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
     }
 
     private void bind(UIEventBuilder events, String selector, String action) {
-        events.addEventBinding(CustomUIEventBindingType.Activating, selector, new EventData().append("Action", action));
+        events.addEventBinding(CustomUIEventBindingType.Activating, selector, buildEventData(action));
     }
 
-    private EventData buildCraftEventData(String action) {
+    private EventData buildEventData(String action) {
         if (!editable) {
             return new EventData().append("Action", action);
         }
         EventData data = new EventData()
                 .append("Action", action)
+                .append("@allowShieldCraft", "#AllowCraftingToggle.Value")
+                .append("@shieldKeepsSignatureEnergyWhenSwapped", "#KeepSignatureEnergyToggle.Value")
+                .append("@visualShieldInPlayersBack", "#VisualShieldInPlayersBackToggle.Value")
+                .append("@fallResistanceWhenBlocking", "#FallResistanceWhenBlockingToggle.Value")
+                .append("@damageFromTheBackResistance", "#DamageFromBackResistanceToggle.Value")
+                .append("@doubleJump", "#DoubleJumpToggle.Value")
+                .append("@fallStarAttack", "#FallStarAttackToggle.Value")
+                .append("@guardBash", "#GuardBashToggle.Value")
+                .append("@guardBashPushLaunch", "#GuardBashPushLaunchToggle.Value")
+                .append("@sprintAttack", "#SprintAttackToggle.Value")
+                .append("@kickPushAttack", "#KickPushAttackToggle.Value")
+                .append("@throwAttack", "#ThrowToggle.Value")
+                .append("@throwLeftHand", "#ThrowLeftHandToggle.Value")
+                .append("@furiousOnslaught", "#FuriousOnslaughtToggle.Value")
+                .append("@guardBashShockwaveWithMjolnir", "#GuardBashShockwaveMjolnirToggle.Value")
                 .append("@weaponMaxDurability", "#WeaponMaxDurabilityInput.Value")
                 .append("@craftModCompatibility", "#CraftModCompatibilityToggle.Value")
                 .append("@craftTimeSeconds", "#CraftTimeSecondsInput.Value")
                 .append("@craftBenchTier", "#CraftBenchTierInput.Value")
-                .append("@craftRequiredMemoriesLevel", "#CraftRequiredMemoriesInput.Value");
+                .append("@craftEndgameBenchTier", "#CraftEndgameBenchTierInput.Value")
+                .append("@craftRequiredMemoriesLevel", "#CraftRequiredMemoriesInput.Value")
+                .append("@damageModCompatibility", "#DamageModCompatibilityToggle.Value");
         for (int i = 1; i <= MAX_INGREDIENT_ROWS; i++) {
             data.append("@ingredientId" + i, "#IngredientId" + i + ".Value");
             data.append("@ingredientQty" + i, "#IngredientQuantity" + i + ".Value");
+        }
+        for (int i = 1; i <= MAX_DAMAGE_ROWS; i++) {
+            data.append("@damageValue" + i, "#DamageValue" + i + ".Value");
         }
         return data;
     }
@@ -255,43 +322,27 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         events.addEventBinding(
                 CustomUIEventBindingType.Activating,
                 "#SaveMainButton",
-                new EventData()
-                        .append("Action", "apply:" + CONFIG_TAB)
-                        .append("@allowShieldCraft", "#AllowCraftingToggle.Value")
-                        .append("@shieldKeepsSignatureEnergyWhenSwapped", "#KeepSignatureEnergyToggle.Value")
-                        .append("@visualShieldInPlayersBack", "#VisualShieldInPlayersBackToggle.Value")
-                        .append("@fallResistanceWhenBlocking", "#FallResistanceWhenBlockingToggle.Value")
-                        .append("@damageFromTheBackResistance", "#DamageFromBackResistanceToggle.Value")
-                        .append("@doubleJump", "#DoubleJumpToggle.Value")
-                        .append("@fallStarAttack", "#FallStarAttackToggle.Value")
-                        .append("@guardBash", "#GuardBashToggle.Value")
-                        .append("@guardBashPushLaunch", "#GuardBashPushLaunchToggle.Value")
-                        .append("@sprintAttack", "#SprintAttackToggle.Value")
-                        .append("@kickPushAttack", "#KickPushAttackToggle.Value")
-                        .append("@throwAttack", "#ThrowToggle.Value")
-                        .append("@throwLeftHand", "#ThrowLeftHandToggle.Value")
-                        .append("@furiousOnslaught", "#FuriousOnslaughtToggle.Value")
-                        .append("@guardBashShockwaveWithMjolnir", "#GuardBashShockwaveMjolnirToggle.Value")
+                buildEventData("apply:" + CONFIG_TAB)
         );
-        bind(events, "#ResetMainButton", "reset:" + CONFIG_TAB);
+        events.addEventBinding(CustomUIEventBindingType.Activating, "#ResetMainButton", buildEventData("reset:" + CONFIG_TAB));
         events.addEventBinding(
                 CustomUIEventBindingType.Activating,
                 "#SaveCraftButton",
-                buildCraftEventData("apply:" + CRAFT_TAB)
+                buildEventData("apply:" + CRAFT_TAB)
         );
-        bind(events, "#SaveDamageButton", "apply:" + DAMAGE_TAB);
-        bind(events, "#ResetCraftButton", "reset:" + CRAFT_TAB);
-        bind(events, "#ResetDamageButton", "reset:" + DAMAGE_TAB);
+        events.addEventBinding(CustomUIEventBindingType.Activating, "#SaveDamageButton", buildEventData("apply:" + DAMAGE_TAB));
+        events.addEventBinding(CustomUIEventBindingType.Activating, "#ResetCraftButton", buildEventData("reset:" + CRAFT_TAB));
+        events.addEventBinding(CustomUIEventBindingType.Activating, "#ResetDamageButton", buildEventData("reset:" + DAMAGE_TAB));
         events.addEventBinding(
                 CustomUIEventBindingType.Activating,
                 "#AddIngredientButton",
-                buildCraftEventData("ingredient:add")
+                buildEventData("ingredient:add")
         );
         for (int i = 1; i <= MAX_INGREDIENT_ROWS; i++) {
             events.addEventBinding(
                     CustomUIEventBindingType.Activating,
                     "#IngredientRemove" + i,
-                    buildCraftEventData("ingredient:remove:" + i)
+                    buildEventData("ingredient:remove:" + i)
             );
         }
     }
@@ -334,6 +385,9 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         setNumericField(commands, "#WeaponMaxDurabilityInput", numberOrZero(config.weaponMaxDurability));
         setNumericField(commands, "#CraftTimeSecondsInput", Math.max(0, config.TimeSeconds));
         setNumericField(commands, "#CraftBenchTierInput", resolveBenchTier(config));
+        boolean hasEndgameBench = hasBench(config, ENDGAME_BENCH_ID);
+        commands.set("#CraftEndgameBenchTierRow.Visible", hasEndgameBench);
+        setNumericField(commands, "#CraftEndgameBenchTierInput", hasEndgameBench ? resolveEndgameBenchTier(config) : 0);
         setNumericField(commands, "#CraftRequiredMemoriesInput", Math.max(0, config.RequiredMemoriesLevel));
         if (editable) {
             commands.set("#CraftConfigNote.Text", joinLines(config.modCompatibilityNote));
@@ -354,6 +408,45 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
             setTextField(commands, "#IngredientId" + index, entry == null ? "" : entry.ItemId);
             setNumericField(commands, "#IngredientQuantity" + index, entry == null ? 0 : Math.max(0, entry.Quantity));
         }
+    }
+
+    private void applyDamageConfigToUI(UICommandBuilder commands) {
+        ShieldCapDamages config = ShieldCapDamageConfigManager.getConfig();
+        List<ShieldCapDamageConfigManager.DamageDefinition> rows = damageRows();
+        for (int i = 1; i <= MAX_DAMAGE_ROWS; i++) {
+            commands.set("#DamageRow" + i + ".Visible", false);
+            commands.set("#DamageLabel" + i + ".Text", "");
+            setNumericField(commands, "#DamageValue" + i, 0);
+        }
+
+        int rowCount = Math.min(MAX_DAMAGE_ROWS, rows.size());
+        for (int i = 0; i < rowCount; i++) {
+            int row = i + 1;
+            ShieldCapDamageConfigManager.DamageDefinition definition = rows.get(i);
+            boolean launchForce = ShieldCapDamageConfigManager.getLaunchForceDefinitions().contains(definition);
+            commands.set("#DamageRow" + row + ".Visible", true);
+            commands.set("#DamageLabel" + row + ".Text", definition.displayKey());
+            double value = launchForce
+                    ? config.getLaunchForce(definition.displayKey())
+                    : config.getDamage(definition.displayKey());
+            setNumericField(commands, "#DamageValue" + row, value);
+        }
+        if (editable) {
+            commands.set("#DamageModCompatibilityToggle.Value", config.modCompatibility == null || config.modCompatibility);
+            commands.set("#DamageConfigNote.Text", joinLines(config.modCompatibilityNote));
+        }
+
+    }
+
+    private void refreshCraftConfigForDisplay() {
+        if (editable && craftIngredientDraft != null) {
+            return;
+        }
+        ShieldCapCraftConfigManager.reloadCraftIfValid();
+    }
+
+    private void refreshDamageConfigForDisplay() {
+        ShieldCapDamageConfigManager.reloadDamagesIfValid();
     }
 
     private void applyReadOnlyState(UICommandBuilder commands) {
@@ -380,6 +473,14 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         commands.set("#SaveCraftButton.Disabled", true);
         commands.set("#ResetCraftButton.Visible", false);
         commands.set("#ResetCraftButton.Disabled", true);
+        commands.set("#SaveDamageButton.Visible", false);
+        commands.set("#SaveDamageButton.Disabled", true);
+        commands.set("#ResetDamageButton.Visible", false);
+        commands.set("#ResetDamageButton.Disabled", true);
+        commands.set("#DamageModCompatibilityToggle.Disabled", true);
+        for (int i = 1; i <= MAX_DAMAGE_ROWS; i++) {
+            commands.set("#DamageValue" + i + ".Disabled", true);
+        }
         commands.set("#AddIngredientButton.Visible", false);
         commands.set("#AddIngredientButton.Disabled", true);
         for (int i = 1; i <= MAX_INGREDIENT_ROWS; i++) {
@@ -406,7 +507,6 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         config.furiousOnslaught = data.furiousOnslaught;
         config.guardBashShockwaveWithMjolnir = data.guardBashShockwaveWithMjolnir;
         ShieldCapConfigManager.saveMainConfigState(config);
-        ShieldCapRecipeOverrideManager.applyConfiguredRecipe();
         refreshPlayerVisuals(store, ref);
     }
 
@@ -420,23 +520,82 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         config.modCompatibility = data.craftModCompatibility;
         config.TimeSeconds = clampInt(data.craftTimeSeconds, 1);
         config.RequiredMemoriesLevel = clampInt(data.craftRequiredMemoriesLevel, 0);
-        applyBenchTier(config, clampInt(data.craftBenchTier, 0));
+        boolean hadEndgameBench = hasBench(config, ENDGAME_BENCH_ID);
+        applyBenchTier(config, NORMAL_BENCH_ID, NORMAL_BENCH_CATEGORY, clampInt(data.craftBenchTier, 0), true);
+        if (hadEndgameBench) {
+            applyBenchTier(config, ENDGAME_BENCH_ID, ENDGAME_BENCH_CATEGORY, clampInt(data.craftEndgameBenchTier, 0), false);
+        }
         syncIngredientDraftFromData(data);
         config.Input = buildIngredientsFromDraft();
 
+        StarkyShieldCaptainAmerica plugin = StarkyShieldCaptainAmerica.getInstance();
+        if (plugin != null) {
+            plugin.markInternalCraftConfigWrite();
+        }
         ShieldCapCraftConfigManager.saveCraftState(config);
         craftIngredientDraft = cloneIngredients(ShieldCapCraftConfigManager.getConfig().Input);
-        applyCraftHotReload();
+        applyCraftHotReloadAsync();
+    }
+
+    private void applyDamageConfig(PageEventData data) {
+        ShieldCapDamages config = ShieldCapDamageConfigManager.getConfigSnapshot();
+        if (config == null) {
+            config = new ShieldCapDamages();
+        }
+        config.modCompatibility = data.damageModCompatibility;
+        config.legacyDisableCompatibilityProfiles = null;
+        config.damageValues = new LinkedHashMap<>();
+        config.launchForces = new LinkedHashMap<>();
+
+        List<ShieldCapDamageConfigManager.DamageDefinition> rows = damageRows();
+        for (int i = 0; i < Math.min(rows.size(), MAX_DAMAGE_ROWS); i++) {
+            ShieldCapDamageConfigManager.DamageDefinition definition = rows.get(i);
+            double value = Math.max(0.0, data.damageValues[i]);
+            if (ShieldCapDamageConfigManager.getLaunchForceDefinitions().contains(definition)) {
+                config.launchForces.put(definition.displayKey(), value);
+            } else {
+                config.damageValues.put(definition.displayKey(), value);
+            }
+        }
+
+        StarkyShieldCaptainAmerica plugin = StarkyShieldCaptainAmerica.getInstance();
+        if (plugin != null) {
+            plugin.markInternalDamageConfigWrite();
+        }
+        ShieldCapDamageConfigManager.saveDamagesFromUi(config);
+        applyDamageHotReloadAsync();
+    }
+
+    private void applyDamageHotReloadAsync() {
+        runAsync("ShieldCapDamageApply", ShieldCapDamageAssetGenerator::generateAndReload);
+    }
+
+    private List<ShieldCapDamageConfigManager.DamageDefinition> damageRows() {
+        return ShieldCapDamageConfigManager.getAllDefinitions();
+    }
+
+    private void applyCraftHotReloadAsync() {
+        runAsync("ShieldCapCraftApply", this::applyCraftHotReload);
     }
 
     private void applyCraftHotReload() {
-        ShieldCapRecipeOverrideManager.applyConfiguredRecipe();
-        ShieldCapDurabilityAssetOverrideManager.applyConfiguredDurabilityAssets();
-        ShieldCapCraft config = ShieldCapCraftConfigManager.getConfig();
-        ShieldCapDurabilityLiveUpdater.applyEverywhereLoaded(config == null ? null : config.weaponMaxDurability);
+        try {
+            ShieldCapRecipeOverrideManager.applyConfiguredRecipe();
+            ShieldCapDurabilityAssetOverrideManager.applyConfiguredDurabilityAssets();
+            ShieldCapCraft config = ShieldCapCraftConfigManager.getConfig();
+            ShieldCapDurabilityLiveUpdater.applyEverywhereLoaded(config == null ? null : config.weaponMaxDurability);
+        } catch (Exception e) {
+            sendMessage("Live reload failed: " + e.getMessage());
+        }
     }
 
-    private void applyBenchTier(ShieldCapCraft config, int tier) {
+    private void runAsync(String name, Runnable task) {
+        Thread thread = new Thread(task, name);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private void applyBenchTier(ShieldCapCraft config, String benchId, String category, int tier, boolean makePrimary) {
         if (config == null) {
             return;
         }
@@ -444,21 +603,24 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         List<ShieldCapCraft.BenchConfig> benches = config.BenchRequirements == null
                 ? new ArrayList<>()
                 : new ArrayList<>(config.BenchRequirements);
-        ShieldCapCraft.BenchConfig target = benches.isEmpty() ? null : benches.get(0);
+        ShieldCapCraft.BenchConfig target = findBenchInList(benches, benchId);
         if (target == null) {
-            target = copyBench(config.Bench);
-            if (target == null) {
-                target = new ShieldCapCraft.BenchConfig();
-            }
+            target = createBench(benchId, category);
             benches.add(target);
         }
 
         target.RequiredTierLevel = Math.max(0, tier);
         config.BenchRequirements = benches;
-        config.Bench = copyBench(target);
+        if (makePrimary) {
+            config.Bench = copyBench(target);
+        }
     }
 
     private int resolveBenchTier(ShieldCapCraft config) {
+        ShieldCapCraft.BenchConfig bench = findBench(config, NORMAL_BENCH_ID);
+        if (bench != null) {
+            return Math.max(0, bench.RequiredTierLevel);
+        }
         if (config == null) {
             return 0;
         }
@@ -472,6 +634,11 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         return 0;
     }
 
+    private int resolveEndgameBenchTier(ShieldCapCraft config) {
+        ShieldCapCraft.BenchConfig bench = findBench(config, ENDGAME_BENCH_ID);
+        return bench == null ? 0 : Math.max(0, bench.RequiredTierLevel);
+    }
+
     private ShieldCapCraft.BenchConfig copyBench(ShieldCapCraft.BenchConfig source) {
         ShieldCapCraft.BenchConfig copy = new ShieldCapCraft.BenchConfig();
         if (source == null) {
@@ -481,6 +648,46 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         copy.RequiredTierLevel = source.RequiredTierLevel;
         copy.Categories = source.Categories == null ? new ArrayList<>() : new ArrayList<>(source.Categories);
         return copy;
+    }
+
+    private ShieldCapCraft.BenchConfig createBench(String id, String category) {
+        ShieldCapCraft.BenchConfig bench = new ShieldCapCraft.BenchConfig();
+        bench.Id = id;
+        bench.Categories = new ArrayList<>();
+        if (category != null && !category.isBlank()) {
+            bench.Categories.add(category);
+        }
+        return bench;
+    }
+
+    private boolean hasBench(ShieldCapCraft config, String id) {
+        return findBench(config, id) != null;
+    }
+
+    private ShieldCapCraft.BenchConfig findBench(ShieldCapCraft config, String id) {
+        if (config == null || id == null) {
+            return null;
+        }
+        ShieldCapCraft.BenchConfig fromList = findBenchInList(config.BenchRequirements, id);
+        if (fromList != null) {
+            return fromList;
+        }
+        if (config.Bench != null && config.Bench.Id != null && id.equalsIgnoreCase(config.Bench.Id)) {
+            return config.Bench;
+        }
+        return null;
+    }
+
+    private ShieldCapCraft.BenchConfig findBenchInList(List<ShieldCapCraft.BenchConfig> benches, String id) {
+        if (benches == null || id == null) {
+            return null;
+        }
+        for (ShieldCapCraft.BenchConfig bench : benches) {
+            if (bench != null && bench.Id != null && id.equalsIgnoreCase(bench.Id)) {
+                return bench;
+            }
+        }
+        return null;
     }
 
     private void refreshPlayerVisuals(Store<EntityStore> store, Ref<EntityStore> ref) {
@@ -555,6 +762,12 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         return pluginManager != null && pluginManager.getPlugin(pluginId) != null;
     }
 
+    private boolean isEndgameQoLActive() {
+        PluginManager pluginManager = PluginManager.get();
+        return pluginManager != null
+                && pluginManager.getPlugin(new PluginIdentifier("Config", "Endgame&QoL")) != null;
+    }
+
     private void executePlayerCommand(String command) {
         if (command == null || command.isBlank()) {
             return;
@@ -569,6 +782,9 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
     }
 
     private List<ShieldCapCraft.IngredientEntry> getIngredientDraft(ShieldCapCraft config) {
+        if (!editable) {
+            return cloneIngredients(config == null ? null : config.Input);
+        }
         if (craftIngredientDraft != null) {
             return craftIngredientDraft;
         }
@@ -681,7 +897,12 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
     }
 
     private void setTextField(UICommandBuilder commands, String selector, String value) {
-        commands.set(selector + (editable ? ".Value" : ".Text"), safeText(value));
+        String text = safeText(value);
+        if (editable) {
+            commands.set(selector + ".Value", text);
+            return;
+        }
+        commands.set(selector + ".Text", text);
     }
 
     private void setNumericField(UICommandBuilder commands, String selector, double value) {
@@ -820,9 +1041,12 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         public boolean craftModCompatibility;
         public double craftTimeSeconds;
         public double craftBenchTier;
+        public double craftEndgameBenchTier;
         public double craftRequiredMemoriesLevel;
+        public boolean damageModCompatibility;
         public final String[] ingredientIds = new String[MAX_INGREDIENT_ROWS];
         public final double[] ingredientQuantities = new double[MAX_INGREDIENT_ROWS];
+        public final double[] damageValues = new double[MAX_DAMAGE_ROWS];
 
         private static BuilderCodec<PageEventData> buildCodec() {
             BuilderCodec.Builder<PageEventData> builder =
@@ -869,8 +1093,12 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
                     (d, v) -> d.craftTimeSeconds = v, d -> d.craftTimeSeconds).add();
             builder.append(new KeyedCodec<>("@craftBenchTier", Codec.DOUBLE),
                     (d, v) -> d.craftBenchTier = v, d -> d.craftBenchTier).add();
+            builder.append(new KeyedCodec<>("@craftEndgameBenchTier", Codec.DOUBLE),
+                    (d, v) -> d.craftEndgameBenchTier = v, d -> d.craftEndgameBenchTier).add();
             builder.append(new KeyedCodec<>("@craftRequiredMemoriesLevel", Codec.DOUBLE),
                     (d, v) -> d.craftRequiredMemoriesLevel = v, d -> d.craftRequiredMemoriesLevel).add();
+            builder.append(new KeyedCodec<>("@damageModCompatibility", Codec.BOOLEAN),
+                    (d, v) -> d.damageModCompatibility = v, d -> d.damageModCompatibility).add();
             for (int i = 0; i < MAX_INGREDIENT_ROWS; i++) {
                 int index = i;
                 builder.append(new KeyedCodec<>("@ingredientId" + (i + 1), Codec.STRING),
@@ -879,6 +1107,12 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
                 builder.append(new KeyedCodec<>("@ingredientQty" + (i + 1), Codec.DOUBLE),
                         (d, v) -> d.ingredientQuantities[index] = v,
                         d -> d.ingredientQuantities[index]).add();
+            }
+            for (int i = 0; i < MAX_DAMAGE_ROWS; i++) {
+                int index = i;
+                builder.append(new KeyedCodec<>("@damageValue" + (i + 1), Codec.DOUBLE),
+                        (d, v) -> d.damageValues[index] = v,
+                        d -> d.damageValues[index]).add();
             }
             return builder.build();
         }

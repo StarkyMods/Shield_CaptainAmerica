@@ -31,6 +31,10 @@ public final class ShieldCapCraftConfigManager {
     private static final String SHIELD_RECIPE_ID = "ShieldCap_Craft";
     private static final String VIBRANIUM_SHIELD_RECIPE_ID = "ShieldCap_Vibranium_Craft";
     private static final String CARTER_SHIELD_RECIPE_ID = "ShieldCap_CaptainCarter_Craft";
+    private static final String NORMAL_BENCH_ID = "Armor_Bench";
+    private static final String NORMAL_BENCH_CATEGORY = "Weapon_Shield";
+    private static final String ENDGAME_BENCH_ID = "Endgame_Bench";
+    private static final String ENDGAME_BENCH_CATEGORY = "Endgame_Armor_Prisma";
     private static final List<String> SHIELD_RECIPE_IDS =
             List.of(SHIELD_RECIPE_ID, VIBRANIUM_SHIELD_RECIPE_ID, CARTER_SHIELD_RECIPE_ID);
     private static final String PRIMARY_WEAPON_ASSET_PATH =
@@ -75,6 +79,10 @@ public final class ShieldCapCraftConfigManager {
 
     public static ShieldCapCraft getConfigSnapshot() {
         return cloneCraft(getConfig());
+    }
+
+    public static ShieldCapCraft createDefaultCraftConfigSnapshot() {
+        return createDefault();
     }
 
     public static File getCraftConfigFile() {
@@ -143,6 +151,10 @@ public final class ShieldCapCraftConfigManager {
         return getConfig() == null || !Boolean.FALSE.equals(getConfig().modCompatibility);
     }
 
+    public static boolean hasEndgameBenchRequirement() {
+        return findBench(getConfig(), ENDGAME_BENCH_ID) != null;
+    }
+
     public static boolean applyEndgameCraftCompatibilityProfile() {
         ShieldCapCraft current = getConfig();
         if (current == null) {
@@ -156,9 +168,24 @@ public final class ShieldCapCraftConfigManager {
         desiredCraft.Input.add(new ShieldCapCraft.IngredientEntry("Ingredient_Bar_Mithril", 10));
         desiredCraft.Input.add(new ShieldCapCraft.IngredientEntry("Ingredient_Leather_Prismic", 15));
         desiredCraft.Input.add(new ShieldCapCraft.IngredientEntry("Alpha_Rex_Leather", 1));
+        ShieldCapCraft.BenchConfig normalBench = findBench(current, NORMAL_BENCH_ID);
+        if (normalBench == null) {
+            ShieldCapCraft defaults = createDefault();
+            normalBench = findBench(defaults, NORMAL_BENCH_ID);
+        }
+        if (normalBench == null) {
+            normalBench = createBench(NORMAL_BENCH_ID, 3, NORMAL_BENCH_CATEGORY);
+        }
+
+        ShieldCapCraft.BenchConfig endgameBench = findBench(current, ENDGAME_BENCH_ID);
+        if (endgameBench == null) {
+            endgameBench = createBench(ENDGAME_BENCH_ID, 0, ENDGAME_BENCH_CATEGORY);
+        }
+
         desiredCraft.BenchRequirements = new ArrayList<>();
-        desiredCraft.BenchRequirements.add(createBench("Endgame_Bench", 0, "Endgame_Armor_Prisma"));
-        desiredCraft.Bench = cloneBench(desiredCraft.BenchRequirements.get(0));
+        desiredCraft.BenchRequirements.add(cloneBench(normalBench));
+        desiredCraft.BenchRequirements.add(cloneBench(endgameBench));
+        desiredCraft.Bench = cloneBench(normalBench);
 
         boolean changed = !craftRecipeFieldsEqual(current, desiredCraft);
         current.Input = cloneIngredients(desiredCraft.Input);
@@ -272,7 +299,7 @@ public final class ShieldCapCraftConfigManager {
         craft.Input.add(new ShieldCapCraft.IngredientEntry("Ingredient_Fabric_Scrap_Cindercloth", 20));
         craft.Input.add(new ShieldCapCraft.IngredientEntry("Ingredient_Bar_Iron", 50));
         craft.Input.add(new ShieldCapCraft.IngredientEntry("Ingredient_Bar_Cobalt", 10));
-        craft.Bench = createBench("Armor_Bench", 3, "Weapon_Shield");
+        craft.Bench = createBench(NORMAL_BENCH_ID, 3, NORMAL_BENCH_CATEGORY);
         craft.BenchRequirements.add(cloneBench(craft.Bench));
         craft.TimeSeconds = 4;
         craft.RequiredMemoriesLevel = 2;
@@ -353,6 +380,14 @@ public final class ShieldCapCraftConfigManager {
             changed = true;
         } else {
             if (normalizeBenchList(target.BenchRequirements, defaults.BenchRequirements)) {
+                changed = true;
+            }
+            if (findBenchInList(target.BenchRequirements, ENDGAME_BENCH_ID) != null
+                    && findBenchInList(target.BenchRequirements, NORMAL_BENCH_ID) == null) {
+                ShieldCapCraft.BenchConfig normalBench = findBench(defaults, NORMAL_BENCH_ID);
+                target.BenchRequirements.add(0, normalBench == null
+                        ? createBench(NORMAL_BENCH_ID, 3, NORMAL_BENCH_CATEGORY)
+                        : cloneBench(normalBench));
                 changed = true;
             }
             if (!benchEquals(target.Bench, target.BenchRequirements.get(0))) {
@@ -588,6 +623,32 @@ public final class ShieldCapCraftConfigManager {
         return Objects.equals(left.Id, right.Id)
                 && left.RequiredTierLevel == right.RequiredTierLevel
                 && Objects.equals(left.Categories, right.Categories);
+    }
+
+    private static ShieldCapCraft.BenchConfig findBench(ShieldCapCraft craft, String id) {
+        if (craft == null || id == null) {
+            return null;
+        }
+        ShieldCapCraft.BenchConfig fromList = findBenchInList(craft.BenchRequirements, id);
+        if (fromList != null) {
+            return fromList;
+        }
+        if (craft.Bench != null && id.equalsIgnoreCase(craft.Bench.Id)) {
+            return craft.Bench;
+        }
+        return null;
+    }
+
+    private static ShieldCapCraft.BenchConfig findBenchInList(List<ShieldCapCraft.BenchConfig> benches, String id) {
+        if (benches == null || id == null) {
+            return null;
+        }
+        for (ShieldCapCraft.BenchConfig bench : benches) {
+            if (bench != null && bench.Id != null && id.equalsIgnoreCase(bench.Id)) {
+                return bench;
+            }
+        }
+        return null;
     }
 
     private static boolean craftRecipeFieldsEqual(ShieldCapCraft left, ShieldCapCraft right) {

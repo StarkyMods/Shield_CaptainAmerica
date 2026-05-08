@@ -1,5 +1,6 @@
 package co.carrd.starkymods.config;
 
+import co.carrd.starkymods.util.ShieldCapInventoryCompat;
 import com.hypixel.hytale.component.Archetype;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -58,6 +59,21 @@ public final class ShieldCapDurabilityLiveUpdater {
         updatedStacks += applyToOnlinePlayers(newMaxDurability);
         updatedStacks += applyToLoadedWorldData(universe, newMaxDurability);
         return updatedStacks;
+    }
+
+    public static int applyToOnlinePlayers(Integer configuredMaxDurability) {
+        if (configuredMaxDurability == null) {
+            return 0;
+        }
+
+        return applyToOnlinePlayers(Math.max(0, configuredMaxDurability));
+    }
+
+    public static int applyToPlayerRef(PlayerRef playerRef, Integer configuredMaxDurability) {
+        if (playerRef == null || configuredMaxDurability == null) {
+            return 0;
+        }
+        return applyToPlayerThreadSafe(playerRef, Math.max(0, configuredMaxDurability));
     }
 
     private static int applyToOnlinePlayers(int newMaxDurability) {
@@ -301,6 +317,9 @@ public final class ShieldCapDurabilityLiveUpdater {
         updated += applyToContainer(inventory.getUtility(), newMaxDurability);
         updated += applyToContainer(inventory.getTools(), newMaxDurability);
         updated += applyToContainer(inventory.getArmor(), newMaxDurability);
+
+        ItemContainer everything = ShieldCapInventoryCompat.getCombinedEverything(inventory);
+        updated += applyToContainer(everything, newMaxDurability);
         return updated;
     }
 

@@ -27,6 +27,7 @@ public final class ShieldCapPacketListener {
             StarkyShieldCaptainAmerica plugin = StarkyShieldCaptainAmerica.getInstance();
             if (plugin != null) {
                 plugin.pollCraftHotReload(player, isOp);
+                plugin.pollDamageHotReload(player, isOp);
             }
 
             if (!(packet instanceof SendWindowAction sendWindowAction)) {

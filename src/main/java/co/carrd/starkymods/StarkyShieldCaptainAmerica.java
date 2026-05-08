@@ -5,8 +5,12 @@ import co.carrd.starkymods.commands.ShieldCapConfigCommand;
 import co.carrd.starkymods.config.ShieldCapConfigManager;
 import co.carrd.starkymods.config.ShieldCapCraftConfigManager;
 import co.carrd.starkymods.config.ShieldCapCraftHotReloadService;
+import co.carrd.starkymods.config.ShieldCapDamageCompatibilityProfile;
+import co.carrd.starkymods.config.ShieldCapDamageConfigManager;
 import co.carrd.starkymods.config.ShieldCapDurabilityAssetOverrideManager;
 import co.carrd.starkymods.config.ShieldCapDurabilityLiveUpdater;
+import co.carrd.starkymods.damage.ShieldCapDamageAssetGenerator;
+import co.carrd.starkymods.damage.ShieldCapDamageHotReloadService;
 import co.carrd.starkymods.interactions.ShieldCapRefreshVisualsInteraction;
 import co.carrd.starkymods.interactions.ShieldCapSignatureEnergySave;
 import co.carrd.starkymods.interactions.ShieldCapSignatureEnergyLoad;
@@ -90,6 +94,7 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
     private final ShieldCapReturnReticleInjector returnReticleInjector = new ShieldCapReturnReticleInjector();
     private final ShieldCapPerfectParryBridgeService perfectParryBridgeService = new ShieldCapPerfectParryBridgeService();
     private final ShieldCapCraftHotReloadService craftHotReloadService = new ShieldCapCraftHotReloadService();
+    private final ShieldCapDamageHotReloadService damageHotReloadService = new ShieldCapDamageHotReloadService();
     private ComponentType<EntityStore, ShieldCapBackStateComponent> shieldCapBackStateComponentType;
 
     public static StarkyShieldCaptainAmerica getInstance() {
@@ -116,6 +121,18 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         craftHotReloadService.pollAndApplyIfPending(player, isOp);
     }
 
+    public void pollDamageHotReload(com.hypixel.hytale.server.core.universe.PlayerRef player, boolean isOp) {
+        damageHotReloadService.pollAndApplyIfPending(player, isOp);
+    }
+
+    public void markInternalCraftConfigWrite() {
+        craftHotReloadService.markInternalCraftConfigWrite();
+    }
+
+    public void markInternalDamageConfigWrite() {
+        damageHotReloadService.markInternalDamageConfigWrite();
+    }
+
     public ComponentType<EntityStore, ShieldCapBackStateComponent> getShieldCapBackStateComponentType() {
         return shieldCapBackStateComponentType;
     }
@@ -130,6 +147,7 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         super.setup();
         ShieldCapConfigManager.init();
         ShieldCapCraftConfigManager.init();
+        ShieldCapDamageConfigManager.init();
         ShieldCapPacketListener.register();
         getEventRegistry().registerGlobal(PlayerReadyEvent.class, ShieldCapUpdateCheckListener::onPlayerReady);
         ShieldCapRecipeOverrideManager.register(this);
@@ -390,19 +408,72 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
     @Override
     protected void start() {
         super.start();
+        applyShieldCapDamageOverrides("start()");
         applyShieldCapCraftOverrides("start()");
         ShieldCapDurabilityAssetOverrideManager.applyConfiguredDurabilityAssets();
         Integer configuredMaxDurability =
                 ShieldCapCraftConfigManager.getConfig() != null ? ShieldCapCraftConfigManager.getConfig().weaponMaxDurability : null;
         ShieldCapDurabilityLiveUpdater.applyEverywhereLoaded(configuredMaxDurability);
         craftHotReloadService.start();
+        damageHotReloadService.start();
+    }
+
+    private void applyShieldCapDamageOverrides(String source) {
+        if (!ShieldCapDamageConfigManager.isDamageCompatibilityProfileEnabled()) {
+            System.out.println("[ShieldCap] Skipping damage compatibility profiles from " + source
+                    + " because shieldcapdamages.json has Mod Compatibility set to false.");
+            ShieldCapDamageAssetGenerator.generateAndReload();
+            return;
+        }
+
+        ShieldCapDamageCompatibilityProfile profile = resolveDamageCompatibilityProfile();
+        damageHotReloadService.markInternalDamageConfigWrite();
+        ShieldCapDamageConfigManager.applyDamageCompatibilityProfile(profile);
+        System.out.println("[ShieldCap] Applying damage overrides from " + source + " using profile " + profile + ".");
+        ShieldCapDamageAssetGenerator.generateAndReload();
+    }
+
+    private ShieldCapDamageCompatibilityProfile resolveDamageCompatibilityProfile() {
+        PluginManager pluginManager = PluginManager.get();
+        if (pluginManager == null) {
+            return ShieldCapDamageCompatibilityProfile.DEFAULT;
+        }
+
+        if (pluginManager.getPlugin(new PluginIdentifier("wanmine", "WansWonderWeapon")) != null) {
+            return ShieldCapDamageCompatibilityProfile.WANS_WONDER_WEAPON;
+        }
+
+        boolean endlessLevelingPresent =
+                pluginManager.getPlugin(new PluginIdentifier("com.airijko", "EndlessLeveling")) != null;
+        boolean endgameQoLPresent =
+                pluginManager.getPlugin(new PluginIdentifier("Config", "Endgame&QoL")) != null;
+
+        if (endlessLevelingPresent || endgameQoLPresent) {
+            return ShieldCapDamageCompatibilityProfile.ENDLESS_OR_ENDGAME;
+        }
+
+        if (pluginManager.getPlugin(new PluginIdentifier("MAJOR76", "MajorDungeons")) != null) {
+            return ShieldCapDamageCompatibilityProfile.MAJOR_DUNGEONS;
+        }
+
+        return ShieldCapDamageCompatibilityProfile.DEFAULT;
+    }
+
+    public ShieldCapDamageCompatibilityProfile getActiveDamageCompatibilityProfile() {
+        return resolveDamageCompatibilityProfile();
     }
 
     private void applyShieldCapCraftOverrides(String source) {
-        if (ShieldCapCraftConfigManager.isCraftCompatibilityProfileEnabled() && isEndgameQoLActive()) {
+        boolean endgameActive = isEndgameQoLActive();
+        boolean craftCompatibilityEnabled = ShieldCapCraftConfigManager.isCraftCompatibilityProfileEnabled();
+        if (craftCompatibilityEnabled && endgameActive) {
             craftHotReloadService.markInternalCraftConfigWrite();
             ShieldCapCraftConfigManager.applyEndgameCraftCompatibilityProfile();
             System.out.println("[ShieldCap] Applying Endgame&QoL craft compatibility from " + source + ".");
+        } else if (craftCompatibilityEnabled && !endgameActive && ShieldCapCraftConfigManager.hasEndgameBenchRequirement()) {
+            craftHotReloadService.markInternalCraftConfigWrite();
+            ShieldCapCraftConfigManager.resetCraftToDefaults();
+            System.out.println("[ShieldCap] Endgame&QoL is not active. Restoring default shield crafting recipes from " + source + ".");
         }
         ShieldCapRecipeOverrideManager.applyConfiguredRecipe();
     }
@@ -416,6 +487,7 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
     @Override
     protected void shutdown() {
         craftHotReloadService.stop();
+        damageHotReloadService.stop();
         perfectParryBridgeService.shutdown();
         returnReticleInjector.shutdown();
         returnKickInputService.shutdown();

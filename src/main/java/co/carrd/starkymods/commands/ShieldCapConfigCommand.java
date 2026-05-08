@@ -17,10 +17,12 @@ import javax.annotation.Nonnull;
 
 public class ShieldCapConfigCommand extends AbstractPlayerCommand {
     private final boolean editable;
+    private final boolean editorForOp;
 
     public ShieldCapConfigCommand(String commandName, boolean editable) {
         super(commandName, editable ? "Open the SHIELDCAP config editor." : "Open the SHIELDCAP config viewer.", false);
         this.editable = editable;
+        this.editorForOp = "capshield".equalsIgnoreCase(commandName);
         if (!editable) {
             this.setPermissionGroup(GameMode.Adventure);
         }
@@ -29,14 +31,16 @@ public class ShieldCapConfigCommand extends AbstractPlayerCommand {
     @Override
     protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store,
                            @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
-        if (editable && !PermissionsModule.get().hasPermission(playerRef.getUuid(), "*")) {
+        boolean isOp = PermissionsModule.get().hasPermission(playerRef.getUuid(), "*");
+        boolean openEditor = editable || (editorForOp && isOp);
+        if (editable && !isOp) {
             context.sendMessage(Message.raw("You must be OP to use this command."));
             return;
         }
 
         Player player = store.getComponent(ref, Player.getComponentType());
         if (player != null) {
-            ShieldCapConfigPage page = editable
+            ShieldCapConfigPage page = openEditor
                     ? ShieldCapConfigPage.createSettingsPage(playerRef)
                     : ShieldCapConfigPage.createViewerPage(playerRef);
             player.getPageManager().openCustomPage(ref, store, page);
