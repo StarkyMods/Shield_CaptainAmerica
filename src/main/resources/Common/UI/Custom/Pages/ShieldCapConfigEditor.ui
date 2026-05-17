@@ -405,11 +405,11 @@ Group {
                             Anchor: (Height: 114, Bottom: 12);
                             Group {
                                 Anchor: (Width: 202, Height: 114);
-                                Background: (TexturePath: "../Starky_RayGun_Wallpaper.png");
+                                Background: (TexturePath: "../StasisRifle_Wallpaper.png");
                             }
                         }
                         Group { FlexWeight: 1; }
-                        Label { Text: "Starky's RayGun"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
+                        Label { Text: "Subnautica Stasis Rifle"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
                     }
                 }
 
@@ -439,11 +439,11 @@ Group {
                             Anchor: (Height: 114, Bottom: 12);
                             Group {
                                 Anchor: (Width: 202, Height: 114);
-                                Background: (TexturePath: "../Starky_ThunderGun_Wallpaper.png");
+                                Background: (TexturePath: "../Starky_RayGun_Wallpaper.png");
                             }
                         }
                         Group { FlexWeight: 1; }
-                        Label { Text: "Starky's ThunderGun"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
+                        Label { Text: "Starky's RayGun"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
                     }
 
                     Group { Anchor: (Width: 12); }
@@ -459,11 +459,11 @@ Group {
                             Anchor: (Height: 114, Bottom: 12);
                             Group {
                                 Anchor: (Width: 202, Height: 114);
-                                Background: (TexturePath: "../FartGun_Wallpaper.png");
+                                Background: (TexturePath: "../Starky_ThunderGun_Wallpaper.png");
                             }
                         }
                         Group { FlexWeight: 1; }
-                        Label { Text: "The Fart Gun"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
+                        Label { Text: "Starky's ThunderGun"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
                     }
 
                     Group { Anchor: (Width: 12); }
@@ -479,11 +479,11 @@ Group {
                             Anchor: (Height: 114, Bottom: 12);
                             Group {
                                 Anchor: (Width: 202, Height: 114);
-                                Background: (TexturePath: "../CustomSkinKeeper_Wallpaper.png");
+                                Background: (TexturePath: "../FartGun_Wallpaper.png");
                             }
                         }
                         Group { FlexWeight: 1; }
-                        Label { Text: "Custom Skin Keeper"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
+                        Label { Text: "The Fart Gun"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
                     }
                 }
 
@@ -502,13 +502,27 @@ Group {
                     LayoutMode: Left;
                     Anchor: (Width: 714, Height: 188);
 
-                    Group {
+                    Button #HomeCard7 {
                         Anchor: (Width: 230, Height: 188, Right: 12);
+                        LayoutMode: Top;
+                        Style: @HomeLinkedCardButtonStyle;
+                        Padding: (Full: 14);
+
+                        Group {
+                            LayoutMode: Middle;
+                            Anchor: (Height: 114, Bottom: 12);
+                            Group {
+                                Anchor: (Width: 202, Height: 114);
+                                Background: (TexturePath: "../CustomSkinKeeper_Wallpaper.png");
+                            }
+                        }
+                        Group { FlexWeight: 1; }
+                        Label { Text: "Custom Skin Keeper"; Anchor: (Height: 42); Style: @HomeCardTitleStyle; }
                     }
 
                     Group { Anchor: (Width: 12); }
 
-                    Button #HomeCard7 {
+                    Button #HomeCard8 {
                         Anchor: (Width: 230, Height: 188);
                         LayoutMode: Top;
                         Style: @HomeLinkedCardButtonStyle;

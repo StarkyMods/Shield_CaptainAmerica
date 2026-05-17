@@ -66,6 +66,7 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
     private static final String HOME_CURSEFORGE_URL = "https://www.curseforge.com/hytale/mods/starky-shield";
     private static final String HOME_MJOLNIR_URL = "https://www.curseforge.com/hytale/mods/starky-mjolnir";
     private static final String HOME_HY_VOICE_ZOO_URL = "https://www.curseforge.com/hytale/mods/hyvoicezoo";
+    private static final String HOME_STASIS_RIFLE_URL = "https://www.curseforge.com/hytale/mods/subnautica-stasis-rifle";
     private static final String HOME_RAYGUN_URL = "https://www.curseforge.com/hytale/mods/starky-raygun";
     private static final String HOME_THUNDERGUN_URL = "https://www.curseforge.com/hytale/mods/starky-thundergun";
     private static final String HOME_FARTGUN_URL = "https://www.curseforge.com/hytale/mods/the-fart-gun";
@@ -141,11 +142,12 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         bind(events, "#HomeCurseforgeButton", "home:link:curseforge");
         bind(events, "#HomeCard1", "home:link:mjolnir");
         bind(events, "#HomeCard2", "home:link:hyvoicezoo");
-        bind(events, "#HomeCard3", "home:link:raygun");
-        bind(events, "#HomeCard4", "home:link:thundergun");
-        bind(events, "#HomeCard5", "home:link:fartgun");
-        bind(events, "#HomeCard6", "home:link:customskinkeeper");
-        bind(events, "#HomeCard7", "home:link:blockingitems");
+        bind(events, "#HomeCard3", "home:link:stasisrifle");
+        bind(events, "#HomeCard4", "home:link:raygun");
+        bind(events, "#HomeCard5", "home:link:thundergun");
+        bind(events, "#HomeCard6", "home:link:fartgun");
+        bind(events, "#HomeCard7", "home:link:customskinkeeper");
+        bind(events, "#HomeCard8", "home:link:blockingitems");
 
         bind(events, "#CompatibilityShieldCard", "compatibility:partner:mjolnir");
         bind(events, "#CompatibilityShieldMenuButton", "compatibility:menu:mjolnir");
@@ -705,6 +707,7 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
             case "curseforge" -> sendMessage(Message.raw(HOME_CURSEFORGE_URL).link(HOME_CURSEFORGE_URL));
             case "mjolnir" -> sendMessage(Message.raw(HOME_MJOLNIR_URL).link(HOME_MJOLNIR_URL));
             case "hyvoicezoo" -> sendMessage(Message.raw(HOME_HY_VOICE_ZOO_URL).link(HOME_HY_VOICE_ZOO_URL));
+            case "stasisrifle" -> sendMessage(Message.raw(HOME_STASIS_RIFLE_URL).link(HOME_STASIS_RIFLE_URL));
             case "raygun" -> sendMessage(Message.raw(HOME_RAYGUN_URL).link(HOME_RAYGUN_URL));
             case "thundergun" -> sendMessage(Message.raw(HOME_THUNDERGUN_URL).link(HOME_THUNDERGUN_URL));
             case "fartgun" -> sendMessage(Message.raw(HOME_FARTGUN_URL).link(HOME_FARTGUN_URL));

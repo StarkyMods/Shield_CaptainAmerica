@@ -402,7 +402,7 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         returnKickInputService.register(this);
         returnReticleInjector.register(this);
         perfectParryBridgeService.register(this);
-        new HStats("3b08e6b8-d2cc-4c30-8b35-1dc475393fad", "1.2.1");
+        new HStats("3b08e6b8-d2cc-4c30-8b35-1dc475393fad", "1.3.0");
     }
 
     @Override
