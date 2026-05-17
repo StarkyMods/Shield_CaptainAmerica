@@ -153,7 +153,7 @@
       "Shield"
     ],
     "PP_Signature_Gain": [
-       "25"
+      "25"
     ],
     "MMO_Weapon_Type": [
       "BLUNT"
@@ -181,7 +181,7 @@
     "Usable": true
   },
   "IconProperties": {
-    "Scale": 1.7,
+    "Scale": 0.6,
     "Rotation": [
       351,
       64,

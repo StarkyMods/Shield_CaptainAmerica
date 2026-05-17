@@ -55,6 +55,9 @@
                         "WorldSoundEventId": "SFX_ShieldCap_Grab"
                       },
                       "CancelOnItemChange": false
+                    },
+                    {
+                      "Type": "ChangeActiveSlot"
                     }
                   ]
                 }
@@ -119,7 +122,7 @@
       "Shield"
     ],
     "PP_Signature_Gain": [
-       "25"
+      "25"
     ],
     "MMO_Weapon_Type": [
       "BLUNT"

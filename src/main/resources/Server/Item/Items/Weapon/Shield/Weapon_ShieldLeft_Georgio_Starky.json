@@ -1,14 +1,13 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.Weapon_Shield_CaptainCarter_Starky.name",
-    "Description": "server.items.Weapon_Shield_CaptainCarter_Starky.description"
+    "Name": "server.items.Weapon_Shield_Georgio_Starky.name",
+    "Description": "server.items.Weapon_Shield_Georgio_Starky.description"
   },
-  "Model": "Items/Weapons/StarkyMods/starkyshieldcaptainamericaleft.blockymodel",
-  "Texture": "Items/Weapons/StarkyMods/starkyshieldcaptainamericacarter.png",
-  "Icon": "Icons/ItemsGenerated/Weapon_Shield_CaptainCarter_Starky.png",
+  "Model": "Items/Weapons/StarkyMods/Bone_Saw_Shield_left.blockymodel",
+  "Texture": "Items/Weapons/StarkyMods/Bone_Saw_Shield2.png",
   "Quality": "ShieldCap_Quality",
   "ItemLevel": 100,
-  "Scale": 2.8,
+  "Scale": 0.53,
   "Categories": [
     "Items.Weapons",
     "StarkyModsCategory.Weapons"
@@ -44,7 +43,7 @@
                     },
                     {
                       "Type": "ShieldCap_Refresh_Java",
-                      "RefreshMode": "SwapFromCarter",
+                      "RefreshMode": "SwapFromGeorgio",
                       "RunTime": 0,
                       "CancelOnItemChange": false
                     },
@@ -250,5 +249,37 @@
         }
       ]
     }
-  }
+  },
+  "IconProperties": {
+    "Scale": 0.53,
+    "Rotation": [
+      357,
+      246,
+      16
+    ],
+    "Translation": [
+      -17,
+      -74
+    ]
+  },
+  "Animation": "Items/Animations/StarkyMods/Saw_Spin1.blockyanim",
+  "Particles": [
+    {
+      "SystemId": "Georgio_Smoke_Black",
+      "TargetEntityPart": "SecondaryItem",
+      "TargetNodeName": "Motor",
+      "Scale": 0.5,
+      "PositionOffset": {
+        "X": 0.2,
+        "Y": -0.5,
+        "Z": 0.3
+      },
+      "RotationOffset": {
+        "Roll": 0,
+        "Pitch": 0,
+        "Yaw": 0
+      }
+    }
+  ],
+  "Icon": "Icons/ItemsGenerated/Weapon_ShieldLeft_Georgio_Starky.png"
 }

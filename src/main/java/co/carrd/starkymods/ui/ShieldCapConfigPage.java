@@ -42,6 +42,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfigPage.PageEventData> {
@@ -477,10 +478,6 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         commands.set("#SaveDamageButton.Disabled", true);
         commands.set("#ResetDamageButton.Visible", false);
         commands.set("#ResetDamageButton.Disabled", true);
-        commands.set("#DamageModCompatibilityToggle.Disabled", true);
-        for (int i = 1; i <= MAX_DAMAGE_ROWS; i++) {
-            commands.set("#DamageValue" + i + ".Disabled", true);
-        }
         commands.set("#AddIngredientButton.Visible", false);
         commands.set("#AddIngredientButton.Disabled", true);
         for (int i = 1; i <= MAX_INGREDIENT_ROWS; i++) {
@@ -928,11 +925,12 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         if (Double.isNaN(value) || Double.isInfinite(value)) {
             return "0";
         }
-        long rounded = Math.round(value);
-        if (Math.abs(value - rounded) < 0.000001) {
-            return Long.toString(rounded);
+        double rounded = Math.round(value * 10.0) / 10.0;
+        long whole = Math.round(rounded);
+        if (Math.abs(rounded - whole) < 0.000001) {
+            return Long.toString(whole);
         }
-        return Double.toString(value);
+        return String.format(Locale.ROOT, "%.1f", rounded);
     }
 
     private String safeText(String value) {

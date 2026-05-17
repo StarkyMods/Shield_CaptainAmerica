@@ -16,8 +16,9 @@ public final class ShieldCapConfigManager {
     private static final String SHIELD_RECIPE_ID = "ShieldCap_Craft";
     private static final String VIBRANIUM_SHIELD_RECIPE_ID = "ShieldCap_Vibranium_Craft";
     private static final String CARTER_SHIELD_RECIPE_ID = "ShieldCap_CaptainCarter_Craft";
+    private static final String GEORGIO_SHIELD_RECIPE_ID = "ShieldCap_Georgio_Craft";
     private static final List<String> SHIELD_RECIPE_IDS =
-            List.of(SHIELD_RECIPE_ID, VIBRANIUM_SHIELD_RECIPE_ID, CARTER_SHIELD_RECIPE_ID);
+            List.of(SHIELD_RECIPE_ID, VIBRANIUM_SHIELD_RECIPE_ID, CARTER_SHIELD_RECIPE_ID, GEORGIO_SHIELD_RECIPE_ID);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private static ShieldCapConfig mainConfig;

@@ -26,6 +26,8 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
     private static final String VIBRANIUM_LEFT_SHIELD_ID = "Weapon_ShieldLeft_Vibranium_Starky";
     private static final String CARTER_MAIN_SHIELD_ID = "Weapon_Shield_CaptainCarter_Starky";
     private static final String CARTER_LEFT_SHIELD_ID = "Weapon_ShieldLeft_CaptainCarter_Starky";
+    private static final String GEORGIO_MAIN_SHIELD_ID = "Weapon_Shield_Georgio_Starky";
+    private static final String GEORGIO_LEFT_SHIELD_ID = "Weapon_ShieldLeft_Georgio_Starky";
 
     @Nonnull
     public static final BuilderCodec<ShieldCapRefreshVisualsInteraction> CODEC =
@@ -88,6 +90,9 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
             if (refreshMode.toLowerCase().contains("carter")) {
                 return ShieldCapVisualSyncService.BackShieldPreference.CARTER;
             }
+            if (refreshMode.toLowerCase().contains("georgio")) {
+                return ShieldCapVisualSyncService.BackShieldPreference.GEORGIO;
+            }
         }
 
         Inventory inventory = player.getInventory();
@@ -102,6 +107,9 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
         }
         if (isCarterShield(activeMain) || isCarterShield(activeLeft)) {
             return ShieldCapVisualSyncService.BackShieldPreference.CARTER;
+        }
+        if (isGeorgioShield(activeMain) || isGeorgioShield(activeLeft)) {
+            return ShieldCapVisualSyncService.BackShieldPreference.GEORGIO;
         }
         return ShieldCapVisualSyncService.BackShieldPreference.AUTO;
     }
@@ -126,6 +134,10 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
 
     private boolean isCarterShield(ItemStack stack) {
         return matchesId(stack, CARTER_MAIN_SHIELD_ID) || matchesId(stack, CARTER_LEFT_SHIELD_ID);
+    }
+
+    private boolean isGeorgioShield(ItemStack stack) {
+        return matchesId(stack, GEORGIO_MAIN_SHIELD_ID) || matchesId(stack, GEORGIO_LEFT_SHIELD_ID);
     }
 
     private boolean matchesId(ItemStack stack, String itemId) {

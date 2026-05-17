@@ -39,9 +39,11 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
     private static final String RETURNED_ITEM_ID = "Weapon_Shield_CaptainAmerica_Starky";
     private static final String VIBRANIUM_RETURNED_ITEM_ID = "Weapon_Shield_Vibranium_Starky";
     private static final String CARTER_RETURNED_ITEM_ID = "Weapon_Shield_CaptainCarter_Starky";
+    private static final String GEORGIO_RETURNED_ITEM_ID = "Weapon_Shield_Georgio_Starky";
     private static final String VARIANT_METADATA_KEY = "ShieldCapVariant";
     private static final String VIBRANIUM_VARIANT_VALUE = "Vibranium";
     private static final String CARTER_VARIANT_VALUE = "Carter";
+    private static final String GEORGIO_VARIANT_VALUE = "Georgio";
     private static final String CATCH_SOUND_ID = "SFX_ShieldCap_Catch";
     private static final long[] CALLING_ANIMATION_CLEAR_RETRY_DELAYS_MS =
             new long[] {0L, 100L};
@@ -226,6 +228,9 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
         }
         if (CARTER_VARIANT_VALUE.equals(variant)) {
             return CARTER_RETURNED_ITEM_ID;
+        }
+        if (GEORGIO_VARIANT_VALUE.equals(variant)) {
+            return GEORGIO_RETURNED_ITEM_ID;
         }
         return RETURNED_ITEM_ID;
     }

@@ -43,25 +43,5 @@
     }
   ],
   "MinScale": 1,
-  "MaxScale": 1,
-  "AnimationSets": {
-    "Idle": {
-      "Animations": [
-        {
-          "Animation": "Items/Animations/StarkyMods/Shield_Spin_Roll_Left.blockyanim",
-          "BlendingDuration": 0,
-          "Looping": true
-        }
-      ]
-    },
-    "FlyIdle": {
-      "Animations": [
-        {
-          "Animation": "Items/Animations/StarkyMods/Shield_Spin_Roll_Left.blockyanim",
-          "BlendingDuration": 0,
-          "Looping": true
-        }
-      ]
-    }
-  }
+  "MaxScale": 1
 }

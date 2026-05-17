@@ -29,9 +29,11 @@ public final class ShieldCapDamageAssetGenerator {
     private static final List<ItemAsset> ITEM_ASSETS = List.of(
             new ItemAsset("Weapon_Shield_CaptainAmerica_Starky", "Server/Item/Items/Weapon/Shield/Weapon_Shield_CaptainAmerica_Starky.json"),
             new ItemAsset("Weapon_Shield_CaptainCarter_Starky", "Server/Item/Items/Weapon/Shield/Weapon_Shield_CaptainCarter_Starky.json"),
+            new ItemAsset("Weapon_Shield_Georgio_Starky", "Server/Item/Items/Weapon/Shield/Weapon_Shield_Georgio_Starky.json"),
             new ItemAsset("Weapon_Shield_Vibranium_Starky", "Server/Item/Items/Weapon/Shield/Weapon_Shield_Vibranium_Starky.json"),
             new ItemAsset("Weapon_ShieldLeft_CaptainAmerica_Starky", "Server/Item/Items/Weapon/Shield/Weapon_ShieldLeft_CaptainAmerica_Starky.json"),
             new ItemAsset("Weapon_ShieldLeft_CaptainCarter_Starky", "Server/Item/Items/Weapon/Shield/Weapon_ShieldLeft_CaptainCarter_Starky.json"),
+            new ItemAsset("Weapon_ShieldLeft_Georgio_Starky", "Server/Item/Items/Weapon/Shield/Weapon_ShieldLeft_Georgio_Starky.json"),
             new ItemAsset("Weapon_ShieldLeft_Vibranium_Starky", "Server/Item/Items/Weapon/Shield/Weapon_ShieldLeft_Vibranium_Starky.json"),
             new ItemAsset("Weapon_ShieldCap_Thrown_Starky", "Server/Item/Items/Weapon_ShieldCap_Thrown_Starky.json")
     );

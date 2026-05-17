@@ -1,5 +1,6 @@
 package co.carrd.starkymods.interactions;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,6 +24,8 @@ import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.protocol.SoundCategory;
 import com.hypixel.hytale.protocol.packets.world.PlaySoundEvent3D;
 import com.hypixel.hytale.builtin.mounts.MountedComponent;
+import com.hypixel.hytale.server.core.asset.type.model.config.Model;
+import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
 import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.InteractionManager;
@@ -33,6 +36,8 @@ import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.entity.EntityModule;
+import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
+import com.hypixel.hytale.server.core.modules.entity.component.PersistentModel;
 import com.hypixel.hytale.server.core.modules.entity.component.NPCMarkerComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.interaction.InteractionModule;
@@ -115,16 +120,23 @@ public final class ShieldCapThrowHomingService {
     private static final String SHIELDCAP_PROJECTILE_ASSET_ID = "ShieldCap_Projectile";
     private static final String SHIELDCAP_VIBRANIUM_PROJECTILE_ASSET_ID = "ShieldCap_Vibranium_Projectile";
     private static final String SHIELDCAP_CARTER_PROJECTILE_ASSET_ID = "ShieldCap_Carter_Projectile";
+    private static final String SHIELDCAP_GEORGIO_PROJECTILE_ASSET_ID = "ShieldCap_Georgio_Projectile";
+    private static final String SHIELDCAP_STATIC_PROJECTILE_ASSET_ID = "ShieldCap_Projectile_Static";
+    private static final String SHIELDCAP_VIBRANIUM_STATIC_PROJECTILE_ASSET_ID = "ShieldCap_Vibranium_Projectile_Static";
+    private static final String SHIELDCAP_CARTER_STATIC_PROJECTILE_ASSET_ID = "ShieldCap_Carter_Projectile_Static";
+    private static final String SHIELDCAP_GEORGIO_STATIC_PROJECTILE_ASSET_ID = "ShieldCap_Georgio_Projectile_Static";
     private static final String MJOLNIR_PROJECTILE_ASSET_ID = "Mjolnir";
     private static final String FOREIGN_PROJECTILE_ASSET_PREFIX = "Mjolnir";
     private static final String THROW_KICK_ROOT_ID = "Root_ShieldCap_Throw_Kick";
     private static final String THROW_KICK_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Throw_Kick";
     private static final String THROW_KICK_VIBRANIUM_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Throw_Kick_Silver";
     private static final String THROW_KICK_CARTER_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Throw_Kick_Carter";
+    private static final String THROW_KICK_GEORGIO_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Throw_Kick_Georgio";
     private static final String THROWN_ITEM_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String VARIANT_METADATA_KEY = "ShieldCapVariant";
     private static final String VIBRANIUM_VARIANT_VALUE = "Vibranium";
     private static final String CARTER_VARIANT_VALUE = "Carter";
+    private static final String GEORGIO_VARIANT_VALUE = "Georgio";
     private static final String RETURN_CALLING_ROOT_ID = "Root_ShieldCap_Return_Calling_Internal";
     private static final String RETURN_CALLING_CLEAR_ROOT_ID = "Root_ShieldCap_Return_Calling_Clear_Internal";
     private static final String NORMAL_IMPACT_SOUND_ID = "SFX_ShieldCap_Hit";
@@ -166,6 +178,7 @@ public final class ShieldCapThrowHomingService {
     private static volatile boolean MJOLNIR_CLASH_BRIDGE_AVAILABLE = true;
     private static Method mjolnirProjectileReturningForClashMethod;
     private static Method mjolnirForceProjectileClashImpactMethod;
+    private static Field projectileAppearanceField;
 
     private ShieldCapThrowHomingService() {
     }
@@ -585,6 +598,7 @@ public final class ShieldCapThrowHomingService {
         trackedState.throwKickStuckInBlock = true;
         trackedState.ownerContactGraceUntilMs = now;
         markThrowKickStuck(store, projectileRef);
+        applyStaticProjectileVisualModel(context.getCommandBuffer(), store, projectileRef, trackedState);
         playThrowKickStickFx(store, projectileRef);
         debug("throwKick stuck in block | owner=" + ownerUuid
                 + " | projectile=" + getEntityUuid(store, projectileRef));
@@ -634,6 +648,7 @@ public final class ShieldCapThrowHomingService {
                 trackedState.throwKickStuckInBlock = true;
                 trackedState.ownerContactGraceUntilMs = now;
                 markThrowKickStuck(store, projectileRef);
+                applyStaticProjectileVisualModel(context.getCommandBuffer(), store, projectileRef, trackedState);
                 playThrowKickStickFx(store, projectileRef);
                 debug("throwKick lateral bounce converted to stick | owner=" + ownerUuid
                         + " | projectile=" + getEntityUuid(store, projectileRef));
@@ -1734,6 +1749,8 @@ public final class ShieldCapThrowHomingService {
                 if (trackedState == null) {
                     continue;
                 }
+
+                updateProjectileFlightAnimation(store, projectile.projectileRef, trackedState, projectile.velocity);
 
                 if (handleMjolnirProjectileClash(store, state, projectile, nowMs)) {
                     continue;
@@ -4354,10 +4371,201 @@ public final class ShieldCapThrowHomingService {
         return projectileAssetName == null || projectileAssetName.isBlank() ? null : projectileAssetName;
     }
 
+    private static String getProjectileVisualModelAssetName(Store<EntityStore> store, Ref<EntityStore> projectileRef) {
+        String projectileAssetName = getProjectileAssetName(store, projectileRef);
+        if (isShieldCapProjectileAssetName(projectileAssetName)) {
+            return projectileAssetName;
+        }
+        if (store == null || projectileRef == null || !projectileRef.isValid()) {
+            return null;
+        }
+        try {
+            ModelComponent modelComponent = store.getComponent(projectileRef, ModelComponent.getComponentType());
+            if (modelComponent != null && modelComponent.getModel() != null) {
+                String modelAssetId = modelComponent.getModel().getModelAssetId();
+                if (isShieldCapProjectileAssetName(modelAssetId)) {
+                    return modelAssetId;
+                }
+            }
+        } catch (RuntimeException ignored) {
+            // Fall through to PersistentModel.
+        }
+        try {
+            PersistentModel persistentModel = store.getComponent(projectileRef, PersistentModel.getComponentType());
+            if (persistentModel != null && persistentModel.getModelReference() != null) {
+                String modelAssetId = persistentModel.getModelReference().getModelAssetId();
+                if (isShieldCapProjectileAssetName(modelAssetId)) {
+                    return modelAssetId;
+                }
+            }
+        } catch (RuntimeException ignored) {
+            // No visual model id available.
+        }
+        return null;
+    }
+
     private static boolean isShieldCapProjectileAssetName(String projectileAssetName) {
         return SHIELDCAP_PROJECTILE_ASSET_ID.equals(projectileAssetName)
                 || SHIELDCAP_VIBRANIUM_PROJECTILE_ASSET_ID.equals(projectileAssetName)
-                || SHIELDCAP_CARTER_PROJECTILE_ASSET_ID.equals(projectileAssetName);
+                || SHIELDCAP_CARTER_PROJECTILE_ASSET_ID.equals(projectileAssetName)
+                || SHIELDCAP_GEORGIO_PROJECTILE_ASSET_ID.equals(projectileAssetName)
+                || SHIELDCAP_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)
+                || SHIELDCAP_VIBRANIUM_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)
+                || SHIELDCAP_CARTER_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)
+                || SHIELDCAP_GEORGIO_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName);
+    }
+
+    private static void updateProjectileFlightAnimation(Store<EntityStore> store,
+                                                        Ref<EntityStore> projectileRef,
+                                                        TrackedProjectileState trackedState,
+                                                        Velocity velocity) {
+        if (store == null || projectileRef == null || !projectileRef.isValid() || trackedState == null) {
+            return;
+        }
+
+        String projectileAssetName = getProjectileVisualModelAssetName(store, projectileRef);
+        if (!isShieldCapProjectileAssetName(projectileAssetName)) {
+            return;
+        }
+        boolean shouldFlyIdle =
+                !trackedState.throwKickStuckInBlock
+                        && !isThrowKickStuck(store, projectileRef)
+                        && !trackedState.groundedAfterProjectileClash;
+
+        if (shouldFlyIdle) {
+            if (!trackedState.flightAnimationApplied) {
+                applyProjectileVisualModel(store, projectileRef, resolveAnimatedProjectileModelAssetId(projectileAssetName));
+                trackedState.flightAnimationApplied = true;
+                trackedState.staticModelApplied = false;
+            }
+            return;
+        }
+
+        if (!trackedState.staticModelApplied) {
+            applyProjectileVisualModel(store, projectileRef, resolveStaticProjectileModelAssetId(projectileAssetName));
+            trackedState.flightAnimationApplied = false;
+            trackedState.staticModelApplied = true;
+        }
+    }
+
+    private static String resolveStaticProjectileModelAssetId(String projectileAssetName) {
+        if (SHIELDCAP_VIBRANIUM_PROJECTILE_ASSET_ID.equals(projectileAssetName)
+                || SHIELDCAP_VIBRANIUM_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)) {
+            return SHIELDCAP_VIBRANIUM_STATIC_PROJECTILE_ASSET_ID;
+        }
+        if (SHIELDCAP_CARTER_PROJECTILE_ASSET_ID.equals(projectileAssetName)
+                || SHIELDCAP_CARTER_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)) {
+            return SHIELDCAP_CARTER_STATIC_PROJECTILE_ASSET_ID;
+        }
+        if (SHIELDCAP_GEORGIO_PROJECTILE_ASSET_ID.equals(projectileAssetName)
+                || SHIELDCAP_GEORGIO_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)) {
+            return SHIELDCAP_GEORGIO_STATIC_PROJECTILE_ASSET_ID;
+        }
+        return SHIELDCAP_STATIC_PROJECTILE_ASSET_ID;
+    }
+
+    private static String resolveAnimatedProjectileModelAssetId(String projectileAssetName) {
+        if (SHIELDCAP_VIBRANIUM_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)) {
+            return SHIELDCAP_VIBRANIUM_PROJECTILE_ASSET_ID;
+        }
+        if (SHIELDCAP_CARTER_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)) {
+            return SHIELDCAP_CARTER_PROJECTILE_ASSET_ID;
+        }
+        if (SHIELDCAP_GEORGIO_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)) {
+            return SHIELDCAP_GEORGIO_PROJECTILE_ASSET_ID;
+        }
+        if (SHIELDCAP_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)) {
+            return SHIELDCAP_PROJECTILE_ASSET_ID;
+        }
+        return projectileAssetName;
+    }
+
+    private static void applyStaticProjectileVisualModel(CommandBuffer<EntityStore> commandBuffer,
+                                                         Store<EntityStore> store,
+                                                         Ref<EntityStore> projectileRef,
+                                                         TrackedProjectileState trackedState) {
+        String projectileAssetName = getProjectileVisualModelAssetName(store, projectileRef);
+        if (!isShieldCapProjectileAssetName(projectileAssetName)) {
+            return;
+        }
+        applyProjectileVisualModel(commandBuffer, projectileRef, resolveStaticProjectileModelAssetId(projectileAssetName));
+        if (trackedState != null) {
+            trackedState.flightAnimationApplied = false;
+            trackedState.staticModelApplied = true;
+        }
+    }
+
+    private static void applyProjectileVisualModel(CommandBuffer<EntityStore> commandBuffer,
+                                                   Ref<EntityStore> projectileRef,
+                                                   String modelAssetId) {
+        if (commandBuffer == null || projectileRef == null || !projectileRef.isValid()
+                || modelAssetId == null || modelAssetId.isBlank()) {
+            return;
+        }
+        try {
+            ModelAsset modelAsset = ModelAsset.getAssetMap().getAsset(modelAssetId);
+            if (modelAsset == null) {
+                return;
+            }
+            commandBuffer.putComponent(
+                    projectileRef,
+                    ModelComponent.getComponentType(),
+                    new ModelComponent(Model.createUnitScaleModel(modelAsset))
+            );
+            commandBuffer.putComponent(
+                    projectileRef,
+                    PersistentModel.getComponentType(),
+                    new PersistentModel(Model.createUnitScaleModel(modelAsset).toReference())
+            );
+            setProjectileAppearance(commandBuffer.getComponent(projectileRef, ProjectileComponent.getComponentType()), modelAssetId);
+        } catch (RuntimeException ignored) {
+            // Visual model swaps are best-effort; projectile physics/logic must keep running.
+        }
+    }
+
+    private static void applyProjectileVisualModel(Store<EntityStore> store,
+                                                   Ref<EntityStore> projectileRef,
+                                                   String modelAssetId) {
+        if (store == null || projectileRef == null || !projectileRef.isValid()
+                || modelAssetId == null || modelAssetId.isBlank()) {
+            return;
+        }
+        try {
+            ModelAsset modelAsset = ModelAsset.getAssetMap().getAsset(modelAssetId);
+            if (modelAsset == null) {
+                return;
+            }
+            store.putComponent(
+                    projectileRef,
+                    ModelComponent.getComponentType(),
+                    new ModelComponent(Model.createUnitScaleModel(modelAsset))
+            );
+            store.putComponent(
+                    projectileRef,
+                    PersistentModel.getComponentType(),
+                    new PersistentModel(Model.createUnitScaleModel(modelAsset).toReference())
+            );
+            setProjectileAppearance(store.getComponent(projectileRef, ProjectileComponent.getComponentType()), modelAssetId);
+        } catch (RuntimeException ignored) {
+            // Visual model swaps are best-effort; projectile physics/logic must keep running.
+        }
+    }
+
+    private static void setProjectileAppearance(ProjectileComponent projectileComponent, String modelAssetId) {
+        if (projectileComponent == null || modelAssetId == null || modelAssetId.isBlank()) {
+            return;
+        }
+        try {
+            Field field = projectileAppearanceField;
+            if (field == null) {
+                field = ProjectileComponent.class.getDeclaredField("appearance");
+                field.setAccessible(true);
+                projectileAppearanceField = field;
+            }
+            field.set(projectileComponent, modelAssetId);
+        } catch (ReflectiveOperationException ignored) {
+            // Older/newer Hytale builds may rename this field; the ModelComponent fallback still remains.
+        }
     }
 
     private static String resolveThrowKickProjectileConfigId(CommandBuffer<EntityStore> commandBuffer,
@@ -4368,6 +4576,9 @@ public final class ShieldCapThrowHomingService {
         }
         if (CARTER_VARIANT_VALUE.equals(variant)) {
             return THROW_KICK_CARTER_PROJECTILE_CONFIG_ID;
+        }
+        if (GEORGIO_VARIANT_VALUE.equals(variant)) {
+            return THROW_KICK_GEORGIO_PROJECTILE_CONFIG_ID;
         }
         return THROW_KICK_PROJECTILE_CONFIG_ID;
     }
@@ -4698,6 +4909,8 @@ public final class ShieldCapThrowHomingService {
         private long ownerContactGraceUntilMs;
         private boolean returnCallingAnimationTriggered;
         private long returnCallingCatchReadyAtMs;
+        private boolean flightAnimationApplied;
+        private boolean staticModelApplied;
         private final Set<UUID> hitTargetUuids = ConcurrentHashMap.newKeySet();
         private final Set<Ref<EntityStore>> hitTargetRefs = ConcurrentHashMap.newKeySet();
 

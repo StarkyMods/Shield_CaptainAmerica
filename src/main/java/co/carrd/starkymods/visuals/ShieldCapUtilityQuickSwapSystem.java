@@ -21,6 +21,8 @@ public final class ShieldCapUtilityQuickSwapSystem extends EntityEventSystem<Ent
     private static final String VIBRANIUM_LEFT_SHIELD_ID = "Weapon_ShieldLeft_Vibranium_Starky";
     private static final String CARTER_BASE_SHIELD_ID = "Weapon_Shield_CaptainCarter_Starky";
     private static final String CARTER_LEFT_SHIELD_ID = "Weapon_ShieldLeft_CaptainCarter_Starky";
+    private static final String GEORGIO_BASE_SHIELD_ID = "Weapon_Shield_Georgio_Starky";
+    private static final String GEORGIO_LEFT_SHIELD_ID = "Weapon_ShieldLeft_Georgio_Starky";
 
     public ShieldCapUtilityQuickSwapSystem() {
         super(SwitchActiveSlotEvent.class);
@@ -99,6 +101,9 @@ public final class ShieldCapUtilityQuickSwapSystem extends EntityEventSystem<Ent
         }
         if (matchesId(itemId, CARTER_BASE_SHIELD_ID) || matchesId(itemId, CARTER_LEFT_SHIELD_ID)) {
             return ShieldCapVisualSyncService.BackShieldPreference.CARTER;
+        }
+        if (matchesId(itemId, GEORGIO_BASE_SHIELD_ID) || matchesId(itemId, GEORGIO_LEFT_SHIELD_ID)) {
+            return ShieldCapVisualSyncService.BackShieldPreference.GEORGIO;
         }
         return null;
     }

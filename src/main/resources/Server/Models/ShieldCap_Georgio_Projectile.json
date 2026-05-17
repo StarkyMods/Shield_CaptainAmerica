@@ -1,6 +1,6 @@
 {
-  "Model": "Items/Weapons/StarkyMods/starkyshieldcaptainamericaprojectile.blockymodel",
-  "Texture": "Items/Weapons/StarkyMods/starkyshieldcaptainamericasilver.png",
+  "Model": "Items/Weapons/StarkyMods/Bone_Saw_Shield_projectile.blockymodel",
+  "Texture": "Items/Weapons/StarkyMods/Bone_Saw_Shield2.png",
   "HitBox": {
     "Min": {
       "X": -0.4,
@@ -44,22 +44,41 @@
   ],
   "MinScale": 1,
   "MaxScale": 1,
+  "Particles": [
+    {
+      "SystemId": "Georgio_Smoke_Black",
+      "Scale": 0.5,
+      "PositionOffset": {
+        "X": 0.2,
+        "Y": -0.5,
+        "Z": 0.3
+      },
+      "RotationOffset": {
+        "Roll": 0,
+        "Pitch": 0,
+        "Yaw": 0
+      },
+      "TargetNodeName": "Motor"
+    }
+  ],
   "AnimationSets": {
     "Idle": {
       "Animations": [
         {
-          "Animation": "Items/Animations/StarkyMods/Shield_Spin_Roll_Left.blockyanim",
+          "Animation": "Items/Animations/StarkyMods/Shield_Georgio_Spin_Roll_Left.blockyanim",
           "BlendingDuration": 0,
-          "Looping": true
+          "Looping": true,
+          "Speed": 1
         }
       ]
     },
     "FlyIdle": {
       "Animations": [
         {
-          "Animation": "Items/Animations/StarkyMods/Shield_Spin_Roll_Left.blockyanim",
+          "Animation": "Items/Animations/StarkyMods/Shield_Georgio_Spin_Roll_Left.blockyanim",
           "BlendingDuration": 0,
-          "Looping": true
+          "Looping": true,
+          "Speed": 1
         }
       ]
     }

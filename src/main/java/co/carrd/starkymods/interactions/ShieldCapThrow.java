@@ -33,13 +33,17 @@ public final class ShieldCapThrow extends SimpleInstantInteraction {
     private static final String VIBRANIUM_LEFT_HAND_ITEM_ID = "Weapon_ShieldLeft_Vibranium_Starky";
     private static final String CARTER_MAIN_HAND_ITEM_ID = "Weapon_Shield_CaptainCarter_Starky";
     private static final String CARTER_LEFT_HAND_ITEM_ID = "Weapon_ShieldLeft_CaptainCarter_Starky";
+    private static final String GEORGIO_MAIN_HAND_ITEM_ID = "Weapon_Shield_Georgio_Starky";
+    private static final String GEORGIO_LEFT_HAND_ITEM_ID = "Weapon_ShieldLeft_Georgio_Starky";
     private static final String THROWN_ITEM_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig";
     private static final String VIBRANIUM_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Silver";
     private static final String CARTER_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Carter";
+    private static final String GEORGIO_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Georgio";
     private static final String VARIANT_METADATA_KEY = "ShieldCapVariant";
     private static final String VIBRANIUM_VARIANT_VALUE = "Vibranium";
     private static final String CARTER_VARIANT_VALUE = "Carter";
+    private static final String GEORGIO_VARIANT_VALUE = "Georgio";
     private static final double DURABILITY_COST = 0.21d;
 
     @Nonnull
@@ -108,6 +112,11 @@ public final class ShieldCapThrow extends SimpleInstantInteraction {
                         ? ShieldVariant.CARTER.toLaunchInfo()
                         : null;
             }
+            if (matchesId(mainHandStack, GEORGIO_MAIN_HAND_ITEM_ID)) {
+                return replaceItemInSlot(hotbarContainer, activeHotbarSlot, mainHandStack, targetItemId, DURABILITY_COST, ShieldVariant.GEORGIO)
+                        ? ShieldVariant.GEORGIO.toLaunchInfo()
+                        : null;
+            }
         }
 
         byte activeUtilitySlot = inventory.getActiveUtilitySlot();
@@ -127,6 +136,11 @@ public final class ShieldCapThrow extends SimpleInstantInteraction {
             if (matchesId(leftHandStack, CARTER_LEFT_HAND_ITEM_ID)) {
                 return replaceItemInSlot(utilityContainer, activeUtilitySlot, leftHandStack, targetItemId, DURABILITY_COST, ShieldVariant.CARTER)
                         ? ShieldVariant.CARTER.toLaunchInfo()
+                        : null;
+            }
+            if (matchesId(leftHandStack, GEORGIO_LEFT_HAND_ITEM_ID)) {
+                return replaceItemInSlot(utilityContainer, activeUtilitySlot, leftHandStack, targetItemId, DURABILITY_COST, ShieldVariant.GEORGIO)
+                        ? ShieldVariant.GEORGIO.toLaunchInfo()
                         : null;
             }
         }
@@ -160,6 +174,8 @@ public final class ShieldCapThrow extends SimpleInstantInteraction {
             copiedMetadata.put(VARIANT_METADATA_KEY, new BsonString(VIBRANIUM_VARIANT_VALUE));
         } else if (variant == ShieldVariant.CARTER) {
             copiedMetadata.put(VARIANT_METADATA_KEY, new BsonString(CARTER_VARIANT_VALUE));
+        } else if (variant == ShieldVariant.GEORGIO) {
+            copiedMetadata.put(VARIANT_METADATA_KEY, new BsonString(GEORGIO_VARIANT_VALUE));
         } else {
             copiedMetadata.remove(VARIANT_METADATA_KEY);
         }
@@ -247,7 +263,8 @@ public final class ShieldCapThrow extends SimpleInstantInteraction {
     private enum ShieldVariant {
         NORMAL(PROJECTILE_CONFIG_ID),
         VIBRANIUM(VIBRANIUM_PROJECTILE_CONFIG_ID),
-        CARTER(CARTER_PROJECTILE_CONFIG_ID);
+        CARTER(CARTER_PROJECTILE_CONFIG_ID),
+        GEORGIO(GEORGIO_PROJECTILE_CONFIG_ID);
 
         private final String projectileConfigId;
 

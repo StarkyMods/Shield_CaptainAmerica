@@ -1,0 +1,17 @@
+{
+  "Spawners": [
+    {
+      "SpawnerId": "Georgio_Smoke_Black",
+      "TotalSpawners": 100,
+      "MaxConcurrent": 1,
+      "SpawnRate": {
+        "Min": 1,
+        "Max": 1
+      },
+      "StartDelay": 0
+    }
+  ],
+  "CullDistance": 999999,
+  "LifeSpan": 999999,
+  "BoundingRadius": 999999
+}

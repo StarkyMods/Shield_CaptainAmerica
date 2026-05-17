@@ -36,9 +36,11 @@ public final class ShieldCapDamageConfigManager {
     private static final List<String> ITEM_ASSET_PATHS = List.of(
             "Server/Item/Items/Weapon/Shield/Weapon_Shield_CaptainAmerica_Starky.json",
             "Server/Item/Items/Weapon/Shield/Weapon_Shield_CaptainCarter_Starky.json",
+            "Server/Item/Items/Weapon/Shield/Weapon_Shield_Georgio_Starky.json",
             "Server/Item/Items/Weapon/Shield/Weapon_Shield_Vibranium_Starky.json",
             "Server/Item/Items/Weapon/Shield/Weapon_ShieldLeft_CaptainAmerica_Starky.json",
             "Server/Item/Items/Weapon/Shield/Weapon_ShieldLeft_CaptainCarter_Starky.json",
+            "Server/Item/Items/Weapon/Shield/Weapon_ShieldLeft_Georgio_Starky.json",
             "Server/Item/Items/Weapon/Shield/Weapon_ShieldLeft_Vibranium_Starky.json"
     );
 

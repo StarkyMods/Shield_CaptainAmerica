@@ -51,12 +51,18 @@ public final class ShieldCapBackModelSystems {
             "Items/Weapons/StarkyMods/starkyshieldcaptainamericaback.blockymodel";
     private static final String BACK_ATTACHMENT_CAPE_MODEL =
             "Items/Weapons/StarkyMods/starkyshieldcaptainamericaback_cape.blockymodel";
+    private static final String BACK_ATTACHMENT_GEORGIO_MODEL =
+            "Items/Weapons/StarkyMods/Bone_Saw_Shield_back.blockymodel";
+    private static final String BACK_ATTACHMENT_GEORGIO_CAPE_MODEL =
+            "Items/Weapons/StarkyMods/Bone_Saw_Shield_back_cape.blockymodel";
     private static final String BACK_ATTACHMENT_TEXTURE =
             "Items/Weapons/StarkyMods/starkyshieldcaptainamerica.png";
     private static final String BACK_ATTACHMENT_VIBRANIUM_TEXTURE =
             "Items/Weapons/StarkyMods/starkyshieldcaptainamericasilver.png";
     private static final String BACK_ATTACHMENT_CARTER_TEXTURE =
             "Items/Weapons/StarkyMods/starkyshieldcaptainamericacarter.png";
+    private static final String BACK_ATTACHMENT_GEORGIO_TEXTURE =
+            "Items/Weapons/StarkyMods/Bone_Saw_Shield2.png";
     private static final String LEGACY_BACK_ATTACHMENT_TEXTURE =
             "Items/Weapons/StarkyMods/starkyshieldcaptainamericaback_attachment.png";
     private static final String SIMPLIFIED_HAIRCUT_MODEL =
@@ -278,7 +284,7 @@ public final class ShieldCapBackModelSystems {
             }
 
             attachments.add(new ModelAttachment(
-                    resolveBackAttachmentModel(useCapeShieldModel),
+                    resolveBackAttachmentModel(useCapeShieldModel, backShieldVariant),
                     resolveBackAttachmentTexture(backShieldVariant),
                     null,
                     null,
@@ -286,13 +292,15 @@ public final class ShieldCapBackModelSystems {
             ));
 
             ModelAttachment[] updatedAttachments = attachments.toArray(ModelAttachment[]::new);
-            if (mutateInPlace) {
-                return setModelAttachmentsInPlace(baseModel, updatedAttachments);
-            }
-            return cloneModelWithAttachments(baseModel, updatedAttachments);
+            return mutateInPlace
+                    ? setModelAttachmentsInPlace(baseModel, updatedAttachments)
+                    : cloneModelWithAttachments(baseModel, updatedAttachments);
         }
 
-        private String resolveBackAttachmentModel(boolean useCapeShieldModel) {
+        private String resolveBackAttachmentModel(boolean useCapeShieldModel, String backShieldVariant) {
+            if ("Georgio".equals(backShieldVariant)) {
+                return useCapeShieldModel ? BACK_ATTACHMENT_GEORGIO_CAPE_MODEL : BACK_ATTACHMENT_GEORGIO_MODEL;
+            }
             return useCapeShieldModel ? BACK_ATTACHMENT_CAPE_MODEL : BACK_ATTACHMENT_MODEL;
         }
 
@@ -302,6 +310,9 @@ public final class ShieldCapBackModelSystems {
             }
             if ("Carter".equals(backShieldVariant)) {
                 return BACK_ATTACHMENT_CARTER_TEXTURE;
+            }
+            if ("Georgio".equals(backShieldVariant)) {
+                return BACK_ATTACHMENT_GEORGIO_TEXTURE;
             }
             return BACK_ATTACHMENT_TEXTURE;
         }
@@ -526,7 +537,7 @@ public final class ShieldCapBackModelSystems {
                 ModelAttachment attachment;
                 if (type == CosmeticType.HAIRCUTS && skin.getHeadAccessory() != null) {
                     attachment = createHaircutAttachment(baseModel.getAttachments(), part, partId, skin, registry);
-                } else if (isAccessoryType(type)) {
+                } else if (type == CosmeticType.CAPES || isAccessoryType(type)) {
                     attachment = createAccessoryAttachment(baseModel.getAttachments(), part, partId);
                 } else {
                     attachment = createSkinAttachment(part, partId);
@@ -1146,10 +1157,13 @@ public final class ShieldCapBackModelSystems {
         private boolean isShieldCapAttachment(ModelAttachment attachment) {
             return attachment != null
                     && (BACK_ATTACHMENT_MODEL.equals(attachment.getModel())
-                    || BACK_ATTACHMENT_CAPE_MODEL.equals(attachment.getModel()))
+                    || BACK_ATTACHMENT_CAPE_MODEL.equals(attachment.getModel())
+                    || BACK_ATTACHMENT_GEORGIO_MODEL.equals(attachment.getModel())
+                    || BACK_ATTACHMENT_GEORGIO_CAPE_MODEL.equals(attachment.getModel()))
                     && (BACK_ATTACHMENT_TEXTURE.equals(attachment.getTexture())
                     || BACK_ATTACHMENT_VIBRANIUM_TEXTURE.equals(attachment.getTexture())
                     || BACK_ATTACHMENT_CARTER_TEXTURE.equals(attachment.getTexture())
+                    || BACK_ATTACHMENT_GEORGIO_TEXTURE.equals(attachment.getTexture())
                     || LEGACY_BACK_ATTACHMENT_TEXTURE.equals(attachment.getTexture()));
         }
 

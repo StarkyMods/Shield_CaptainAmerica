@@ -38,6 +38,8 @@ public final class ShieldCapDurabilityLiveUpdater {
     private static final String VIBRANIUM_LEFT_ID = "Weapon_ShieldLeft_Vibranium_Starky";
     private static final String CARTER_PRIMARY_ID = "Weapon_Shield_CaptainCarter_Starky";
     private static final String CARTER_LEFT_ID = "Weapon_ShieldLeft_CaptainCarter_Starky";
+    private static final String GEORGIO_PRIMARY_ID = "Weapon_Shield_Georgio_Starky";
+    private static final String GEORGIO_LEFT_ID = "Weapon_ShieldLeft_Georgio_Starky";
     private static final String THROWN_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final long WORLD_UPDATE_WAIT_TIMEOUT_MS = 15000L;
 
@@ -390,6 +392,8 @@ public final class ShieldCapDurabilityLiveUpdater {
                 || isMatchingItemId(itemId, VIBRANIUM_LEFT_ID)
                 || isMatchingItemId(itemId, CARTER_PRIMARY_ID)
                 || isMatchingItemId(itemId, CARTER_LEFT_ID)
+                || isMatchingItemId(itemId, GEORGIO_PRIMARY_ID)
+                || isMatchingItemId(itemId, GEORGIO_LEFT_ID)
                 || isMatchingItemId(itemId, THROWN_ID);
     }
 
