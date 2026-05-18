@@ -86,24 +86,29 @@
                   "CancelOnItemChange": false
                 },
                 {
-                  "Type": "ShieldCap_Refresh_Java",
-                  "RunTime": 0,
+                      "Type": "ShieldCap_Refresh_Java",
+                      "RefreshMode": "SwapToVibranium",
+                      "RunTime": 0,
                   "CancelOnItemChange": false
                 }
               ]
             },
             {
-              "Type": "Serial",
               "Interactions": [
                 {
-                  "Type": "Simple",
-                  "RunTime": 0.2,
-                  "Effects": {
-                    "ItemAnimationId": "ShieldCapBackToHand",
-                    "ClearAnimationOnFinish": true,
-                    "WorldSoundEventId": "SFX_ShieldCap_Grab"
-                  },
-                  "CancelOnItemChange": true
+                  "Type": "Serial",
+                  "Interactions": [
+                    {
+                      "Type": "Simple",
+                      "RunTime": 0.2,
+                      "Effects": {
+                        "ItemAnimationId": "ShieldCapBackToHand",
+                        "ClearAnimationOnFinish": true,
+                        "WorldSoundEventId": "SFX_ShieldCap_Grab"
+                      },
+                      "CancelOnItemChange": true
+                    }
+                  ]
                 }
               ]
             }

@@ -29,6 +29,7 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
     private boolean pendingApply;
     private boolean pendingModelReset;
     private boolean awaitingNaturalModel;
+    private boolean waitingForExternalVisualClear;
     private Model pendingBaseModel;
     private Model naturalBaseModel;
     private ModelAttachment[] preservedExtraAttachments;
@@ -109,6 +110,14 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
         this.awaitingNaturalModel = awaitingNaturalModel;
     }
 
+    public boolean isWaitingForExternalVisualClear() {
+        return waitingForExternalVisualClear;
+    }
+
+    public void setWaitingForExternalVisualClear(boolean waitingForExternalVisualClear) {
+        this.waitingForExternalVisualClear = waitingForExternalVisualClear;
+    }
+
     public void setPendingBaseModel(Model pendingBaseModel) {
         this.pendingBaseModel = pendingBaseModel;
     }
@@ -169,6 +178,7 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
         copy.pendingApply = pendingApply;
         copy.pendingModelReset = pendingModelReset;
         copy.awaitingNaturalModel = awaitingNaturalModel;
+        copy.waitingForExternalVisualClear = waitingForExternalVisualClear;
         copy.pendingBaseModel = pendingBaseModel;
         copy.naturalBaseModel = naturalBaseModel;
         copy.preservedExtraAttachments =

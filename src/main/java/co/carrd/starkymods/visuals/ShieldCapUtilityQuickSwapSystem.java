@@ -87,9 +87,26 @@ public final class ShieldCapUtilityQuickSwapSystem extends EntityEventSystem<Ent
             return previousVariant;
         }
         if (currentVariant != null) {
-            return ShieldCapVisualSyncService.BackShieldPreference.AUTO_CLEAR_PENDING;
+            return equippedPreference(currentVariant);
         }
         return null;
+    }
+
+    private ShieldCapVisualSyncService.BackShieldPreference equippedPreference(
+            ShieldCapVisualSyncService.BackShieldPreference variant) {
+        if (variant == ShieldCapVisualSyncService.BackShieldPreference.NORMAL) {
+            return ShieldCapVisualSyncService.BackShieldPreference.EQUIPPED_NORMAL;
+        }
+        if (variant == ShieldCapVisualSyncService.BackShieldPreference.VIBRANIUM) {
+            return ShieldCapVisualSyncService.BackShieldPreference.EQUIPPED_VIBRANIUM;
+        }
+        if (variant == ShieldCapVisualSyncService.BackShieldPreference.CARTER) {
+            return ShieldCapVisualSyncService.BackShieldPreference.EQUIPPED_CARTER;
+        }
+        if (variant == ShieldCapVisualSyncService.BackShieldPreference.GEORGIO) {
+            return ShieldCapVisualSyncService.BackShieldPreference.EQUIPPED_GEORGIO;
+        }
+        return ShieldCapVisualSyncService.BackShieldPreference.AUTO_CLEAR_PENDING;
     }
 
     private ShieldCapVisualSyncService.BackShieldPreference variantPreference(String itemId) {

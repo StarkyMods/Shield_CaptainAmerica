@@ -3,8 +3,10 @@ package co.carrd.starkymods.visuals;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.hypixel.hytale.component.Archetype;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
@@ -33,6 +35,7 @@ import javax.annotation.Nullable;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -65,6 +68,10 @@ public final class ShieldCapBackModelSystems {
             "Items/Weapons/StarkyMods/Bone_Saw_Shield2.png";
     private static final String LEGACY_BACK_ATTACHMENT_TEXTURE =
             "Items/Weapons/StarkyMods/starkyshieldcaptainamericaback_attachment.png";
+    private static final String ATTACK_ON_TITAN_BACK_ATTACHMENT_MODEL =
+            "Items/Weapons/Starwhals/AOT_VME_Legs_Starwhals.blockymodel";
+    private static final String ATTACK_ON_TITAN_BACK_ATTACHMENT_TEXTURE =
+            "Items/Weapons/Starwhals/AOT_VME_Legs_Starwhals.png";
     private static final String SIMPLIFIED_HAIRCUT_MODEL =
             "Characters/Haircuts/HairbaseGeneric.blockymodel";
     private static final String LOG_PREFIX = "[ShieldCapBackModelDebug] ";
@@ -99,13 +106,6 @@ public final class ShieldCapBackModelSystems {
 
             ModelComponent currentModelComponent =
                     chunk.getComponent(entityIndex, ModelComponent.getComponentType());
-            if (state.shouldShowBackShield()
-                    && !state.isPendingApply()
-                    && currentModelComponent != null
-                    && !hasShieldCapAttachment(currentModelComponent.getModel())) {
-                state.rebuild();
-            }
-
             Model currentModel = currentModelComponent == null ? null : currentModelComponent.getModel();
             PlayerSkinComponent playerSkinComponent =
                     chunk.getComponent(entityIndex, PlayerSkinComponent.getComponentType());
@@ -135,6 +135,57 @@ public final class ShieldCapBackModelSystems {
             Model appearanceModel = createAppearanceModel(player, playerSkinComponent);
             String appearanceSignature = buildModelSignature(appearanceModel);
             Model currentBaseModel = removeShieldCapAttachment(currentModel);
+            boolean externalVisualStateActive = hasExternalVisualStateActive(player);
+            boolean externalVisualAttachmentActive = hasForeignVisualAttachment(currentModel, appearanceModel, state);
+            boolean shouldYieldToExternalVisual =
+                    (externalVisualStateActive && (externalVisualAttachmentActive || hasActiveShieldAttachment))
+                            || (externalVisualAttachmentActive
+                            && (hasActiveShieldAttachment || state.isWaitingForExternalVisualClear()));
+            if (state.shouldShowBackShield() && shouldYieldToExternalVisual) {
+                state.setPendingApply(false);
+                state.setPendingModelReset(false);
+                state.setWaitingForExternalVisualClear(true);
+                if (hasActiveShieldAttachment) {
+                    chunk.setComponent(
+                            entityIndex,
+                            ModelComponent.getComponentType(),
+                            new ModelComponent(currentBaseModel)
+                    );
+                    playerSkinComponent.setNetworkOutdated();
+                }
+                debug("skip back shield while foreign visual is active"
+                        + " | player=" + playerId
+                        + " | externalState=" + externalVisualStateActive
+                        + " | externalAttachment=" + externalVisualAttachmentActive
+                        + " | hasShieldAttachment=" + hasActiveShieldAttachment
+                        + " | currentModel=" + summarizeModel(currentModel)
+                        + " | appearanceModel=" + summarizeModel(appearanceModel));
+                return;
+            }
+            if (state.isWaitingForExternalVisualClear()) {
+                state.setWaitingForExternalVisualClear(false);
+                if (state.shouldShowBackShield() && !hasActiveShieldAttachment) {
+                    state.rebuild();
+                    dirty = true;
+                    debug("retry back shield after external visual clear"
+                            + " | player=" + playerId
+                            + " | currentModel=" + summarizeModel(currentModel)
+                            + " | appearanceModel=" + summarizeModel(appearanceModel));
+                }
+            }
+            if (state.shouldShowBackShield()
+                    && !state.isPendingApply()
+                    && currentModelComponent != null
+                    && !hasActiveShieldAttachment) {
+                state.rebuild();
+                dirty = true;
+                debug("request back shield rebuild because attachment missing"
+                        + " | player=" + playerId
+                        + " | externalState=" + externalVisualStateActive
+                        + " | externalAttachment=" + externalVisualAttachmentActive
+                        + " | currentModel=" + summarizeModel(currentModel)
+                        + " | appearanceModel=" + summarizeModel(appearanceModel));
+            }
             boolean currentUsesManagedAppearanceBase = hasSameBaseVisual(currentBaseModel, appearanceModel);
             boolean activeShieldBaseMismatch = state.shouldShowBackShield()
                     && hasActiveShieldAttachment
@@ -176,7 +227,12 @@ public final class ShieldCapBackModelSystems {
             }
 
             rememberNaturalBaseModel(state, currentModel, appearanceModel);
-            Model baseModel = selectInjectionBaseModel(currentModel, appearanceModel, state.getNaturalBaseModel());
+            Model baseModel = selectInjectionBaseModel(
+                    currentModel,
+                    appearanceModel,
+                    state.getNaturalBaseModel(),
+                    externalVisualAttachmentActive && !externalVisualStateActive
+            );
             debug("tick dirty"
                     + " | player=" + playerId
                     + " | shouldShow=" + state.shouldShowBackShield()
@@ -341,15 +397,25 @@ public final class ShieldCapBackModelSystems {
         }
 
         private Model selectInjectionBaseModel(Model currentModel, Model appearanceModel) {
-            return selectInjectionBaseModel(currentModel, appearanceModel, null);
+            return selectInjectionBaseModel(currentModel, appearanceModel, null, false);
         }
 
         private Model selectInjectionBaseModel(Model currentModel, Model appearanceModel, Model naturalBaseModel) {
+            return selectInjectionBaseModel(currentModel, appearanceModel, naturalBaseModel, false);
+        }
+
+        private Model selectInjectionBaseModel(Model currentModel,
+                                               Model appearanceModel,
+                                               Model naturalBaseModel,
+                                               boolean currentHasStaleExternalVisual) {
             if (appearanceModel == null) {
                 return naturalBaseModel != null ? removeShieldCapAttachment(naturalBaseModel) : removeShieldCapAttachment(currentModel);
             }
             if (currentModel == null) {
-                return naturalBaseModel != null ? removeShieldCapAttachment(naturalBaseModel) : appearanceModel;
+                return appearanceModel;
+            }
+            if (currentHasStaleExternalVisual) {
+                return appearanceModel;
             }
 
             if (hasShieldCapAttachment(currentModel)) {
@@ -357,10 +423,7 @@ public final class ShieldCapBackModelSystems {
                 return hasSameBaseVisual(normalizedCurrent, appearanceModel) ? appearanceModel : normalizedCurrent;
             }
             if (isLikelyUninitializedPlayerModel(currentModel, appearanceModel)) {
-                return naturalBaseModel != null ? removeShieldCapAttachment(naturalBaseModel) : appearanceModel;
-            }
-            if (naturalBaseModel != null) {
-                return removeShieldCapAttachment(naturalBaseModel);
+                return appearanceModel;
             }
 
             return removeShieldCapAttachment(currentModel);
@@ -380,6 +443,9 @@ public final class ShieldCapBackModelSystems {
             Model normalizedCurrent = removeShieldCapAttachment(currentModel);
             Model normalizedAppearance = removeShieldCapAttachment(appearanceModel);
             Model normalizedPendingBase = removeShieldCapAttachment(state.getPendingBaseModel());
+            if (hasForeignVisualAttachment(normalizedCurrent, normalizedAppearance, null)) {
+                return;
+            }
 
             if (state.isAwaitingNaturalModel()) {
                 if (normalizedPendingBase != null
@@ -452,6 +518,166 @@ public final class ShieldCapBackModelSystems {
             }
 
             return cloneModelWithAttachments(model, attachments.toArray(ModelAttachment[]::new));
+        }
+
+        private boolean hasForeignVisualAttachment(Model currentModel,
+                                                   Model appearanceModel,
+                                                   ShieldCapBackStateComponent state) {
+            if (currentModel == null || currentModel.getAttachments() == null || currentModel.getAttachments().length == 0) {
+                return false;
+            }
+
+            for (ModelAttachment attachment : currentModel.getAttachments()) {
+                if (attachment == null || isShieldCapAttachment(attachment)) {
+                    continue;
+                }
+                if (isKnownExternalVisualAttachment(attachment)
+                        || isLikelyExternalVisualAttachment(attachment, appearanceModel)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private boolean isKnownExternalVisualAttachment(ModelAttachment attachment) {
+            return attachment != null
+                    && stringEquals(attachment.getModel(), ATTACK_ON_TITAN_BACK_ATTACHMENT_MODEL)
+                    && stringEquals(attachment.getTexture(), ATTACK_ON_TITAN_BACK_ATTACHMENT_TEXTURE);
+        }
+
+        private boolean isLikelyExternalVisualAttachment(ModelAttachment attachment, Model appearanceModel) {
+            if (attachment == null || attachment.getModel() == null) {
+                return false;
+            }
+
+            String model = attachment.getModel();
+            if (!model.startsWith("Items/")) {
+                return false;
+            }
+
+            ModelAttachment[] appearanceAttachments =
+                    appearanceModel == null ? null : appearanceModel.getAttachments();
+            return !containsEquivalentAttachment(appearanceAttachments, attachment);
+        }
+
+        private boolean hasExternalVisualStateActive(Player player) {
+            if (player == null || player.getReference() == null || !player.getReference().isValid()) {
+                return false;
+            }
+
+            Store<EntityStore> store = player.getReference().getStore();
+            if (store == null) {
+                return false;
+            }
+
+            return hasGenericExternalVisualStateActive(store, player.getReference())
+                    || isVisualStateComponentActive(
+                    store,
+                    player.getReference(),
+                    "org.starwhals.plugin.visuals.AttackOnTitanVisualStateComponent"
+            );
+        }
+
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        private boolean hasGenericExternalVisualStateActive(Store<EntityStore> store, Ref<EntityStore> ref) {
+            try {
+                Archetype<EntityStore> archetype = store.getArchetype(ref);
+                if (archetype == null || archetype.isEmpty()) {
+                    return false;
+                }
+
+                for (int index = 0; index < archetype.length(); index++) {
+                    ComponentType componentType = archetype.get(index);
+                    Object component = store.getComponent(ref, componentType);
+                    if (isExternalVisualStateComponentActive(component)) {
+                        return true;
+                    }
+                }
+            } catch (Exception ignored) {
+                return false;
+            }
+            return false;
+        }
+
+        private boolean isExternalVisualStateComponentActive(Object component) {
+            if (component == null) {
+                return false;
+            }
+
+            Class<?> componentClass = component.getClass();
+            Package componentPackage = componentClass.getPackage();
+            String packageName = componentPackage == null ? "" : componentPackage.getName();
+            String simpleName = componentClass.getSimpleName();
+            if (packageName.startsWith("co.carrd.starkymods")
+                    || !simpleName.contains("Visual")
+                    || !(simpleName.contains("State") || simpleName.contains("Component"))) {
+                return false;
+            }
+
+            for (Method method : componentClass.getMethods()) {
+                if (method.getParameterCount() != 0
+                        || method.getReturnType() != boolean.class
+                        || !method.getName().startsWith("shouldShow")) {
+                    continue;
+                }
+                try {
+                    if (Boolean.TRUE.equals(method.invoke(component))) {
+                        return isExternalVisualStatePending(componentClass, component);
+                    }
+                } catch (Exception ignored) {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        private boolean isExternalVisualStatePending(Class<?> componentClass, Object component) {
+            boolean foundPendingMethod = false;
+            for (Method method : componentClass.getMethods()) {
+                if (method.getParameterCount() != 0
+                        || method.getReturnType() != boolean.class
+                        || !method.getName().contains("Pending")) {
+                    continue;
+                }
+
+                foundPendingMethod = true;
+                try {
+                    if (Boolean.TRUE.equals(method.invoke(component))) {
+                        return true;
+                    }
+                } catch (Exception ignored) {
+                    return false;
+                }
+            }
+
+            return !foundPendingMethod;
+        }
+
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        private boolean isVisualStateComponentActive(Store<EntityStore> store,
+                                                     Ref<EntityStore> ref,
+                                                     String componentClassName) {
+            try {
+                Class<?> componentClass = Class.forName(componentClassName);
+                Method getComponentType = componentClass.getMethod("getComponentType");
+                Object componentTypeObject = getComponentType.invoke(null);
+                if (!(componentTypeObject instanceof ComponentType componentType)) {
+                    return false;
+                }
+
+                Object component = store.getComponent(ref, componentType);
+                if (component == null) {
+                    return false;
+                }
+
+                Method shouldShowBackShield = componentClass.getMethod("shouldShowBackShield");
+                Object result = shouldShowBackShield.invoke(component);
+                return Boolean.TRUE.equals(result) && isExternalVisualStatePending(componentClass, component);
+            } catch (ClassNotFoundException ignored) {
+                return false;
+            } catch (Exception ignored) {
+                return false;
+            }
         }
 
         private boolean isEquivalentToAppearanceBase(Model currentModel, Model appearanceModel) {

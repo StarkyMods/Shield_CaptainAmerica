@@ -66,6 +66,8 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
         ShieldCapVisualSyncService.BackShieldPreference preference =
                 isSwapFromRefresh()
                         ? resolveBackShieldPreference(player)
+                        : isSwapToRefresh()
+                        ? resolveEquippedShieldPreference()
                         : ShieldCapVisualSyncService.BackShieldPreference.AUTO_CLEAR_PENDING;
         plugin.getVisualSyncService().syncDeferred(player, false, preference);
     }
@@ -74,6 +76,29 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
         return refreshMode != null
                 && (refreshMode.toLowerCase().startsWith("swapfrom")
                 || "FromHand".equalsIgnoreCase(refreshMode));
+    }
+
+    private boolean isSwapToRefresh() {
+        return refreshMode != null && refreshMode.toLowerCase().startsWith("swapto");
+    }
+
+    private ShieldCapVisualSyncService.BackShieldPreference resolveEquippedShieldPreference() {
+        if (refreshMode == null) {
+            return ShieldCapVisualSyncService.BackShieldPreference.AUTO_CLEAR_PENDING;
+        }
+        if (refreshMode.toLowerCase().contains("normal")) {
+            return ShieldCapVisualSyncService.BackShieldPreference.EQUIPPED_NORMAL;
+        }
+        if (refreshMode.toLowerCase().contains("vibranium")) {
+            return ShieldCapVisualSyncService.BackShieldPreference.EQUIPPED_VIBRANIUM;
+        }
+        if (refreshMode.toLowerCase().contains("carter")) {
+            return ShieldCapVisualSyncService.BackShieldPreference.EQUIPPED_CARTER;
+        }
+        if (refreshMode.toLowerCase().contains("georgio")) {
+            return ShieldCapVisualSyncService.BackShieldPreference.EQUIPPED_GEORGIO;
+        }
+        return ShieldCapVisualSyncService.BackShieldPreference.AUTO_CLEAR_PENDING;
     }
 
     private ShieldCapVisualSyncService.BackShieldPreference resolveBackShieldPreference(Player player) {
