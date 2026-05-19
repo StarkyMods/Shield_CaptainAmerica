@@ -79,7 +79,7 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
     private static final String PARTNER_PERFECT_DODGES_URL = "https://www.curseforge.com/hytale/mods/perfect-dodges";
     private static final String PARTNER_MJOLNIR_URL = HOME_MJOLNIR_URL;
 
-    private static final PluginIdentifier ENDLESS_LEVELING_PLUGIN_ID = new PluginIdentifier("com.airijko", "EndlessLeveling");
+    private static final PluginIdentifier ENDLESS_LEVELING_PLUGIN_ID = new PluginIdentifier("Airijko", "EndlessLevelingCore");
     private static final PluginIdentifier MJOLNIR_PLUGIN_ID = new PluginIdentifier("StarkyMods", "Starky's Mjolnir");
     private static final PluginIdentifier PERFECT_PARRIES_PLUGIN_ID = new PluginIdentifier("narwhals", "Perfect Parries");
     private static final PluginIdentifier ZEPHYR_PLUGIN_ID = new PluginIdentifier("narwhals", "Zephyr");
@@ -738,20 +738,20 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         String target = action.substring("compatibility:menu:".length()).trim();
         boolean isOp = PermissionsModule.get().hasPermission(playerRef.getUuid(), "*");
         switch (target.toLowerCase()) {
-            case "endlessleveling" -> runCompatibilityMenuCommand(ref, store, ENDLESS_LEVELING_PLUGIN_ID, "el", "Endless Leveling mod is not active");
-            case "mjolnir" -> runCompatibilityMenuCommand(ref, store, MJOLNIR_PLUGIN_ID, "mjolnir", "Starky's Mjolnir mod is not active");
-            case "perfectparries" -> runCompatibilityMenuCommand(ref, store, PERFECT_PARRIES_PLUGIN_ID, isOp ? "parrymodsettings" : "parrymod", "Perfect Parries mod is not active");
-            case "zephyr" -> runCompatibilityMenuCommand(ref, store, ZEPHYR_PLUGIN_ID, isOp ? "zephyrsettings" : "zephyr", "Zephyr mod is not active");
-            case "perfectdodges" -> runCompatibilityMenuCommand(ref, store, PERFECT_DODGES_PLUGIN_ID, isOp ? "dodgemodsettings" : "dodgemod", "Perfect Dodges mod is not active");
+            case "endlessleveling" -> runCompatibilityMenuCommand(ref, store, ENDLESS_LEVELING_PLUGIN_ID, "el", "Endless Leveling mod is not active", PARTNER_ENDLESS_LEVELING_URL);
+            case "mjolnir" -> runCompatibilityMenuCommand(ref, store, MJOLNIR_PLUGIN_ID, "mjolnir", "Starky's Mjolnir mod is not active", PARTNER_MJOLNIR_URL);
+            case "perfectparries" -> runCompatibilityMenuCommand(ref, store, PERFECT_PARRIES_PLUGIN_ID, isOp ? "parrymodsettings" : "parrymod", "Perfect Parries mod is not active", PARTNER_PERFECT_PARRIES_URL);
+            case "zephyr" -> runCompatibilityMenuCommand(ref, store, ZEPHYR_PLUGIN_ID, isOp ? "zephyr settings" : "zephyr", "Zephyr mod is not active", PARTNER_ZEPHYR_URL);
+            case "perfectdodges" -> runCompatibilityMenuCommand(ref, store, PERFECT_DODGES_PLUGIN_ID, isOp ? "pd admin" : "pd", "Perfect Dodges mod is not active", PARTNER_PERFECT_DODGES_URL);
             default -> {
             }
         }
     }
 
     private void runCompatibilityMenuCommand(Ref<EntityStore> ref, Store<EntityStore> store,
-                                             PluginIdentifier pluginId, String command, String inactiveMessage) {
+                                             PluginIdentifier pluginId, String command, String inactiveMessage, String curseForgeUrl) {
         if (!isPluginActive(pluginId)) {
-            sendMessage(inactiveMessage);
+            sendMessage(Message.raw(inactiveMessage + ". Open CurseForge page").link(curseForgeUrl));
             return;
         }
         executePlayerCommand(command);
@@ -1119,6 +1119,5 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         }
     }
 }
-
 
 

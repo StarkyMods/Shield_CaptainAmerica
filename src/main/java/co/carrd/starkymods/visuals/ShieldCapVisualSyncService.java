@@ -1109,6 +1109,20 @@ public final class ShieldCapVisualSyncService {
                 return BACK_VARIANT_GEORGIO;
             }
         }
+        if (preference == BackShieldPreference.PRIORITY_REFRESH) {
+            if (hasNormalBackShieldCandidate) {
+                return BACK_VARIANT_NORMAL;
+            }
+            if (hasCarterBackShieldCandidate) {
+                return BACK_VARIANT_CARTER;
+            }
+            if (hasGeorgioBackShieldCandidate) {
+                return BACK_VARIANT_GEORGIO;
+            }
+            if (hasVibraniumBackShieldCandidate) {
+                return BACK_VARIANT_VIBRANIUM;
+            }
+        }
         if (BACK_VARIANT_GEORGIO.equals(currentBackShieldVariant) && hasGeorgioBackShieldCandidate) {
             return BACK_VARIANT_GEORGIO;
         }
@@ -1136,6 +1150,7 @@ public final class ShieldCapVisualSyncService {
     public enum BackShieldPreference {
         AUTO,
         AUTO_CLEAR_PENDING,
+        PRIORITY_REFRESH,
         NORMAL,
         VIBRANIUM,
         CARTER,

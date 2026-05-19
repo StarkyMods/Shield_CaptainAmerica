@@ -2,6 +2,7 @@ package co.carrd.starkymods;
 
 import co.carrd.starkymods.commands.ShieldCapCraftCommand;
 import co.carrd.starkymods.commands.ShieldCapConfigCommand;
+import co.carrd.starkymods.commands.ShieldCapVisualRefreshCommand;
 import co.carrd.starkymods.config.ShieldCapConfigManager;
 import co.carrd.starkymods.config.ShieldCapCraftConfigManager;
 import co.carrd.starkymods.config.ShieldCapCraftHotReloadService;
@@ -12,6 +13,7 @@ import co.carrd.starkymods.config.ShieldCapDurabilityLiveUpdater;
 import co.carrd.starkymods.damage.ShieldCapDamageAssetGenerator;
 import co.carrd.starkymods.damage.ShieldCapDamageHotReloadService;
 import co.carrd.starkymods.interactions.ShieldCapRefreshVisualsInteraction;
+import co.carrd.starkymods.interactions.ShieldCapVisualRefreshInteraction;
 import co.carrd.starkymods.interactions.ShieldCapSignatureEnergySave;
 import co.carrd.starkymods.interactions.ShieldCapSignatureEnergyLoad;
 import co.carrd.starkymods.interactions.ShieldCapPrimarySelector;
@@ -76,6 +78,7 @@ import co.carrd.starkymods.visuals.ShieldCapUtilityQuickSwapSystem;
 import co.carrd.starkymods.visuals.ShieldCapVisualSyncService;
 import co.carrd.starkymods.interactions.ShieldCapReturnKickInputService;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -149,6 +152,7 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         ShieldCapCraftConfigManager.init();
         ShieldCapDamageConfigManager.init();
         ShieldCapPacketListener.register();
+        getEventRegistry().register(PlayerDisconnectEvent.class, ShieldCapUpdateCheckListener::onPlayerDisconnect);
         getEventRegistry().registerGlobal(PlayerReadyEvent.class, ShieldCapUpdateCheckListener::onPlayerReady);
         ShieldCapRecipeOverrideManager.register(this);
         this.getCommandRegistry().registerCommand(new ShieldCapCraftCommand());
@@ -156,6 +160,7 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         this.getCommandRegistry().registerCommand(new ShieldCapConfigCommand("capshieldsettings", true));
         this.getCommandRegistry().registerCommand(new ShieldCapConfigCommand("capshieldmod", false));
         this.getCommandRegistry().registerCommand(new ShieldCapConfigCommand("capshieldmodsettings", true));
+        this.getCommandRegistry().registerCommand(new ShieldCapVisualRefreshCommand());
         shieldCapBackStateComponentType =
                 getEntityStoreRegistry().registerComponent(
                         ShieldCapBackStateComponent.class,
@@ -167,6 +172,11 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
                 "ShieldCap_Refresh_Java",
                 ShieldCapRefreshVisualsInteraction.class,
                 ShieldCapRefreshVisualsInteraction.CODEC
+        );
+        getCodecRegistry(Interaction.CODEC).register(
+                "ShieldCap_Visual_Refresh",
+                ShieldCapVisualRefreshInteraction.class,
+                ShieldCapVisualRefreshInteraction.CODEC
         );
         getCodecRegistry(Interaction.CODEC).register(
                 "ShieldCap_SignatureEnergy_Save_Java",
@@ -402,7 +412,7 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         returnKickInputService.register(this);
         returnReticleInjector.register(this);
         perfectParryBridgeService.register(this);
-        new HStats("3b08e6b8-d2cc-4c30-8b35-1dc475393fad", "1.3.0");
+        new HStats("3b08e6b8-d2cc-4c30-8b35-1dc475393fad", "1.3.1");
     }
 
     @Override
@@ -444,7 +454,7 @@ public class StarkyShieldCaptainAmerica extends JavaPlugin {
         }
 
         boolean endlessLevelingPresent =
-                pluginManager.getPlugin(new PluginIdentifier("com.airijko", "EndlessLeveling")) != null;
+                pluginManager.getPlugin(new PluginIdentifier("Airijko", "EndlessLevelingCore")) != null;
         boolean endgameQoLPresent =
                 pluginManager.getPlugin(new PluginIdentifier("Config", "Endgame&QoL")) != null;
 

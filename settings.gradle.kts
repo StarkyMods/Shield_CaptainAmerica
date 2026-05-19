@@ -1,1 +1,1 @@
-rootProject.name = "Starky's Shield Captain America 1.3.0"
+rootProject.name = "Starky's Shield Captain America 1.3.1"
