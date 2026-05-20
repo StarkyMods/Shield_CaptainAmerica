@@ -111,16 +111,6 @@
       "Interactions": [
         "ShieldLeft_Primary_Charging"
       ]
-    },
-    "HeldOffhand": {
-      "Interactions": [
-        {
-          "Type": "Simple",
-          "Effects": {
-            "WorldSoundEventId": "SFX_ShieldGeorgioLeft_Motor"
-          }
-        }
-      ]
     }
   },
   "Weapon": {},
