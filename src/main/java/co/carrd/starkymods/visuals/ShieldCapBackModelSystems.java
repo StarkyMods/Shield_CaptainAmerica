@@ -66,6 +66,8 @@ public final class ShieldCapBackModelSystems {
             "Items/Weapons/StarkyMods/starkyshieldcaptainamericacarter.png";
     private static final String BACK_ATTACHMENT_GEORGIO_TEXTURE =
             "Items/Weapons/StarkyMods/Bone_Saw_Shield2.png";
+    private static final String BACK_ATTACHMENT_ANTI_TEXTURE =
+            "Items/Weapons/StarkyMods/starkyshieldanticap.png";
     private static final String LEGACY_BACK_ATTACHMENT_TEXTURE =
             "Items/Weapons/StarkyMods/starkyshieldcaptainamericaback_attachment.png";
     private static final String ATTACK_ON_TITAN_BACK_ATTACHMENT_MODEL =
@@ -85,6 +87,8 @@ public final class ShieldCapBackModelSystems {
     }
 
     public static final class Tick extends EntityTickingSystem<EntityStore> {
+        private static final int STABLE_VISUAL_CHECK_INTERVAL_TICKS = 10;
+        private int stableVisualCheckCursor;
         private static final Query<EntityStore> QUERY = Query.and(
                 ShieldCapBackStateComponent.getComponentType(),
                 Player.getComponentType(),
@@ -115,6 +119,13 @@ public final class ShieldCapBackModelSystems {
 
             boolean dirty = state.consumeDirty();
             boolean hasActiveShieldAttachment = currentModel != null && hasShieldCapAttachment(currentModel);
+            boolean hasPendingVisualWork = state.isPendingApply()
+                    || state.isPendingModelReset()
+                    || state.isAwaitingNaturalModel()
+                    || state.isWaitingForExternalVisualClear();
+            if (!state.shouldShowBackShield() && hasActiveShieldAttachment) {
+                dirty = true;
+            }
             if (dirty && !state.shouldShowBackShield()) {
                 state.setPendingApply(false);
                 state.setPendingModelReset(false);
@@ -128,6 +139,21 @@ public final class ShieldCapBackModelSystems {
                             + " | currentModel=" + summarizeModel(currentModel));
                     return;
                 }
+            }
+
+            if (!dirty
+                    && !state.shouldShowBackShield()
+                    && !hasActiveShieldAttachment
+                    && !hasPendingVisualWork) {
+                return;
+            }
+
+            if (!dirty
+                    && state.shouldShowBackShield()
+                    && hasActiveShieldAttachment
+                    && !hasPendingVisualWork
+                    && !shouldRunStableVisualCheck()) {
+                return;
             }
 
             Player player = chunk.getComponent(entityIndex, Player.getComponentType());
@@ -317,6 +343,15 @@ public final class ShieldCapBackModelSystems {
             return QUERY;
         }
 
+        private boolean shouldRunStableVisualCheck() {
+            stableVisualCheckCursor++;
+            if (stableVisualCheckCursor >= STABLE_VISUAL_CHECK_INTERVAL_TICKS) {
+                stableVisualCheckCursor = 0;
+                return true;
+            }
+            return false;
+        }
+
         private Model buildShieldCapModel(Model baseModel) {
             return buildShieldCapModel(baseModel, false, false, "Normal");
         }
@@ -369,6 +404,9 @@ public final class ShieldCapBackModelSystems {
             }
             if ("Georgio".equals(backShieldVariant)) {
                 return BACK_ATTACHMENT_GEORGIO_TEXTURE;
+            }
+            if ("AntiCaptainAmerica".equals(backShieldVariant)) {
+                return BACK_ATTACHMENT_ANTI_TEXTURE;
             }
             return BACK_ATTACHMENT_TEXTURE;
         }
@@ -1390,6 +1428,7 @@ public final class ShieldCapBackModelSystems {
                     || BACK_ATTACHMENT_VIBRANIUM_TEXTURE.equals(attachment.getTexture())
                     || BACK_ATTACHMENT_CARTER_TEXTURE.equals(attachment.getTexture())
                     || BACK_ATTACHMENT_GEORGIO_TEXTURE.equals(attachment.getTexture())
+                    || BACK_ATTACHMENT_ANTI_TEXTURE.equals(attachment.getTexture())
                     || LEGACY_BACK_ATTACHMENT_TEXTURE.equals(attachment.getTexture()));
         }
 

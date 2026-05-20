@@ -34,6 +34,8 @@ public final class ShieldCapPerfectParryBridgeService {
     private static final String CARTER_LEFT_SHIELD_ID = "Weapon_ShieldLeft_CaptainCarter_Starky";
     private static final String GEORGIO_MAIN_SHIELD_ID = "Weapon_Shield_Georgio_Starky";
     private static final String GEORGIO_LEFT_SHIELD_ID = "Weapon_ShieldLeft_Georgio_Starky";
+    private static final String ANTI_MAIN_SHIELD_ID = "Weapon_Shield_AntiCaptainAmerica_Starky";
+    private static final String ANTI_LEFT_SHIELD_ID = "Weapon_ShieldLeft_AntiCaptainAmerica_Starky";
     private static final String PERFECT_PARRY_ROOT_ID = "Root_ShieldCap_Perfect_Parry_Shockwave";
     private static final long PERFECT_PARRY_IMPACT_SUPPRESSION_WINDOW_MS = 1500L;
     private static final InteractionType[] FORCED_LANES = {
@@ -212,7 +214,8 @@ public final class ShieldCapPerfectParryBridgeService {
                 && (matchesId(hotbar.getItemStack(activeHotbarSlot), MAIN_SHIELD_ID)
                 || matchesId(hotbar.getItemStack(activeHotbarSlot), VIBRANIUM_MAIN_SHIELD_ID)
                 || matchesId(hotbar.getItemStack(activeHotbarSlot), CARTER_MAIN_SHIELD_ID)
-                || matchesId(hotbar.getItemStack(activeHotbarSlot), GEORGIO_MAIN_SHIELD_ID))) {
+                || matchesId(hotbar.getItemStack(activeHotbarSlot), GEORGIO_MAIN_SHIELD_ID)
+                || matchesId(hotbar.getItemStack(activeHotbarSlot), ANTI_MAIN_SHIELD_ID))) {
             log("shield equipped | hand=main | slot=" + activeHotbarSlot);
             return true;
         }
@@ -227,7 +230,9 @@ public final class ShieldCapPerfectParryBridgeService {
                 || matchesId(utility.getItemStack(activeUtilitySlot), CARTER_LEFT_SHIELD_ID)
                 || matchesId(utility.getItemStack(activeUtilitySlot), CARTER_MAIN_SHIELD_ID)
                 || matchesId(utility.getItemStack(activeUtilitySlot), GEORGIO_LEFT_SHIELD_ID)
-                || matchesId(utility.getItemStack(activeUtilitySlot), GEORGIO_MAIN_SHIELD_ID));
+                || matchesId(utility.getItemStack(activeUtilitySlot), GEORGIO_MAIN_SHIELD_ID)
+                || matchesId(utility.getItemStack(activeUtilitySlot), ANTI_LEFT_SHIELD_ID)
+                || matchesId(utility.getItemStack(activeUtilitySlot), ANTI_MAIN_SHIELD_ID));
         if (leftEquipped) {
             log("shield equipped | hand=left | slot=" + activeUtilitySlot);
         }

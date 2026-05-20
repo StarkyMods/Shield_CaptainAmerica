@@ -1,13 +1,14 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.Weapon_Shield_Georgio_Starky.name",
-    "Description": "server.items.Weapon_Shield_Georgio_Starky.description"
+    "Name": "server.items.Weapon_Shield_AntiCaptainAmerica_Starky.name",
+    "Description": "server.items.Weapon_Shield_AntiCaptainAmerica_Starky.description"
   },
-  "Model": "Items/Weapons/StarkyMods/Bone_Saw_Shield_right.blockymodel",
-  "Texture": "Items/Weapons/StarkyMods/Bone_Saw_Shield2.png",
+  "Model": "Items/Weapons/StarkyMods/starkyshieldcaptainamericaright.blockymodel",
+  "Texture": "Items/Weapons/StarkyMods/starkyshieldanticap.png",
+  "Icon": "Icons/ItemsGenerated/Weapon_Shield_AntiCaptainAmerica_Starky.png",
   "Quality": "ShieldCap_Quality",
   "ItemLevel": 100,
-  "Scale": 0.53,
+  "Scale": 2.8,
   "Categories": [
     "Items.Weapons",
     "StarkyModsCategory.Weapons"
@@ -48,7 +49,7 @@
                     },
                     {
                       "Type": "ShieldCap_Refresh_Java",
-                      "RefreshMode": "SwapFromGeorgio",
+                      "RefreshMode": "SwapFromAnti",
                       "RunTime": 0,
                       "CancelOnItemChange": false
                     },
@@ -86,7 +87,7 @@
                 },
                 {
                   "Type": "ShieldCap_Refresh_Java",
-                  "RefreshMode": "SwapToGeorgio",
+                  "RefreshMode": "SwapToAnti",
                   "RunTime": 0,
                   "CancelOnItemChange": false
                 }
@@ -176,17 +177,6 @@
         ],
         "ConditionValueType": "Absolute"
       }
-    ],
-    "GlidingActive": [
-      {
-        "Condition": [
-          0,
-          0
-        ],
-        "WorldSoundEventId": "SFX_ShieldGeorgio_Motor",
-        "ConditionValueType": "Absolute",
-        "LocalSoundEventId": "SFX_ShieldGeorgio_Motor"
-      }
     ]
   },
   "DurabilityLossOnHit": 0.21,
@@ -196,15 +186,15 @@
     "Usable": true
   },
   "IconProperties": {
-    "Scale": 0.53,
+    "Scale": 0.6,
     "Rotation": [
       351,
       64,
       342
     ],
     "Translation": [
-      18,
-      -73
+      3.5,
+      -13.8
     ]
   },
   "InteractionVars": {
@@ -616,25 +606,5 @@
       ]
     }
   },
-  "SoundEventId": "SFX_ShieldCap_Held",
-  "Animation": "Items/Animations/StarkyMods/Saw_Spin1.blockyanim",
-  "Particles": [
-    {
-      "SystemId": "Georgio_Smoke_Black",
-      "TargetEntityPart": "PrimaryItem",
-      "TargetNodeName": "Motor",
-      "Scale": 0.5,
-      "PositionOffset": {
-        "X": 0.2,
-        "Y": -0.5,
-        "Z": 0.3
-      },
-      "RotationOffset": {
-        "Roll": 0,
-        "Pitch": 0,
-        "Yaw": 0
-      }
-    }
-  ],
-  "Icon": "Icons/ItemsGenerated/Weapon_Shield_Georgio_Starky.png"
+  "SoundEventId": "SFX_ShieldCap_Held"
 }

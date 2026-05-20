@@ -33,6 +33,7 @@ public class ShieldCapThrowHomingMarkProjectile extends SimpleInstantInteraction
     private static final String SHIELDCAP_VIBRANIUM_PROJECTILE_ASSET_ID = "ShieldCap_Vibranium_Projectile";
     private static final String SHIELDCAP_CARTER_PROJECTILE_ASSET_ID = "ShieldCap_Carter_Projectile";
     private static final String SHIELDCAP_GEORGIO_PROJECTILE_ASSET_ID = "ShieldCap_Georgio_Projectile";
+    private static final String SHIELDCAP_ANTI_PROJECTILE_ASSET_ID = "ShieldCap_AntiCaptainAmerica_Projectile";
 
     @Nonnull
     public static final BuilderCodec<ShieldCapThrowHomingMarkProjectile> CODEC =
@@ -231,7 +232,8 @@ public class ShieldCapThrowHomingMarkProjectile extends SimpleInstantInteraction
         return SHIELDCAP_PROJECTILE_ASSET_ID.equals(projectileAssetName)
                 || SHIELDCAP_VIBRANIUM_PROJECTILE_ASSET_ID.equals(projectileAssetName)
                 || SHIELDCAP_CARTER_PROJECTILE_ASSET_ID.equals(projectileAssetName)
-                || SHIELDCAP_GEORGIO_PROJECTILE_ASSET_ID.equals(projectileAssetName);
+                || SHIELDCAP_GEORGIO_PROJECTILE_ASSET_ID.equals(projectileAssetName)
+                || SHIELDCAP_ANTI_PROJECTILE_ASSET_ID.equals(projectileAssetName);
     }
 
     private boolean isOwnedByOwner(@Nonnull CommandBuffer<EntityStore> commandBuffer,

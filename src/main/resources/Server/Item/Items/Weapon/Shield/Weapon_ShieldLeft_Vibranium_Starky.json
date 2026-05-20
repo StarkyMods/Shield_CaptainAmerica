@@ -76,9 +76,9 @@
             {
               "Interactions": [
                 {
-                      "Type": "ShieldCap_Refresh_Java",
-                      "RefreshMode": "SwapToVibranium",
-                      "RunTime": 0,
+                  "Type": "ShieldCap_Refresh_Java",
+                  "RefreshMode": "SwapToVibranium",
+                  "RunTime": 0,
                   "CancelOnItemChange": false
                 }
               ]
@@ -255,5 +255,6 @@
         }
       ]
     }
-  }
+  },
+  "SoundEventId": "SFX_ShieldCap_Held"
 }

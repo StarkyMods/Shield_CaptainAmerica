@@ -1,11 +1,11 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.Weapon_Shield_CaptainCarter_Starky.name",
-    "Description": "server.items.Weapon_Shield_CaptainCarter_Starky.description"
+    "Name": "server.items.Weapon_Shield_AntiCaptainAmerica_Starky.name",
+    "Description": "server.items.Weapon_Shield_AntiCaptainAmerica_Starky.description"
   },
   "Model": "Items/Weapons/StarkyMods/starkyshieldcaptainamericaleft.blockymodel",
-  "Texture": "Items/Weapons/StarkyMods/starkyshieldcaptainamericacarter.png",
-  "Icon": "Icons/ItemsGenerated/Weapon_Shield_CaptainCarter_Starky.png",
+  "Texture": "Items/Weapons/StarkyMods/starkyshieldanticap.png",
+  "Icon": "Icons/ItemsGenerated/Weapon_Shield_AntiCaptainAmerica_Starky.png",
   "Quality": "ShieldCap_Quality",
   "ItemLevel": 100,
   "Scale": 2.8,
@@ -44,7 +44,7 @@
                     },
                     {
                       "Type": "ShieldCap_Refresh_Java",
-                      "RefreshMode": "SwapFromCarter",
+                      "RefreshMode": "SwapFromAnti",
                       "RunTime": 0,
                       "CancelOnItemChange": false
                     },
@@ -77,7 +77,7 @@
               "Interactions": [
                 {
                   "Type": "ShieldCap_Refresh_Java",
-                  "RefreshMode": "SwapToCarter",
+                  "RefreshMode": "SwapToAnti",
                   "RunTime": 0,
                   "CancelOnItemChange": false
                 }

@@ -28,6 +28,8 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
     private static final String CARTER_LEFT_SHIELD_ID = "Weapon_ShieldLeft_CaptainCarter_Starky";
     private static final String GEORGIO_MAIN_SHIELD_ID = "Weapon_Shield_Georgio_Starky";
     private static final String GEORGIO_LEFT_SHIELD_ID = "Weapon_ShieldLeft_Georgio_Starky";
+    private static final String ANTI_MAIN_SHIELD_ID = "Weapon_Shield_AntiCaptainAmerica_Starky";
+    private static final String ANTI_LEFT_SHIELD_ID = "Weapon_ShieldLeft_AntiCaptainAmerica_Starky";
 
     @Nonnull
     public static final BuilderCodec<ShieldCapRefreshVisualsInteraction> CODEC =
@@ -98,6 +100,9 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
         if (refreshMode.toLowerCase().contains("georgio")) {
             return ShieldCapVisualSyncService.BackShieldPreference.EQUIPPED_GEORGIO;
         }
+        if (refreshMode.toLowerCase().contains("anti")) {
+            return ShieldCapVisualSyncService.BackShieldPreference.EQUIPPED_ANTI;
+        }
         return ShieldCapVisualSyncService.BackShieldPreference.AUTO_CLEAR_PENDING;
     }
 
@@ -118,6 +123,9 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
             if (refreshMode.toLowerCase().contains("georgio")) {
                 return ShieldCapVisualSyncService.BackShieldPreference.GEORGIO;
             }
+            if (refreshMode.toLowerCase().contains("anti")) {
+                return ShieldCapVisualSyncService.BackShieldPreference.ANTI;
+            }
         }
 
         Inventory inventory = player.getInventory();
@@ -135,6 +143,9 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
         }
         if (isGeorgioShield(activeMain) || isGeorgioShield(activeLeft)) {
             return ShieldCapVisualSyncService.BackShieldPreference.GEORGIO;
+        }
+        if (isAntiShield(activeMain) || isAntiShield(activeLeft)) {
+            return ShieldCapVisualSyncService.BackShieldPreference.ANTI;
         }
         return ShieldCapVisualSyncService.BackShieldPreference.AUTO;
     }
@@ -163,6 +174,10 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
 
     private boolean isGeorgioShield(ItemStack stack) {
         return matchesId(stack, GEORGIO_MAIN_SHIELD_ID) || matchesId(stack, GEORGIO_LEFT_SHIELD_ID);
+    }
+
+    private boolean isAntiShield(ItemStack stack) {
+        return matchesId(stack, ANTI_MAIN_SHIELD_ID) || matchesId(stack, ANTI_LEFT_SHIELD_ID);
     }
 
     private boolean matchesId(ItemStack stack, String itemId) {

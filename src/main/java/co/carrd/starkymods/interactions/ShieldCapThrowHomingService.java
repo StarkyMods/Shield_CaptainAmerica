@@ -121,10 +121,12 @@ public final class ShieldCapThrowHomingService {
     private static final String SHIELDCAP_VIBRANIUM_PROJECTILE_ASSET_ID = "ShieldCap_Vibranium_Projectile";
     private static final String SHIELDCAP_CARTER_PROJECTILE_ASSET_ID = "ShieldCap_Carter_Projectile";
     private static final String SHIELDCAP_GEORGIO_PROJECTILE_ASSET_ID = "ShieldCap_Georgio_Projectile";
+    private static final String SHIELDCAP_ANTI_PROJECTILE_ASSET_ID = "ShieldCap_AntiCaptainAmerica_Projectile";
     private static final String SHIELDCAP_STATIC_PROJECTILE_ASSET_ID = "ShieldCap_Projectile_Static";
     private static final String SHIELDCAP_VIBRANIUM_STATIC_PROJECTILE_ASSET_ID = "ShieldCap_Vibranium_Projectile_Static";
     private static final String SHIELDCAP_CARTER_STATIC_PROJECTILE_ASSET_ID = "ShieldCap_Carter_Projectile_Static";
     private static final String SHIELDCAP_GEORGIO_STATIC_PROJECTILE_ASSET_ID = "ShieldCap_Georgio_Projectile_Static";
+    private static final String SHIELDCAP_ANTI_STATIC_PROJECTILE_ASSET_ID = "ShieldCap_AntiCaptainAmerica_Projectile_Static";
     private static final String MJOLNIR_PROJECTILE_ASSET_ID = "Mjolnir";
     private static final String FOREIGN_PROJECTILE_ASSET_PREFIX = "Mjolnir";
     private static final String THROW_KICK_ROOT_ID = "Root_ShieldCap_Throw_Kick";
@@ -132,11 +134,13 @@ public final class ShieldCapThrowHomingService {
     private static final String THROW_KICK_VIBRANIUM_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Throw_Kick_Silver";
     private static final String THROW_KICK_CARTER_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Throw_Kick_Carter";
     private static final String THROW_KICK_GEORGIO_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Throw_Kick_Georgio";
+    private static final String THROW_KICK_ANTI_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Throw_Kick_AntiCaptainAmerica";
     private static final String THROWN_ITEM_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String VARIANT_METADATA_KEY = "ShieldCapVariant";
     private static final String VIBRANIUM_VARIANT_VALUE = "Vibranium";
     private static final String CARTER_VARIANT_VALUE = "Carter";
     private static final String GEORGIO_VARIANT_VALUE = "Georgio";
+    private static final String ANTI_VARIANT_VALUE = "AntiCaptainAmerica";
     private static final String RETURN_CALLING_ROOT_ID = "Root_ShieldCap_Return_Calling_Internal";
     private static final String RETURN_CALLING_CLEAR_ROOT_ID = "Root_ShieldCap_Return_Calling_Clear_Internal";
     private static final String NORMAL_IMPACT_SOUND_ID = "SFX_ShieldCap_Hit";
@@ -4409,10 +4413,12 @@ public final class ShieldCapThrowHomingService {
                 || SHIELDCAP_VIBRANIUM_PROJECTILE_ASSET_ID.equals(projectileAssetName)
                 || SHIELDCAP_CARTER_PROJECTILE_ASSET_ID.equals(projectileAssetName)
                 || SHIELDCAP_GEORGIO_PROJECTILE_ASSET_ID.equals(projectileAssetName)
+                || SHIELDCAP_ANTI_PROJECTILE_ASSET_ID.equals(projectileAssetName)
                 || SHIELDCAP_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)
                 || SHIELDCAP_VIBRANIUM_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)
                 || SHIELDCAP_CARTER_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)
-                || SHIELDCAP_GEORGIO_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName);
+                || SHIELDCAP_GEORGIO_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)
+                || SHIELDCAP_ANTI_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName);
     }
 
     private static void updateProjectileFlightAnimation(Store<EntityStore> store,
@@ -4461,6 +4467,10 @@ public final class ShieldCapThrowHomingService {
                 || SHIELDCAP_GEORGIO_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)) {
             return SHIELDCAP_GEORGIO_STATIC_PROJECTILE_ASSET_ID;
         }
+        if (SHIELDCAP_ANTI_PROJECTILE_ASSET_ID.equals(projectileAssetName)
+                || SHIELDCAP_ANTI_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)) {
+            return SHIELDCAP_ANTI_STATIC_PROJECTILE_ASSET_ID;
+        }
         return SHIELDCAP_STATIC_PROJECTILE_ASSET_ID;
     }
 
@@ -4473,6 +4483,9 @@ public final class ShieldCapThrowHomingService {
         }
         if (SHIELDCAP_GEORGIO_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)) {
             return SHIELDCAP_GEORGIO_PROJECTILE_ASSET_ID;
+        }
+        if (SHIELDCAP_ANTI_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)) {
+            return SHIELDCAP_ANTI_PROJECTILE_ASSET_ID;
         }
         if (SHIELDCAP_STATIC_PROJECTILE_ASSET_ID.equals(projectileAssetName)) {
             return SHIELDCAP_PROJECTILE_ASSET_ID;
@@ -4579,6 +4592,9 @@ public final class ShieldCapThrowHomingService {
         }
         if (GEORGIO_VARIANT_VALUE.equals(variant)) {
             return THROW_KICK_GEORGIO_PROJECTILE_CONFIG_ID;
+        }
+        if (ANTI_VARIANT_VALUE.equals(variant)) {
+            return THROW_KICK_ANTI_PROJECTILE_CONFIG_ID;
         }
         return THROW_KICK_PROJECTILE_CONFIG_ID;
     }

@@ -19,6 +19,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class ShieldCapRecipeOverrideManager {
     private static final AtomicBoolean APPLYING_OVERRIDE = new AtomicBoolean(false);
+    private static final String BASE_SHIELD_RECIPE_ID = ShieldCapCraftConfigManager.getShieldRecipeId();
+    private static final String ANTI_CAPTAIN_AMERICA_SHIELD_RECIPE_ID =
+            ShieldCapCraftConfigManager.getAntiCaptainAmericaShieldRecipeId();
+    private static final String ANTI_CAPTAIN_AMERICA_SHIELD_ITEM_ID = "Weapon_Shield_AntiCaptainAmerica_Starky";
 
     private ShieldCapRecipeOverrideManager() {
     }
@@ -67,12 +71,21 @@ public final class ShieldCapRecipeOverrideManager {
                 }
 
                 CraftingRecipe original = CraftingRecipe.getAssetMap().getAsset(recipeId);
+                boolean generatedAntiRecipe = original == null
+                        && ANTI_CAPTAIN_AMERICA_SHIELD_RECIPE_ID.equalsIgnoreCase(recipeId);
+                if (generatedAntiRecipe) {
+                    original = CraftingRecipe.getAssetMap().getAsset(BASE_SHIELD_RECIPE_ID);
+                }
                 if (original == null) {
                     System.out.println("[ShieldCap] Could not apply recipe override: recipe not found -> " + recipeId);
                     return false;
                 }
 
-                CraftingRecipe modified = buildFromConfig(original, config);
+                CraftingRecipe modified = buildFromConfig(
+                        original,
+                        config,
+                        generatedAntiRecipe ? ANTI_CAPTAIN_AMERICA_SHIELD_ITEM_ID : null
+                );
                 setRecipeId(modified, recipeId);
                 modifiedRecipes.add(modified);
             }
@@ -96,7 +109,9 @@ public final class ShieldCapRecipeOverrideManager {
         }
     }
 
-    private static CraftingRecipe buildFromConfig(CraftingRecipe original, ShieldCapCraft config) {
+    private static CraftingRecipe buildFromConfig(CraftingRecipe original,
+                                                  ShieldCapCraft config,
+                                                  String primaryOutputItemOverride) {
         MaterialQuantity[] inputs = new MaterialQuantity[config.Input.size()];
         for (int i = 0; i < config.Input.size(); i++) {
             ShieldCapCraft.IngredientEntry entry = config.Input.get(i);
@@ -104,6 +119,10 @@ public final class ShieldCapRecipeOverrideManager {
         }
 
         MaterialQuantity primaryOutput = original.getPrimaryOutput();
+        if (primaryOutputItemOverride != null && !primaryOutputItemOverride.isBlank()) {
+            int quantity = primaryOutput == null ? 1 : Math.max(1, primaryOutput.getQuantity());
+            primaryOutput = new MaterialQuantity(primaryOutputItemOverride, null, null, quantity, null);
+        }
 
         List<ShieldCapCraft.BenchConfig> configuredBenches = config.BenchRequirements;
         if (configuredBenches == null || configuredBenches.isEmpty()) {

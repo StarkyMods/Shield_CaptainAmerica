@@ -1,5 +1,7 @@
 package co.carrd.starkymods.config;
 
+import co.carrd.starkymods.compat.ShieldCapOptionalModSupport;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -32,6 +34,7 @@ public final class ShieldCapCraftConfigManager {
     private static final String VIBRANIUM_SHIELD_RECIPE_ID = "ShieldCap_Vibranium_Craft";
     private static final String CARTER_SHIELD_RECIPE_ID = "ShieldCap_CaptainCarter_Craft";
     private static final String GEORGIO_SHIELD_RECIPE_ID = "ShieldCap_Georgio_Craft";
+    private static final String ANTI_CAPTAIN_AMERICA_SHIELD_RECIPE_ID = "ShieldCap_AntiCaptainAmerica_Craft";
     private static final String NORMAL_BENCH_ID = "Armor_Bench";
     private static final String NORMAL_BENCH_CATEGORY = "Weapon_Shield";
     private static final String ENDGAME_BENCH_ID = "Endgame_Bench";
@@ -95,7 +98,17 @@ public final class ShieldCapCraftConfigManager {
     }
 
     public static List<String> getShieldRecipeIds() {
-        return SHIELD_RECIPE_IDS;
+        if (!ShieldCapOptionalModSupport.isCaptainAmericaSuitActive()) {
+            return SHIELD_RECIPE_IDS;
+        }
+
+        List<String> recipeIds = new ArrayList<>(SHIELD_RECIPE_IDS);
+        recipeIds.add(ANTI_CAPTAIN_AMERICA_SHIELD_RECIPE_ID);
+        return recipeIds;
+    }
+
+    public static String getAntiCaptainAmericaShieldRecipeId() {
+        return ANTI_CAPTAIN_AMERICA_SHIELD_RECIPE_ID;
     }
 
     public static void load() {

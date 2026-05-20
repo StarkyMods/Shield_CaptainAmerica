@@ -40,15 +40,19 @@ public final class ShieldCapVisualSyncService {
     private static final String CARTER_LEFT_SHIELD_ID = "Weapon_ShieldLeft_CaptainCarter_Starky";
     private static final String GEORGIO_BASE_SHIELD_ID = "Weapon_Shield_Georgio_Starky";
     private static final String GEORGIO_LEFT_SHIELD_ID = "Weapon_ShieldLeft_Georgio_Starky";
+    private static final String ANTI_BASE_SHIELD_ID = "Weapon_Shield_AntiCaptainAmerica_Starky";
+    private static final String ANTI_LEFT_SHIELD_ID = "Weapon_ShieldLeft_AntiCaptainAmerica_Starky";
     private static final String THROWN_SHIELD_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String VARIANT_METADATA_KEY = "ShieldCapVariant";
     private static final String VIBRANIUM_VARIANT_VALUE = "Vibranium";
     private static final String CARTER_VARIANT_VALUE = "Carter";
     private static final String GEORGIO_VARIANT_VALUE = "Georgio";
+    private static final String ANTI_VARIANT_VALUE = "AntiCaptainAmerica";
     private static final String BACK_VARIANT_NORMAL = "Normal";
     private static final String BACK_VARIANT_VIBRANIUM = "Vibranium";
     private static final String BACK_VARIANT_CARTER = "Carter";
     private static final String BACK_VARIANT_GEORGIO = "Georgio";
+    private static final String BACK_VARIANT_ANTI = "AntiCaptainAmerica";
     private static final long RECENT_EQUIPPED_PREFERENCE_TTL_MS = 1500L;
 
     private final Set<UUID> syncingPlayers = ConcurrentHashMap.newKeySet();
@@ -221,14 +225,16 @@ public final class ShieldCapVisualSyncService {
         return preference == BackShieldPreference.NORMAL
                 || preference == BackShieldPreference.VIBRANIUM
                 || preference == BackShieldPreference.CARTER
-                || preference == BackShieldPreference.GEORGIO;
+                || preference == BackShieldPreference.GEORGIO
+                || preference == BackShieldPreference.ANTI;
     }
 
     private boolean isEquippedShieldPreference(BackShieldPreference preference) {
         return preference == BackShieldPreference.EQUIPPED_NORMAL
                 || preference == BackShieldPreference.EQUIPPED_VIBRANIUM
                 || preference == BackShieldPreference.EQUIPPED_CARTER
-                || preference == BackShieldPreference.EQUIPPED_GEORGIO;
+                || preference == BackShieldPreference.EQUIPPED_GEORGIO
+                || preference == BackShieldPreference.EQUIPPED_ANTI;
     }
 
     private BackShieldPreference consumePendingBackShieldPreference(UUID playerUuid) {
@@ -440,7 +446,8 @@ public final class ShieldCapVisualSyncService {
                     BASE_SHIELD_ID,
                     VIBRANIUM_BASE_SHIELD_ID,
                     CARTER_BASE_SHIELD_ID,
-                    GEORGIO_BASE_SHIELD_ID
+                    GEORGIO_BASE_SHIELD_ID,
+                    ANTI_BASE_SHIELD_ID
             );
             inventoryChanged |= normalizeActiveSlotItem(
                     utility,
@@ -448,7 +455,8 @@ public final class ShieldCapVisualSyncService {
                     LEFT_SHIELD_ID,
                     VIBRANIUM_LEFT_SHIELD_ID,
                     CARTER_LEFT_SHIELD_ID,
-                    GEORGIO_LEFT_SHIELD_ID
+                    GEORGIO_LEFT_SHIELD_ID,
+                    ANTI_LEFT_SHIELD_ID
             );
             inventoryChanged |= normalizeInactiveSlotItems(hotbar, activeHotbarSlot);
             inventoryChanged |= normalizeInactiveUtilitySlotItems(utility, activeUtilitySlot);
@@ -489,28 +497,38 @@ public final class ShieldCapVisualSyncService {
                             + countGeorgioShields(storage)
                             + countGeorgioShields(backpack)
                             + countGeorgioShields(tools);
+            int antiShieldCount =
+                    countAntiShields(hotbar)
+                            + countAntiShields(utility)
+                            + countAntiShields(storage)
+                            + countAntiShields(backpack)
+                            + countAntiShields(tools);
 
             int equippedNormalShieldCount = countEquippedNormalShield(activeMainStack) + countEquippedNormalShield(activeUtilityStack);
             int equippedVibraniumShieldCount = countEquippedVibraniumShield(activeMainStack) + countEquippedVibraniumShield(activeUtilityStack);
             int equippedCarterShieldCount = countEquippedCarterShield(activeMainStack) + countEquippedCarterShield(activeUtilityStack);
             int equippedGeorgioShieldCount = countEquippedGeorgioShield(activeMainStack) + countEquippedGeorgioShield(activeUtilityStack);
+            int equippedAntiShieldCount = countEquippedAntiShield(activeMainStack) + countEquippedAntiShield(activeUtilityStack);
             equippedNormalShieldCount = Math.max(equippedNormalShieldCount, forcedEquippedNormalShieldCount(backShieldPreference));
             equippedVibraniumShieldCount = Math.max(equippedVibraniumShieldCount, forcedEquippedVibraniumShieldCount(backShieldPreference));
             equippedCarterShieldCount = Math.max(equippedCarterShieldCount, forcedEquippedCarterShieldCount(backShieldPreference));
             equippedGeorgioShieldCount = Math.max(equippedGeorgioShieldCount, forcedEquippedGeorgioShieldCount(backShieldPreference));
+            equippedAntiShieldCount = Math.max(equippedAntiShieldCount, forcedEquippedAntiShieldCount(backShieldPreference));
 
             int totalShieldCount =
-                    normalShieldCount + vibraniumShieldCount + carterShieldCount + georgioShieldCount;
+                    normalShieldCount + vibraniumShieldCount + carterShieldCount + georgioShieldCount + antiShieldCount;
             int equippedShieldCount =
                     equippedNormalShieldCount
                             + equippedVibraniumShieldCount
                             + equippedCarterShieldCount
-                            + equippedGeorgioShieldCount;
+                            + equippedGeorgioShieldCount
+                            + equippedAntiShieldCount;
             boolean hasSpareShieldOutsideActiveHands = totalShieldCount > equippedShieldCount;
             boolean hasNormalBackShieldCandidate = normalShieldCount > equippedNormalShieldCount;
             boolean hasVibraniumBackShieldCandidate = vibraniumShieldCount > equippedVibraniumShieldCount;
             boolean hasCarterBackShieldCandidate = carterShieldCount > equippedCarterShieldCount;
             boolean hasGeorgioBackShieldCandidate = georgioShieldCount > equippedGeorgioShieldCount;
+            boolean hasAntiBackShieldCandidate = antiShieldCount > equippedAntiShieldCount;
             if (backShieldPreference == BackShieldPreference.EQUIPPED_NORMAL) {
                 hasNormalBackShieldCandidate = false;
             } else if (backShieldPreference == BackShieldPreference.EQUIPPED_VIBRANIUM) {
@@ -519,12 +537,15 @@ public final class ShieldCapVisualSyncService {
                 hasCarterBackShieldCandidate = false;
             } else if (backShieldPreference == BackShieldPreference.EQUIPPED_GEORGIO) {
                 hasGeorgioBackShieldCandidate = false;
+            } else if (backShieldPreference == BackShieldPreference.EQUIPPED_ANTI) {
+                hasAntiBackShieldCandidate = false;
             }
             boolean hasBackShieldCandidate =
                     hasNormalBackShieldCandidate
                             || hasVibraniumBackShieldCandidate
                             || hasCarterBackShieldCandidate
-                            || hasGeorgioBackShieldCandidate;
+                            || hasGeorgioBackShieldCandidate
+                            || hasAntiBackShieldCandidate;
             String currentBackShieldVariant = getCurrentVisibleBackShieldVariant(player);
             String backShieldVariant =
                     resolveBackShieldTexturePreference(
@@ -532,6 +553,7 @@ public final class ShieldCapVisualSyncService {
                             hasVibraniumBackShieldCandidate,
                             hasCarterBackShieldCandidate,
                             hasGeorgioBackShieldCandidate,
+                            hasAntiBackShieldCandidate,
                             currentBackShieldVariant,
                             backShieldPreference
                     );
@@ -553,7 +575,8 @@ public final class ShieldCapVisualSyncService {
                                             String normalDesiredId,
                                             String vibraniumDesiredId,
                                             String carterDesiredId,
-                                            String georgioDesiredId) {
+                                            String georgioDesiredId,
+                                            String antiDesiredId) {
         if (container == null || activeSlot == Inventory.INACTIVE_SLOT_INDEX || activeSlot < 0 || activeSlot >= container.getCapacity()) {
             return false;
         }
@@ -570,6 +593,8 @@ public final class ShieldCapVisualSyncService {
             desiredId = carterDesiredId;
         } else if (isGeorgioShield(current)) {
             desiredId = georgioDesiredId;
+        } else if (isAntiShield(current)) {
+            desiredId = antiDesiredId;
         } else {
             desiredId = normalDesiredId;
         }
@@ -728,6 +753,20 @@ public final class ShieldCapVisualSyncService {
         return count;
     }
 
+    private int countAntiShields(ItemContainer container) {
+        if (container == null) {
+            return 0;
+        }
+
+        int count = 0;
+        for (short slot = 0; slot < container.getCapacity(); slot++) {
+            if (isAntiShield(container.getItemStack(slot))) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     private int countEquippedNormalShield(ItemStack stack) {
         return isNormalShield(stack) ? 1 : 0;
     }
@@ -744,6 +783,10 @@ public final class ShieldCapVisualSyncService {
         return isGeorgioShield(stack) ? 1 : 0;
     }
 
+    private int countEquippedAntiShield(ItemStack stack) {
+        return isAntiShield(stack) ? 1 : 0;
+    }
+
     private int forcedEquippedNormalShieldCount(BackShieldPreference preference) {
         return preference == BackShieldPreference.EQUIPPED_NORMAL ? 1 : 0;
     }
@@ -758,6 +801,10 @@ public final class ShieldCapVisualSyncService {
 
     private int forcedEquippedGeorgioShieldCount(BackShieldPreference preference) {
         return preference == BackShieldPreference.EQUIPPED_GEORGIO ? 1 : 0;
+    }
+
+    private int forcedEquippedAntiShieldCount(BackShieldPreference preference) {
+        return preference == BackShieldPreference.EQUIPPED_ANTI ? 1 : 0;
     }
 
     private int countShieldInEquippedSlot(ItemContainer container, byte activeSlot) {
@@ -832,6 +879,11 @@ public final class ShieldCapVisualSyncService {
             currentState.setPendingModelReset(false);
             currentState.setPendingApply(false);
             currentState.setWaitingForExternalVisualClear(false);
+            currentState.clearPendingBaseModel();
+            currentState.clearNaturalBaseModel();
+            currentState.clearPreservedExtraAttachments();
+            currentState.setAwaitingNaturalModel(false);
+            currentState.rebuild();
         }
         if (forceBackRebuild) {
             if (shouldShowBackShield) {
@@ -840,7 +892,7 @@ public final class ShieldCapVisualSyncService {
             currentState.rebuild();
         }
 
-        if (changed || textureChanged || shouldShowBackShield || forceBackRebuild) {
+        if (changed || textureChanged || shouldShowBackShield || forceBackRebuild || !shouldShowBackShield) {
             debug("sync back attachment"
                     + " | shouldShow=" + shouldShowBackShield
                     + " | changed=" + changed
@@ -881,7 +933,9 @@ public final class ShieldCapVisualSyncService {
                 || matchesId(stack, CARTER_BASE_SHIELD_ID)
                 || matchesId(stack, CARTER_LEFT_SHIELD_ID)
                 || matchesId(stack, GEORGIO_BASE_SHIELD_ID)
-                || matchesId(stack, GEORGIO_LEFT_SHIELD_ID);
+                || matchesId(stack, GEORGIO_LEFT_SHIELD_ID)
+                || matchesId(stack, ANTI_BASE_SHIELD_ID)
+                || matchesId(stack, ANTI_LEFT_SHIELD_ID);
     }
 
     private boolean isHandVariant(ItemStack stack) {
@@ -889,7 +943,8 @@ public final class ShieldCapVisualSyncService {
                 || matchesId(stack, LEFT_SHIELD_ID)
                 || matchesId(stack, VIBRANIUM_LEFT_SHIELD_ID)
                 || matchesId(stack, CARTER_LEFT_SHIELD_ID)
-                || matchesId(stack, GEORGIO_LEFT_SHIELD_ID);
+                || matchesId(stack, GEORGIO_LEFT_SHIELD_ID)
+                || matchesId(stack, ANTI_LEFT_SHIELD_ID);
     }
 
     private String resolveBaseShieldId(ItemStack stack) {
@@ -901,6 +956,9 @@ public final class ShieldCapVisualSyncService {
         }
         if (isGeorgioShield(stack) || isGeorgioThrownShield(stack)) {
             return GEORGIO_BASE_SHIELD_ID;
+        }
+        if (isAntiShield(stack) || isAntiThrownShield(stack)) {
+            return ANTI_BASE_SHIELD_ID;
         }
         return BASE_SHIELD_ID;
     }
@@ -914,6 +972,9 @@ public final class ShieldCapVisualSyncService {
         }
         if (isGeorgioShield(stack) || isGeorgioThrownShield(stack)) {
             return GEORGIO_LEFT_SHIELD_ID;
+        }
+        if (isAntiShield(stack) || isAntiThrownShield(stack)) {
+            return ANTI_LEFT_SHIELD_ID;
         }
         return LEFT_SHIELD_ID;
     }
@@ -933,6 +994,11 @@ public final class ShieldCapVisualSyncService {
                 || matchesId(stack, GEORGIO_LEFT_SHIELD_ID);
     }
 
+    private boolean isAntiShield(ItemStack stack) {
+        return matchesId(stack, ANTI_BASE_SHIELD_ID)
+                || matchesId(stack, ANTI_LEFT_SHIELD_ID);
+    }
+
     private boolean isNormalShield(ItemStack stack) {
         return matchesId(stack, BASE_SHIELD_ID)
                 || matchesId(stack, RIGHT_SHIELD_ID)
@@ -949,6 +1015,10 @@ public final class ShieldCapVisualSyncService {
 
     private boolean isGeorgioThrownShield(ItemStack stack) {
         return GEORGIO_VARIANT_VALUE.equals(getThrownShieldVariant(stack));
+    }
+
+    private boolean isAntiThrownShield(ItemStack stack) {
+        return ANTI_VARIANT_VALUE.equals(getThrownShieldVariant(stack));
     }
 
     private String getThrownShieldVariant(ItemStack stack) {
@@ -1087,6 +1157,7 @@ public final class ShieldCapVisualSyncService {
                                                       boolean hasVibraniumBackShieldCandidate,
                                                       boolean hasCarterBackShieldCandidate,
                                                       boolean hasGeorgioBackShieldCandidate,
+                                                      boolean hasAntiBackShieldCandidate,
                                                       String currentBackShieldVariant,
                                                       BackShieldPreference preference) {
         if (preference == BackShieldPreference.NORMAL) {
@@ -1109,9 +1180,17 @@ public final class ShieldCapVisualSyncService {
                 return BACK_VARIANT_GEORGIO;
             }
         }
+        if (preference == BackShieldPreference.ANTI) {
+            if (hasAntiBackShieldCandidate) {
+                return BACK_VARIANT_ANTI;
+            }
+        }
         if (preference == BackShieldPreference.PRIORITY_REFRESH) {
             if (hasNormalBackShieldCandidate) {
                 return BACK_VARIANT_NORMAL;
+            }
+            if (hasAntiBackShieldCandidate) {
+                return BACK_VARIANT_ANTI;
             }
             if (hasCarterBackShieldCandidate) {
                 return BACK_VARIANT_CARTER;
@@ -1126,6 +1205,9 @@ public final class ShieldCapVisualSyncService {
         if (BACK_VARIANT_GEORGIO.equals(currentBackShieldVariant) && hasGeorgioBackShieldCandidate) {
             return BACK_VARIANT_GEORGIO;
         }
+        if (BACK_VARIANT_ANTI.equals(currentBackShieldVariant) && hasAntiBackShieldCandidate) {
+            return BACK_VARIANT_ANTI;
+        }
         if (BACK_VARIANT_CARTER.equals(currentBackShieldVariant) && hasCarterBackShieldCandidate) {
             return BACK_VARIANT_CARTER;
         }
@@ -1138,13 +1220,16 @@ public final class ShieldCapVisualSyncService {
         if (hasNormalBackShieldCandidate) {
             return BACK_VARIANT_NORMAL;
         }
-        if (hasVibraniumBackShieldCandidate) {
-            return BACK_VARIANT_VIBRANIUM;
+        if (hasAntiBackShieldCandidate) {
+            return BACK_VARIANT_ANTI;
         }
         if (hasCarterBackShieldCandidate) {
             return BACK_VARIANT_CARTER;
         }
-        return hasGeorgioBackShieldCandidate ? BACK_VARIANT_GEORGIO : BACK_VARIANT_NORMAL;
+        if (hasGeorgioBackShieldCandidate) {
+            return BACK_VARIANT_GEORGIO;
+        }
+        return hasVibraniumBackShieldCandidate ? BACK_VARIANT_VIBRANIUM : BACK_VARIANT_NORMAL;
     }
 
     public enum BackShieldPreference {
@@ -1152,13 +1237,15 @@ public final class ShieldCapVisualSyncService {
         AUTO_CLEAR_PENDING,
         PRIORITY_REFRESH,
         NORMAL,
-        VIBRANIUM,
+        ANTI,
         CARTER,
         GEORGIO,
+        VIBRANIUM,
         EQUIPPED_NORMAL,
-        EQUIPPED_VIBRANIUM,
+        EQUIPPED_ANTI,
         EQUIPPED_CARTER,
-        EQUIPPED_GEORGIO
+        EQUIPPED_GEORGIO,
+        EQUIPPED_VIBRANIUM
     }
 
     private record TimedBackShieldPreference(BackShieldPreference preference, long createdAtMillis) {

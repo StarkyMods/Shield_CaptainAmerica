@@ -1,5 +1,7 @@
 package co.carrd.starkymods.config;
 
+import co.carrd.starkymods.compat.ShieldCapOptionalModSupport;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -17,6 +19,7 @@ public final class ShieldCapConfigManager {
     private static final String VIBRANIUM_SHIELD_RECIPE_ID = "ShieldCap_Vibranium_Craft";
     private static final String CARTER_SHIELD_RECIPE_ID = "ShieldCap_CaptainCarter_Craft";
     private static final String GEORGIO_SHIELD_RECIPE_ID = "ShieldCap_Georgio_Craft";
+    private static final String ANTI_CAPTAIN_AMERICA_SHIELD_RECIPE_ID = "ShieldCap_AntiCaptainAmerica_Craft";
     private static final List<String> SHIELD_RECIPE_IDS =
             List.of(SHIELD_RECIPE_ID, VIBRANIUM_SHIELD_RECIPE_ID, CARTER_SHIELD_RECIPE_ID, GEORGIO_SHIELD_RECIPE_ID);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -58,7 +61,9 @@ public final class ShieldCapConfigManager {
         if (recipeId == null || recipeId.isBlank()) {
             return false;
         }
-        return SHIELD_RECIPE_IDS.stream().anyMatch(id -> id.equalsIgnoreCase(recipeId));
+        return SHIELD_RECIPE_IDS.stream().anyMatch(id -> id.equalsIgnoreCase(recipeId))
+                || (ShieldCapOptionalModSupport.isCaptainAmericaSuitActive()
+                && ANTI_CAPTAIN_AMERICA_SHIELD_RECIPE_ID.equalsIgnoreCase(recipeId));
     }
 
     public static boolean isCraftingAllowed() {

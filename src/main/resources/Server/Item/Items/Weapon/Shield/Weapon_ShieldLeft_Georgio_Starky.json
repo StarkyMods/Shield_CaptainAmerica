@@ -75,9 +75,9 @@
             {
               "Interactions": [
                 {
-                      "Type": "ShieldCap_Refresh_Java",
-                      "RefreshMode": "SwapToGeorgio",
-                      "RunTime": 0,
+                  "Type": "ShieldCap_Refresh_Java",
+                  "RefreshMode": "SwapToGeorgio",
+                  "RunTime": 0,
                   "CancelOnItemChange": false
                 }
               ]
@@ -110,6 +110,16 @@
     "Primary": {
       "Interactions": [
         "ShieldLeft_Primary_Charging"
+      ]
+    },
+    "HeldOffhand": {
+      "Interactions": [
+        {
+          "Type": "Simple",
+          "Effects": {
+            "WorldSoundEventId": "SFX_ShieldGeorgioLeft_Motor"
+          }
+        }
       ]
     }
   },
@@ -148,6 +158,17 @@
           0
         ],
         "ConditionValueType": "Absolute"
+      }
+    ],
+    "GlidingActive": [
+      {
+        "Condition": [
+          0,
+          0
+        ],
+        "WorldSoundEventId": "SFX_ShieldGeorgio_Motor",
+        "ConditionValueType": "Absolute",
+        "LocalSoundEventId": "SFX_ShieldGeorgio_Motor"
       }
     ]
   },
@@ -286,5 +307,6 @@
       }
     }
   ],
-  "Icon": "Icons/ItemsGenerated/Weapon_ShieldLeft_Georgio_Starky.png"
+  "Icon": "Icons/ItemsGenerated/Weapon_ShieldLeft_Georgio_Starky.png",
+  "SoundEventId": "SFX_ShieldCap_Held"
 }

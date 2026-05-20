@@ -32,11 +32,13 @@ public class ShieldCapThrowHomingLaunchConfigProjectile extends SimpleInstantInt
     private static final String VIBRANIUM_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Silver";
     private static final String CARTER_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Carter";
     private static final String GEORGIO_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_Georgio";
+    private static final String ANTI_PROJECTILE_CONFIG_ID = "ShieldCap_ProjectileConfig_AntiCaptainAmerica";
     private static final String THROWN_ITEM_ID = "Weapon_ShieldCap_Thrown_Starky";
     private static final String VARIANT_METADATA_KEY = "ShieldCapVariant";
     private static final String VIBRANIUM_VARIANT_VALUE = "Vibranium";
     private static final String CARTER_VARIANT_VALUE = "Carter";
     private static final String GEORGIO_VARIANT_VALUE = "Georgio";
+    private static final String ANTI_VARIANT_VALUE = "AntiCaptainAmerica";
 
     @Nonnull
     public static final BuilderCodec<ShieldCapThrowHomingLaunchConfigProjectile> CODEC =
@@ -108,6 +110,9 @@ public class ShieldCapThrowHomingLaunchConfigProjectile extends SimpleInstantInt
             }
             if (GEORGIO_VARIANT_VALUE.equals(variant)) {
                 return GEORGIO_PROJECTILE_CONFIG_ID;
+            }
+            if (ANTI_VARIANT_VALUE.equals(variant)) {
+                return ANTI_PROJECTILE_CONFIG_ID;
             }
         }
         return config;

@@ -1,0 +1,25 @@
+{
+  "AudioCategory": "AudioCat_Inventory",
+  "Volume": 0,
+  "Layers": [
+    {
+      "Volume": -18,
+      "RandomSettings": {
+        "MinPitch": 0,
+        "MaxPitch": 0,
+        "MaxStartOffset": 0,
+        "MinVolume": 0,
+        "MaxVolume": 0
+      },
+      "StartDelay": 0,
+      "Looping": true,
+      "Files": [
+        "Sounds/StarkyMods/ShieldGeorgioMotor2.ogg"
+      ]
+    }
+  ],
+  "PreventSoundInterruption": true,
+  "Pitch": 0,
+  "MaxDistance": 6,
+  "StartAttenuationDistance": 3
+}

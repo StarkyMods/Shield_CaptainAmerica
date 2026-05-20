@@ -23,6 +23,8 @@ public final class ShieldCapUtilityQuickSwapSystem extends EntityEventSystem<Ent
     private static final String CARTER_LEFT_SHIELD_ID = "Weapon_ShieldLeft_CaptainCarter_Starky";
     private static final String GEORGIO_BASE_SHIELD_ID = "Weapon_Shield_Georgio_Starky";
     private static final String GEORGIO_LEFT_SHIELD_ID = "Weapon_ShieldLeft_Georgio_Starky";
+    private static final String ANTI_BASE_SHIELD_ID = "Weapon_Shield_AntiCaptainAmerica_Starky";
+    private static final String ANTI_LEFT_SHIELD_ID = "Weapon_ShieldLeft_AntiCaptainAmerica_Starky";
 
     public ShieldCapUtilityQuickSwapSystem() {
         super(SwitchActiveSlotEvent.class);
@@ -106,6 +108,9 @@ public final class ShieldCapUtilityQuickSwapSystem extends EntityEventSystem<Ent
         if (variant == ShieldCapVisualSyncService.BackShieldPreference.GEORGIO) {
             return ShieldCapVisualSyncService.BackShieldPreference.EQUIPPED_GEORGIO;
         }
+        if (variant == ShieldCapVisualSyncService.BackShieldPreference.ANTI) {
+            return ShieldCapVisualSyncService.BackShieldPreference.EQUIPPED_ANTI;
+        }
         return ShieldCapVisualSyncService.BackShieldPreference.AUTO_CLEAR_PENDING;
     }
 
@@ -121,6 +126,9 @@ public final class ShieldCapUtilityQuickSwapSystem extends EntityEventSystem<Ent
         }
         if (matchesId(itemId, GEORGIO_BASE_SHIELD_ID) || matchesId(itemId, GEORGIO_LEFT_SHIELD_ID)) {
             return ShieldCapVisualSyncService.BackShieldPreference.GEORGIO;
+        }
+        if (matchesId(itemId, ANTI_BASE_SHIELD_ID) || matchesId(itemId, ANTI_LEFT_SHIELD_ID)) {
+            return ShieldCapVisualSyncService.BackShieldPreference.ANTI;
         }
         return null;
     }

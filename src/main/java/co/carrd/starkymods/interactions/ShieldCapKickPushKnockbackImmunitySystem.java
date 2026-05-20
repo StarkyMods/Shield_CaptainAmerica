@@ -75,7 +75,13 @@ public final class ShieldCapKickPushKnockbackImmunitySystem extends DamageEventS
     }
 
     public static void tickStore(Store<EntityStore> store) {
-        if (store == null) {
+        if (store == null || IMMUNITY_UNTIL_MS.isEmpty()) {
+            return;
+        }
+
+        long now = System.currentTimeMillis();
+        IMMUNITY_UNTIL_MS.entrySet().removeIf(entry -> entry.getValue() == null || entry.getValue() < now);
+        if (IMMUNITY_UNTIL_MS.isEmpty()) {
             return;
         }
 
