@@ -122,7 +122,8 @@ public final class ShieldCapBackModelSystems {
             boolean hasPendingVisualWork = state.isPendingApply()
                     || state.isPendingModelReset()
                     || state.isAwaitingNaturalModel()
-                    || state.isWaitingForExternalVisualClear();
+                    || state.isWaitingForExternalVisualClear()
+                    || state.hasAppearanceRefreshTicks();
             if (!state.shouldShowBackShield() && hasActiveShieldAttachment) {
                 dirty = true;
             }
@@ -159,7 +160,12 @@ public final class ShieldCapBackModelSystems {
             Player player = chunk.getComponent(entityIndex, Player.getComponentType());
             String playerId = resolvePlayerDebugId(player);
             Model appearanceModel = createAppearanceModel(player, playerSkinComponent);
-            String appearanceSignature = buildModelSignature(appearanceModel);
+            String appearanceSignature = buildAppearanceSignature(player, appearanceModel);
+            boolean appearanceChanged = state.updateAppearanceSignature(appearanceSignature);
+            boolean forcedAppearanceRefresh = state.consumeAppearanceRefreshTick();
+            if (forcedAppearanceRefresh && state.shouldShowBackShield()) {
+                dirty = true;
+            }
             Model currentBaseModel = removeShieldCapAttachment(currentModel);
             boolean externalVisualStateActive = hasExternalVisualStateActive(player);
             boolean externalVisualAttachmentActive = hasForeignVisualAttachment(currentModel, appearanceModel, state);
@@ -225,7 +231,6 @@ public final class ShieldCapBackModelSystems {
                 state.clearNaturalBaseModel();
                 state.clearPendingBaseModel();
                 state.setPendingApply(true);
-                state.updateAppearanceSignature(appearanceSignature);
                 state.rebuild();
                 chunk.setComponent(
                         entityIndex,
@@ -238,13 +243,11 @@ public final class ShieldCapBackModelSystems {
             if (state.shouldShowBackShield()
                     && hasActiveShieldAttachment
                     && !state.isPendingApply()
-                    && state.updateAppearanceSignature(appearanceSignature)) {
+                    && appearanceChanged) {
                 state.clearNaturalBaseModel();
                 state.clearPendingBaseModel();
                 state.rebuild();
                 dirty = true;
-            } else if (!state.shouldShowBackShield()) {
-                state.updateAppearanceSignature(appearanceSignature);
             }
 
             if (!dirty) {
@@ -257,7 +260,10 @@ public final class ShieldCapBackModelSystems {
                     currentModel,
                     appearanceModel,
                     state.getNaturalBaseModel(),
-                    externalVisualAttachmentActive && !externalVisualStateActive
+                    externalVisualAttachmentActive && !externalVisualStateActive,
+                    (appearanceChanged || state.isPendingApply() || forcedAppearanceRefresh)
+                            && !externalVisualAttachmentActive
+                            && !externalVisualStateActive
             );
             debug("tick dirty"
                     + " | player=" + playerId
@@ -446,6 +452,14 @@ public final class ShieldCapBackModelSystems {
                                                Model appearanceModel,
                                                Model naturalBaseModel,
                                                boolean currentHasStaleExternalVisual) {
+            return selectInjectionBaseModel(currentModel, appearanceModel, naturalBaseModel, currentHasStaleExternalVisual, false);
+        }
+
+        private Model selectInjectionBaseModel(Model currentModel,
+                                               Model appearanceModel,
+                                               Model naturalBaseModel,
+                                               boolean currentHasStaleExternalVisual,
+                                               boolean preferFreshAppearanceModel) {
             if (appearanceModel == null) {
                 return naturalBaseModel != null ? removeShieldCapAttachment(naturalBaseModel) : removeShieldCapAttachment(currentModel);
             }
@@ -458,6 +472,9 @@ public final class ShieldCapBackModelSystems {
 
             if (hasShieldCapAttachment(currentModel)) {
                 Model normalizedCurrent = removeShieldCapAttachment(currentModel);
+                if (preferFreshAppearanceModel) {
+                    return appearanceModel;
+                }
                 return hasSameBaseVisual(normalizedCurrent, appearanceModel) ? appearanceModel : normalizedCurrent;
             }
             if (isLikelyUninitializedPlayerModel(currentModel, appearanceModel)) {
@@ -902,7 +919,6 @@ public final class ShieldCapBackModelSystems {
             if (visibleArmorSlots.contains(ItemArmorSlot.Head)
                     && (type == CosmeticType.HAIRCUTS
                     || type == CosmeticType.EARS
-                    || type == CosmeticType.FACIAL_HAIR
                     || type == CosmeticType.HEAD_ACCESSORY
                     || type == CosmeticType.FACE_ACCESSORY
                     || type == CosmeticType.EAR_ACCESSORY)) {
@@ -1709,6 +1725,57 @@ public final class ShieldCapBackModelSystems {
                     + model.getGradientId()
                     + '|'
                     + summarizeAttachments(model.getAttachments());
+        }
+
+        private String buildAppearanceSignature(Player player, Model model) {
+            return buildModelSignature(model) + "|armor=" + buildArmorVisibilitySignature(player);
+        }
+
+        private String buildArmorVisibilitySignature(Player player) {
+            if (player == null || player.getPlayerRef() == null || player.getPlayerRef().getReference() == null) {
+                return "no-player";
+            }
+
+            Store<EntityStore> store = player.getPlayerRef().getReference().getStore();
+            PlayerSettings settings = store == null
+                    ? null
+                    : store.getComponent(player.getPlayerRef().getReference(), PlayerSettings.getComponentType());
+            StringBuilder signature = new StringBuilder()
+                    .append("hide=")
+                    .append(settings != null && settings.hideHelmet()).append(',')
+                    .append(settings != null && settings.hideCuirass()).append(',')
+                    .append(settings != null && settings.hideGauntlets()).append(',')
+                    .append(settings != null && settings.hidePants());
+
+            if (player.getInventory() == null || player.getInventory().getArmor() == null) {
+                return signature.append("|armor=[]").toString();
+            }
+
+            ItemContainer armorContainer = player.getInventory().getArmor();
+            signature.append("|armor=[");
+            for (short slot = 0; slot < armorContainer.getCapacity(); slot++) {
+                ItemStack stack = armorContainer.getItemStack(slot);
+                if (ItemStack.isEmpty(stack)) {
+                    signature.append(slot).append(":empty;");
+                    continue;
+                }
+
+                ItemArmorSlot armorSlot = null;
+                if (stack.getItem() != null
+                        && stack.getItem().getArmor() != null
+                        && stack.getItem().getArmor().toPacket() != null) {
+                    armorSlot = stack.getItem().getArmor().toPacket().armorSlot;
+                }
+                signature.append(slot)
+                        .append(':')
+                        .append(stack.getItemId())
+                        .append(':')
+                        .append(armorSlot)
+                        .append(':')
+                        .append(isArmorSlotVisible(armorSlot, settings))
+                        .append(';');
+            }
+            return signature.append(']').toString();
         }
 
         private String summarizeAttachments(ModelAttachment[] attachments) {

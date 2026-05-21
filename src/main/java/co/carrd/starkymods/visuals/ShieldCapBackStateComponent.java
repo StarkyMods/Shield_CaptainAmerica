@@ -34,6 +34,7 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
     private Model naturalBaseModel;
     private ModelAttachment[] preservedExtraAttachments;
     private String appearanceSignature;
+    private int appearanceRefreshTicks;
 
     public boolean shouldShowBackShield() {
         return showBackShield;
@@ -169,6 +170,23 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
         return appearanceSignature;
     }
 
+    public void requestAppearanceRefreshTicks(int ticks) {
+        appearanceRefreshTicks = Math.max(appearanceRefreshTicks, Math.max(0, ticks));
+    }
+
+    public boolean hasAppearanceRefreshTicks() {
+        return appearanceRefreshTicks > 0;
+    }
+
+    public boolean consumeAppearanceRefreshTick() {
+        if (appearanceRefreshTicks <= 0) {
+            return false;
+        }
+
+        appearanceRefreshTicks--;
+        return true;
+    }
+
     @Override
     public ShieldCapBackStateComponent clone() {
         ShieldCapBackStateComponent copy = new ShieldCapBackStateComponent();
@@ -184,6 +202,7 @@ public final class ShieldCapBackStateComponent implements Component<EntityStore>
         copy.preservedExtraAttachments =
                 preservedExtraAttachments == null ? null : preservedExtraAttachments.clone();
         copy.appearanceSignature = appearanceSignature;
+        copy.appearanceRefreshTicks = appearanceRefreshTicks;
         return copy;
     }
 

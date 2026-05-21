@@ -12,8 +12,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.hypixel.hytale.assetstore.AssetUpdateQuery;
 import com.hypixel.hytale.assetstore.RawAsset;
+import com.hypixel.hytale.common.plugin.PluginIdentifier;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
+import com.hypixel.hytale.server.core.plugin.PluginManager;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -25,6 +27,10 @@ import java.util.List;
 
 public final class ShieldCapDamageAssetGenerator {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final PluginIdentifier ENDLESS_LEVELING_ID =
+            new PluginIdentifier("Airijko", "EndlessLevelingCore");
+    private static final int DEFAULT_SIGNATURE_ENERGY_MAX = 75;
+    private static final int ENDLESS_LEVELING_SIGNATURE_ENERGY_MAX = 600;
 
     private static final List<ItemAsset> ITEM_ASSETS = List.of(
             new ItemAsset("Weapon_Shield_CaptainAmerica_Starky", "Server/Item/Items/Weapon/Shield/Weapon_Shield_CaptainAmerica_Starky.json"),
@@ -63,6 +69,9 @@ public final class ShieldCapDamageAssetGenerator {
             }
 
             List<RawAsset<String>> itemAssets = new ArrayList<>();
+            int signatureEnergyMax = isEndlessLevelingActive()
+                    ? ENDLESS_LEVELING_SIGNATURE_ENERGY_MAX
+                    : DEFAULT_SIGNATURE_ENERGY_MAX;
             for (ItemAsset itemAsset : ITEM_ASSETS) {
                 JsonObject itemJson = loadJson(itemAsset.resourcePath());
                 if (itemJson == null) {
@@ -73,6 +82,9 @@ public final class ShieldCapDamageAssetGenerator {
                 }
                 if (!"Weapon_ShieldCap_Thrown_Starky".equals(itemAsset.id())) {
                     applyConfig(itemJson, config);
+                }
+                if (isMainShieldItem(itemAsset.id())) {
+                    applySignatureEnergyMax(itemJson, signatureEnergyMax);
                 }
                 File output = outputFolder.resolve(itemAsset.id() + ".json").toFile();
                 try (FileWriter writer = new FileWriter(output)) {
@@ -230,6 +242,40 @@ public final class ShieldCapDamageAssetGenerator {
                 knockback.addProperty("Force", Math.max(0.0, value));
             }
         }
+    }
+
+    private static boolean isMainShieldItem(String itemId) {
+        return itemId != null
+                && itemId.startsWith("Weapon_Shield_")
+                && !itemId.startsWith("Weapon_ShieldLeft_");
+    }
+
+    private static boolean isEndlessLevelingActive() {
+        PluginManager pluginManager = PluginManager.get();
+        return pluginManager != null && pluginManager.getPlugin(ENDLESS_LEVELING_ID) != null;
+    }
+
+    private static void applySignatureEnergyMax(JsonObject itemJson, int amount) {
+        if (itemJson == null) {
+            return;
+        }
+
+        JsonObject weapon = itemJson.getAsJsonObject("Weapon");
+        if (weapon == null) {
+            return;
+        }
+
+        JsonObject statModifiers = weapon.getAsJsonObject("StatModifiers");
+        if (statModifiers == null) {
+            return;
+        }
+
+        JsonArray signatureEnergy = statModifiers.getAsJsonArray("SignatureEnergy");
+        if (signatureEnergy == null || signatureEnergy.isEmpty() || !signatureEnergy.get(0).isJsonObject()) {
+            return;
+        }
+
+        signatureEnergy.get(0).getAsJsonObject().addProperty("Amount", amount);
     }
 
     private static JsonObject loadJson(String path) {

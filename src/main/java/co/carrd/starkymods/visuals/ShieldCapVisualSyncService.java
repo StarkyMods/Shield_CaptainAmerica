@@ -857,6 +857,7 @@ public final class ShieldCapVisualSyncService {
                 newState.updateShowBackShield(true);
                 newState.setPendingApply(false);
                 newState.setWaitingForExternalVisualClear(false);
+                newState.requestAppearanceRefreshTicks(20);
                 newState.rebuild();
             }
             if (forceBackRebuild) {
@@ -874,6 +875,7 @@ public final class ShieldCapVisualSyncService {
         if (shouldShowBackShield) {
             currentState.setPendingApply(false);
             currentState.setWaitingForExternalVisualClear(false);
+            currentState.requestAppearanceRefreshTicks(20);
             currentState.rebuild();
         } else {
             currentState.setPendingModelReset(false);

@@ -1212,7 +1212,7 @@ Group {
                                     }
 
                                     Label {
-                                        Text: "RPG System featuring races, classes, skills, dungeons, abilities, augments, etc. If installed and active, all Cap's Shield damages will be automatically increased if (Mod Compatibility) is ON in DAMAGES. Also, Cap's Shield Maximum Signature Energy will be increased from 70 to 560 points. Best class for Cap's Shields is Vanguard.";
+                                        Text: "RPG System featuring races, classes, skills, dungeons, abilities, augments, etc. If installed and active, all Cap's Shield damages will be automatically increased if (Mod Compatibility) is ON in DAMAGES. Also, Cap's Shield Maximum Signature Energy will be increased from 75 to 600 points. Best class for Cap's Shields is Vanguard.";
                                         FlexWeight: 1;
                                         Style: (FontSize: 12, TextColor: #e8bdbd, Wrap: true, HorizontalAlignment: Center);
                                     }
