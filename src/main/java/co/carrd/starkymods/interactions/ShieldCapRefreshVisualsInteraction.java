@@ -1,6 +1,7 @@
 package co.carrd.starkymods.interactions;
 
 import co.carrd.starkymods.StarkyShieldCaptainAmerica;
+import co.carrd.starkymods.util.ShieldCapInventoryCompat;
 import co.carrd.starkymods.visuals.ShieldCapVisualSyncService;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -10,7 +11,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
@@ -60,14 +61,16 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
             return;
         }
 
-        Player player = resolvePlayer(context.getCommandBuffer(), context);
+        CommandBuffer<EntityStore> commandBuffer = context.getCommandBuffer();
+        Ref<EntityStore> playerRef = resolvePlayerRef(commandBuffer, context);
+        Player player = getPlayerFromRef(commandBuffer, playerRef);
         if (player == null) {
             return;
         }
 
         ShieldCapVisualSyncService.BackShieldPreference preference =
                 isSwapFromRefresh()
-                        ? resolveBackShieldPreference(player)
+                        ? resolveBackShieldPreference(commandBuffer, playerRef)
                         : isSwapToRefresh()
                         ? resolveEquippedShieldPreference()
                         : ShieldCapVisualSyncService.BackShieldPreference.AUTO_CLEAR_PENDING;
@@ -106,8 +109,9 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
         return ShieldCapVisualSyncService.BackShieldPreference.AUTO_CLEAR_PENDING;
     }
 
-    private ShieldCapVisualSyncService.BackShieldPreference resolveBackShieldPreference(Player player) {
-        if (player == null || player.getInventory() == null) {
+    private ShieldCapVisualSyncService.BackShieldPreference resolveBackShieldPreference(CommandBuffer<EntityStore> commandBuffer,
+                                                                                       Ref<EntityStore> playerRef) {
+        if (commandBuffer == null || playerRef == null || !playerRef.isValid()) {
             return ShieldCapVisualSyncService.BackShieldPreference.AUTO;
         }
         if (refreshMode != null) {
@@ -128,9 +132,12 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
             }
         }
 
-        Inventory inventory = player.getInventory();
-        ItemStack activeMain = getActiveStack(inventory.getHotbar(), inventory.getActiveHotbarSlot());
-        ItemStack activeLeft = getActiveStack(inventory.getUtility(), inventory.getActiveUtilitySlot());
+        ItemStack activeMain = getActiveStack(
+                ShieldCapInventoryCompat.getHotbar(commandBuffer, playerRef),
+                ShieldCapInventoryCompat.getActiveHotbarSlot(commandBuffer, playerRef));
+        ItemStack activeLeft = getActiveStack(
+                ShieldCapInventoryCompat.getUtility(commandBuffer, playerRef),
+                ShieldCapInventoryCompat.getActiveUtilitySlot(commandBuffer, playerRef));
 
         if (isNormalShield(activeMain) || isNormalShield(activeLeft)) {
             return ShieldCapVisualSyncService.BackShieldPreference.NORMAL;
@@ -152,7 +159,7 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
 
     private ItemStack getActiveStack(ItemContainer container, byte slot) {
         if (container == null
-                || slot == Inventory.INACTIVE_SLOT_INDEX
+                || slot == InventoryComponent.INACTIVE_SLOT_INDEX
                 || slot < 0
                 || slot >= container.getCapacity()) {
             return null;
@@ -195,14 +202,18 @@ public class ShieldCapRefreshVisualsInteraction extends SimpleInstantInteraction
                 || stackItemId.contains(itemId);
     }
 
-    private Player resolvePlayer(@Nonnull CommandBuffer<EntityStore> commandBuffer,
-                                 @Nonnull InteractionContext context) {
-        Player player = getPlayerFromRef(commandBuffer, context.getEntity());
-        if (player != null) {
-            return player;
+    private Ref<EntityStore> resolvePlayerRef(@Nonnull CommandBuffer<EntityStore> commandBuffer,
+                                              @Nonnull InteractionContext context) {
+        Ref<EntityStore> entityRef = context.getEntity();
+        if (getPlayerFromRef(commandBuffer, entityRef) != null) {
+            return entityRef;
         }
 
-        return getPlayerFromRef(commandBuffer, context.getOwningEntity());
+        Ref<EntityStore> owningRef = context.getOwningEntity();
+        if (getPlayerFromRef(commandBuffer, owningRef) != null) {
+            return owningRef;
+        }
+        return null;
     }
 
     private Player getPlayerFromRef(@Nonnull CommandBuffer<EntityStore> commandBuffer,

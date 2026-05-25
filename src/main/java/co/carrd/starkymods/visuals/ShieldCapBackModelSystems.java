@@ -1,5 +1,6 @@
 package co.carrd.starkymods.visuals;
 
+import co.carrd.starkymods.util.ShieldCapInventoryCompat;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -19,7 +20,9 @@ import com.hypixel.hytale.server.core.cosmetics.CosmeticsModule;
 import com.hypixel.hytale.server.core.cosmetics.PlayerSkin;
 import com.hypixel.hytale.server.core.cosmetics.PlayerSkinPart;
 import com.hypixel.hytale.server.core.cosmetics.PlayerSkinPartTexture;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
@@ -763,22 +766,23 @@ public final class ShieldCapBackModelSystems {
                 return baseModel;
             }
 
-            if (player.getPlayerRef() == null || player.getPlayerRef().getReference() == null) {
+            Ref<EntityStore> playerRef = player.getReference();
+            if (playerRef == null || !playerRef.isValid()) {
                 return baseModel;
             }
 
-            Store<EntityStore> store = player.getPlayerRef().getReference().getStore();
+            Store<EntityStore> store = playerRef.getStore();
             if (store == null) {
                 return baseModel;
             }
 
             PlayerSkinComponent playerSkinComponent =
-                    store.getComponent(player.getPlayerRef().getReference(), PlayerSkinComponent.getComponentType());
+                    store.getComponent(playerRef, PlayerSkinComponent.getComponentType());
             if (playerSkinComponent == null || playerSkinComponent.getPlayerSkin() == null) {
                 return baseModel;
             }
             PlayerSettings playerSettings =
-                    store.getComponent(player.getPlayerRef().getReference(), PlayerSettings.getComponentType());
+                    store.getComponent(playerRef, PlayerSettings.getComponentType());
 
             PlayerSkin skin = skinFromProtocol(playerSkinComponent.getPlayerSkin());
             CosmeticRegistry registry = CosmeticsModule.get().getRegistry();
@@ -862,11 +866,14 @@ public final class ShieldCapBackModelSystems {
         }
 
         private Set<ItemArmorSlot> collectVisibleArmorSlots(Player player, PlayerSettings playerSettings) {
-            if (player == null || player.getInventory() == null) {
+            if (player == null || player.getReference() == null || !player.getReference().isValid()) {
                 return EnumSet.noneOf(ItemArmorSlot.class);
             }
 
-            return collectVisibleArmorSlots(player.getInventory().getArmor(), playerSettings);
+            Ref<EntityStore> playerRef = player.getReference();
+            return collectVisibleArmorSlots(
+                    ShieldCapInventoryCompat.getSection(playerRef.getStore(), playerRef, InventoryComponent.ARMOR_SECTION_ID),
+                    playerSettings);
         }
 
         private Set<ItemArmorSlot> collectVisibleArmorSlots(ItemContainer armorContainer, PlayerSettings playerSettings) {
@@ -1643,8 +1650,13 @@ public final class ShieldCapBackModelSystems {
             }
 
             try {
-                if (player.getPlayerRef() != null) {
-                    return String.valueOf(player.getPlayerRef().getUuid());
+                Ref<EntityStore> playerRef = player.getReference();
+                if (playerRef != null && playerRef.isValid() && playerRef.getStore() != null) {
+                    UUIDComponent uuidComponent =
+                            playerRef.getStore().getComponent(playerRef, UUIDComponent.getComponentType());
+                    if (uuidComponent != null && uuidComponent.getUuid() != null) {
+                        return String.valueOf(uuidComponent.getUuid());
+                    }
                 }
             } catch (Throwable ignored) {
             }
@@ -1732,14 +1744,15 @@ public final class ShieldCapBackModelSystems {
         }
 
         private String buildArmorVisibilitySignature(Player player) {
-            if (player == null || player.getPlayerRef() == null || player.getPlayerRef().getReference() == null) {
+            if (player == null || player.getReference() == null || !player.getReference().isValid()) {
                 return "no-player";
             }
 
-            Store<EntityStore> store = player.getPlayerRef().getReference().getStore();
+            Ref<EntityStore> playerRef = player.getReference();
+            Store<EntityStore> store = playerRef.getStore();
             PlayerSettings settings = store == null
                     ? null
-                    : store.getComponent(player.getPlayerRef().getReference(), PlayerSettings.getComponentType());
+                    : store.getComponent(playerRef, PlayerSettings.getComponentType());
             StringBuilder signature = new StringBuilder()
                     .append("hide=")
                     .append(settings != null && settings.hideHelmet()).append(',')
@@ -1747,11 +1760,12 @@ public final class ShieldCapBackModelSystems {
                     .append(settings != null && settings.hideGauntlets()).append(',')
                     .append(settings != null && settings.hidePants());
 
-            if (player.getInventory() == null || player.getInventory().getArmor() == null) {
+            ItemContainer armorContainer =
+                    ShieldCapInventoryCompat.getSection(store, playerRef, InventoryComponent.ARMOR_SECTION_ID);
+            if (armorContainer == null) {
                 return signature.append("|armor=[]").toString();
             }
 
-            ItemContainer armorContainer = player.getInventory().getArmor();
             signature.append("|armor=[");
             for (short slot = 0; slot < armorContainer.getCapacity(); slot++) {
                 ItemStack stack = armorContainer.getItemStack(slot);

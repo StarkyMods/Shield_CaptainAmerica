@@ -1,9 +1,10 @@
 package co.carrd.starkymods.interactions;
 
+import co.carrd.starkymods.util.ShieldCapInventoryCompat;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -23,13 +24,12 @@ final class ShieldCapThrownHandResolver {
         }
 
         Player player = store.getComponent(ownerRef, Player.getComponentType());
-        if (player == null || player.getInventory() == null) {
+        if (player == null) {
             return ActiveThrownHand.NONE;
         }
 
-        Inventory inventory = player.getInventory();
-        ItemContainer hotbar = inventory.getHotbar();
-        byte activeHotbarSlot = inventory.getActiveHotbarSlot();
+        ItemContainer hotbar = ShieldCapInventoryCompat.getHotbar(store, ownerRef);
+        byte activeHotbarSlot = ShieldCapInventoryCompat.getActiveHotbarSlot(store, ownerRef);
         if (isValidSlot(hotbar, activeHotbarSlot) && matchesId(hotbar.getItemStack(activeHotbarSlot), THROWN_ITEM_ID)) {
             return ActiveThrownHand.MAIN;
         }
@@ -37,8 +37,8 @@ final class ShieldCapThrownHandResolver {
             return ActiveThrownHand.MAIN;
         }
 
-        ItemContainer utility = inventory.getUtility();
-        byte activeUtilitySlot = inventory.getActiveUtilitySlot();
+        ItemContainer utility = ShieldCapInventoryCompat.getUtility(store, ownerRef);
+        byte activeUtilitySlot = ShieldCapInventoryCompat.getActiveUtilitySlot(store, ownerRef);
         if (isValidSlot(utility, activeUtilitySlot) && matchesId(utility.getItemStack(activeUtilitySlot), THROWN_ITEM_ID)) {
             return ActiveThrownHand.LEFT;
         }
@@ -52,7 +52,7 @@ final class ShieldCapThrownHandResolver {
 
     private static boolean isValidSlot(ItemContainer container, byte slot) {
         return container != null
-                && slot != Inventory.INACTIVE_SLOT_INDEX
+                && slot != InventoryComponent.INACTIVE_SLOT_INDEX
                 && slot >= 0
                 && slot < container.getCapacity();
     }

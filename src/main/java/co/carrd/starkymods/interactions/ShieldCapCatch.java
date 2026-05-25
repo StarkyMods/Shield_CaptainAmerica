@@ -1,5 +1,7 @@
 package co.carrd.starkymods.interactions;
 
+import co.carrd.starkymods.util.ShieldCapInventoryCompat;
+
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +22,6 @@ import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.ProjectileComponent;
 import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
-import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.entity.EntityModule;
@@ -85,23 +86,20 @@ public final class ShieldCapCatch extends SimpleInstantInteraction {
         }
 
         Player player = store.getComponent(ownerRef, Player.getComponentType());
-        if (player == null || player.getInventory() == null) {
+        if (player == null) {
             return;
         }
 
-        Inventory inventory = player.getInventory();
-        String restoredContainer = restoreInContainer(inventory.getHotbar(), "hotbar");
+        String restoredContainer = restoreInContainer(ShieldCapInventoryCompat.getHotbar(store, ownerRef), "hotbar");
         if (restoredContainer == null) {
-            restoredContainer = restoreInContainer(inventory.getUtility(), "utility");
+            restoredContainer = restoreInContainer(ShieldCapInventoryCompat.getUtility(store, ownerRef), "utility");
         }
-        if (restoredContainer == null) {
-            restoredContainer = restoreInContainer(inventory.getStorage(), "storage");
-        }
-        if (restoredContainer == null) {
-            restoredContainer = restoreInContainer(inventory.getBackpack(), "backpack");
-        }
-        if (restoredContainer == null) {
-            restoredContainer = restoreInContainer(inventory.getTools(), "tools");
+        ItemContainer[] containers = ShieldCapInventoryCompat.getAllContainers(store, ownerRef);
+        for (ItemContainer container : containers) {
+            if (restoredContainer != null) {
+                break;
+            }
+            restoredContainer = restoreInContainer(container, "inventory");
         }
         boolean restored = restoredContainer != null;
         debug("restoreToOwnerAndRemoveProjectile | owner=" + getEntityUuid(store, ownerRef)

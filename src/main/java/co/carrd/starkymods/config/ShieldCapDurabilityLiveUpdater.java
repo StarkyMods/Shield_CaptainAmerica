@@ -12,7 +12,6 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.spatial.SpatialData;
 import com.hypixel.hytale.component.spatial.SpatialResource;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
@@ -291,39 +290,20 @@ public final class ShieldCapDurabilityLiveUpdater {
     }
 
     private static int applyToPlayer(PlayerRef playerRef, int newMaxDurability) {
-        Holder<EntityStore> holder = playerRef.getHolder();
-        Player player = null;
-        if (holder != null) {
-            player = holder.getComponent(Player.getComponentType());
-        }
-        if (player == null) {
-            Ref<EntityStore> entityRef = playerRef.getReference();
-            if (entityRef != null && entityRef.isValid()) {
-                Store<EntityStore> entityStore = entityRef.getStore();
-                if (entityStore != null) {
-                    player = entityStore.getComponent(entityRef, Player.getComponentType());
-                }
-            }
-        }
-        if (player == null) {
+        Ref<EntityStore> entityRef = playerRef == null ? null : playerRef.getReference();
+        if (entityRef == null || !entityRef.isValid()) {
             return 0;
         }
 
-        Inventory inventory = player.getInventory();
-        if (inventory == null) {
+        Store<EntityStore> entityStore = entityRef.getStore();
+        if (entityStore == null) {
             return 0;
         }
 
         int updated = 0;
-        updated += applyToContainer(inventory.getHotbar(), newMaxDurability);
-        updated += applyToContainer(inventory.getStorage(), newMaxDurability);
-        updated += applyToContainer(inventory.getBackpack(), newMaxDurability);
-        updated += applyToContainer(inventory.getUtility(), newMaxDurability);
-        updated += applyToContainer(inventory.getTools(), newMaxDurability);
-        updated += applyToContainer(inventory.getArmor(), newMaxDurability);
-
-        ItemContainer everything = ShieldCapInventoryCompat.getCombinedEverything(inventory);
-        updated += applyToContainer(everything, newMaxDurability);
+        for (ItemContainer container : ShieldCapInventoryCompat.getAllContainers(entityStore, entityRef)) {
+            updated += applyToContainer(container, newMaxDurability);
+        }
         return updated;
     }
 

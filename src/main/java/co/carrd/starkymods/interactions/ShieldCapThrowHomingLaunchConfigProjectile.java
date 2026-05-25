@@ -1,17 +1,17 @@
 package co.carrd.starkymods.interactions;
 
+import co.carrd.starkymods.util.ShieldCapInventoryCompat;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.math.vector.Transform;
-import com.hypixel.hytale.math.vector.Vector3d;
+import org.joml.Vector3d;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
@@ -124,28 +124,17 @@ public class ShieldCapThrowHomingLaunchConfigProjectile extends SimpleInstantInt
         }
 
         Player player = commandBuffer.getComponent(ownerRef, Player.getComponentType());
-        if (player == null || player.getInventory() == null) {
+        if (player == null) {
             return null;
         }
 
-        Inventory inventory = player.getInventory();
-        String variant = findThrownShieldVariant(inventory.getHotbar());
-        if (variant != null) {
-            return variant;
+        for (ItemContainer container : ShieldCapInventoryCompat.getAllContainers(commandBuffer, ownerRef)) {
+            String variant = findThrownShieldVariant(container);
+            if (variant != null) {
+                return variant;
+            }
         }
-        variant = findThrownShieldVariant(inventory.getUtility());
-        if (variant != null) {
-            return variant;
-        }
-        variant = findThrownShieldVariant(inventory.getStorage());
-        if (variant != null) {
-            return variant;
-        }
-        variant = findThrownShieldVariant(inventory.getBackpack());
-        if (variant != null) {
-            return variant;
-        }
-        return findThrownShieldVariant(inventory.getTools());
+        return null;
     }
 
     private String findThrownShieldVariant(ItemContainer container) {

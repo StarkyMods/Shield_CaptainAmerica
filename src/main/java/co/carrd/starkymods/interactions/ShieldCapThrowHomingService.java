@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 
+import co.carrd.starkymods.util.ShieldCapInventoryCompat;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import co.carrd.starkymods.visuals.ShieldCapReturnReticleInjector;
@@ -19,7 +20,7 @@ import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.spatial.SpatialResource;
-import com.hypixel.hytale.math.vector.Vector3d;
+import org.joml.Vector3d;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.protocol.SoundCategory;
 import com.hypixel.hytale.protocol.packets.world.PlaySoundEvent3D;
@@ -32,13 +33,12 @@ import com.hypixel.hytale.server.core.entity.InteractionManager;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.ProjectileComponent;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.entity.EntityModule;
 import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.PersistentModel;
-import com.hypixel.hytale.server.core.modules.entity.component.NPCMarkerComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.interaction.InteractionModule;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.RootInteraction;
@@ -51,6 +51,7 @@ import com.hypixel.hytale.server.core.universe.world.ParticleUtil;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.PositionUtil;
+import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import org.bson.BsonDocument;
 import org.bson.BsonString;
 
@@ -707,21 +708,21 @@ public final class ShieldCapThrowHomingService {
         }
 
         Vector3d velocity = projectileVelocity.getVelocity();
-        if (!velocity.isFinite() || velocity.closeToZero(1e-6)) {
+        if (!velocity.isFinite() || isCloseToZero(velocity, 1e-6)) {
             return;
         }
 
-        Vector3d reducedVelocity = velocity.clone().scale(FIRST_WALL_BOUNCE_SPEED_MULTIPLIER);
+        Vector3d reducedVelocity = new Vector3d(velocity).mul(FIRST_WALL_BOUNCE_SPEED_MULTIPLIER);
         projectileVelocity.set(reducedVelocity);
 
         if (physicsProvider.getVelocity() != null) {
-            physicsProvider.getVelocity().assign(reducedVelocity);
+            physicsProvider.getVelocity().set(reducedVelocity);
         }
         if (physicsProvider.getMovement() != null) {
-            physicsProvider.getMovement().assign(reducedVelocity);
+            physicsProvider.getMovement().set(reducedVelocity);
         }
         if (physicsProvider.getNextMovement() != null) {
-            physicsProvider.getNextMovement().assign(reducedVelocity);
+            physicsProvider.getNextMovement().set(reducedVelocity);
         }
     }
 
@@ -868,7 +869,7 @@ public final class ShieldCapThrowHomingService {
                     continue;
                 }
 
-                double distanceSq = searchOrigin.distanceSquaredTo(projectilePos);
+                double distanceSq = searchOrigin.distanceSquared(projectilePos);
                 if (!Double.isFinite(distanceSq) || distanceSq > maxDistanceSq || distanceSq >= nearestDistanceSq) {
                     continue;
                 }
@@ -1172,6 +1173,12 @@ public final class ShieldCapThrowHomingService {
                 }
 
                 try {
+                    if (playerRefEntity == null
+                            || !playerRefEntity.isValid()
+                            || commandBuffer.getComponent(playerRefEntity, Player.getComponentType()) == null) {
+                        continue;
+                    }
+
                     InteractionManager interactionManager =
                             commandBuffer.getComponent(playerRefEntity, InteractionModule.get().getInteractionManagerComponent());
                     if (interactionManager == null) {
@@ -1181,6 +1188,9 @@ public final class ShieldCapThrowHomingService {
                     InteractionContext context =
                             InteractionContext.forInteraction(interactionManager, playerRefEntity, InteractionType.Primary, commandBuffer);
                     interactionManager.tryStartChain(playerRefEntity, commandBuffer, InteractionType.Primary, context, rootInteraction);
+                } catch (Throwable t) {
+                    debug("return calling effect skipped | owner=" + ownerUuid
+                            + " | error=" + t.getClass().getSimpleName() + ": " + t.getMessage());
                 } finally {
                     PENDING_RETURN_CALLING_EFFECT_REQUESTS.remove(ownerUuid);
                 }
@@ -1218,6 +1228,12 @@ public final class ShieldCapThrowHomingService {
                 }
 
                 try {
+                    if (playerRefEntity == null
+                            || !playerRefEntity.isValid()
+                            || commandBuffer.getComponent(playerRefEntity, Player.getComponentType()) == null) {
+                        continue;
+                    }
+
                     InteractionManager interactionManager =
                             commandBuffer.getComponent(playerRefEntity, InteractionModule.get().getInteractionManagerComponent());
                     if (interactionManager == null) {
@@ -1227,6 +1243,9 @@ public final class ShieldCapThrowHomingService {
                     InteractionContext context =
                             InteractionContext.forInteraction(interactionManager, playerRefEntity, InteractionType.Primary, commandBuffer);
                     interactionManager.tryStartChain(playerRefEntity, commandBuffer, InteractionType.Primary, context, rootInteraction);
+                } catch (Throwable t) {
+                    debug("return calling clear skipped | owner=" + ownerUuid
+                            + " | error=" + t.getClass().getSimpleName() + ": " + t.getMessage());
                 } finally {
                     PENDING_RETURN_CALLING_CLEAR_REQUESTS.remove(ownerUuid, requestedAt);
                 }
@@ -1543,7 +1562,7 @@ public final class ShieldCapThrowHomingService {
         }
 
         playImpactSound(store, impactPos, soundEventId);
-        Vector3d particlePos = impactPos.clone();
+        Vector3d particlePos = new Vector3d(impactPos);
         if (IMPACT_PARTICLE_ID.equals(particleId)) {
             particlePos.y += IMPACT_PARTICLE_Y_OFFSET;
         }
@@ -1634,7 +1653,7 @@ public final class ShieldCapThrowHomingService {
 
         TransformComponent transform =
                 store.getComponent(projectileRef, EntityModule.get().getTransformComponentType());
-        return transform != null && transform.getPosition() != null ? transform.getPosition().clone() : null;
+        return transform != null && transform.getPosition() != null ? new Vector3d(transform.getPosition()) : null;
     }
 
     private static List<Ref<EntityStore>> getViewerRefs(Store<EntityStore> store) {
@@ -1805,7 +1824,7 @@ public final class ShieldCapThrowHomingService {
                         scheduleTrackedProjectileRemoval(store, state, projectile.projectileRef);
                         continue;
                     }
-                    double ownerDistance = projectile.transform.getPosition().distanceTo(ownerAimPosition);
+                    double ownerDistance = projectile.transform.getPosition().distance(ownerAimPosition);
                     if (ownerDistance <= OWNER_RETURN_CALLING_TRIGGER_DISTANCE
                             && !trackedState.returnCallingAnimationTriggered) {
                         PENDING_RETURN_CALLING_EFFECT_REQUESTS.put(state.ownerUuid, nowMs);
@@ -1989,7 +2008,7 @@ public final class ShieldCapThrowHomingService {
                 continue;
             }
 
-            double distance = projectileTransform.getPosition().distanceTo(ownerAimPosition);
+            double distance = projectileTransform.getPosition().distance(ownerAimPosition);
             if (Double.isFinite(distance)
                     && distance >= RETURN_KICK_MIN_DISTANCE
                     && distance <= RETURN_KICK_MAX_DISTANCE) {
@@ -2008,13 +2027,12 @@ public final class ShieldCapThrowHomingService {
         }
 
         Player player = store.getComponent(ownerRef, Player.getComponentType());
-        if (player == null || player.getInventory() == null) {
+        if (player == null) {
             return false;
         }
 
-        Inventory inventory = player.getInventory();
-        ItemContainer hotbar = inventory.getHotbar();
-        byte activeHotbarSlot = inventory.getActiveHotbarSlot();
+        ItemContainer hotbar = ShieldCapInventoryCompat.getHotbar(store, ownerRef);
+        byte activeHotbarSlot = ShieldCapInventoryCompat.getActiveHotbarSlot(store, ownerRef);
         ItemStack mainHandStack = isInventorySlotUsable(hotbar, activeHotbarSlot)
                 ? hotbar.getItemStack(activeHotbarSlot)
                 : null;
@@ -2030,8 +2048,8 @@ public final class ShieldCapThrowHomingService {
             return false;
         }
 
-        ItemContainer utility = inventory.getUtility();
-        byte activeUtilitySlot = inventory.getActiveUtilitySlot();
+        ItemContainer utility = ShieldCapInventoryCompat.getUtility(store, ownerRef);
+        byte activeUtilitySlot = ShieldCapInventoryCompat.getActiveUtilitySlot(store, ownerRef);
         return isInventorySlotUsable(utility, activeUtilitySlot)
                 && matchesItem(utility.getItemStack(activeUtilitySlot), ShieldCapThrownHandResolver.THROWN_ITEM_ID);
     }
@@ -2078,7 +2096,7 @@ public final class ShieldCapThrowHomingService {
         }
 
         Vector3d mjolnirPosition = mjolnirTransform.getPosition();
-        if (projectile.transform.getPosition().distanceTo(mjolnirPosition) <= PROJECTILE_CLASH_TOUCH_DISTANCE) {
+        if (projectile.transform.getPosition().distance(mjolnirPosition) <= PROJECTILE_CLASH_TOUCH_DISTANCE) {
             forceMjolnirProjectileClashImpact(store, mjolnirProjectileRef, projectile.projectileRef, nowMs);
             resolveMjolnirProjectileClashImpact(
                     store,
@@ -2229,17 +2247,17 @@ public final class ShieldCapThrowHomingService {
             currentSpeed = MIN_PROJECTILE_SPEED;
         }
 
-        Vector3d reversedVelocity = currentVelocity.clone();
-        if (reversedVelocity.closeToZero(1e-6)) {
+        Vector3d reversedVelocity = new Vector3d(currentVelocity);
+        if (isCloseToZero(reversedVelocity, 1e-6)) {
             reversedVelocity = new Vector3d(0.0, 0.0, -1.0);
         } else {
             reversedVelocity.normalize();
         }
-        reversedVelocity.scale(-currentSpeed);
+        reversedVelocity.mul(-currentSpeed);
 
         projectileVelocity.set(reversedVelocity);
         if (physicsProvider.getVelocity() != null) {
-            physicsProvider.getVelocity().assign(reversedVelocity);
+            physicsProvider.getVelocity().set(reversedVelocity);
         }
         physicsProvider.setState(StandardPhysicsProvider.STATE.ACTIVE);
         physicsProvider.setOnGround(false);
@@ -2248,11 +2266,11 @@ public final class ShieldCapThrowHomingService {
         physicsProvider.setMovedInsideSolid(false);
         physicsProvider.setVelocityExtremaCount(0);
 
-        Vector3d reversedDirection = reversedVelocity.clone();
-        if (!reversedDirection.closeToZero(1e-6)) {
+        Vector3d reversedDirection = new Vector3d(reversedVelocity);
+        if (!isCloseToZero(reversedDirection, 1e-6)) {
             reversedDirection.normalize();
             projectileTransform.setPosition(
-                    projectileTransform.getPosition().clone().add(reversedDirection.scale(IMPACT_UNSTICK_DISTANCE))
+                    new Vector3d(projectileTransform.getPosition()).add(reversedDirection.mul(IMPACT_UNSTICK_DISTANCE))
             );
         }
 
@@ -2285,18 +2303,18 @@ public final class ShieldCapThrowHomingService {
             return;
         }
 
-        Vector3d forward = currentVelocity.clone();
-        if (forward.closeToZero(1e-6)) {
+        Vector3d forward = new Vector3d(currentVelocity);
+        if (isCloseToZero(forward, 1e-6)) {
             return;
         }
 
         forward.normalize();
         projectileTransform.setPosition(
-                projectileTransform.getPosition().clone().add(forward.scale(Math.max(IMPACT_UNSTICK_DISTANCE, unstuckDistance)))
+                new Vector3d(projectileTransform.getPosition()).add(forward.mul(Math.max(IMPACT_UNSTICK_DISTANCE, unstuckDistance)))
         );
         projectileVelocity.set(currentVelocity);
         if (physicsProvider.getVelocity() != null) {
-            physicsProvider.getVelocity().assign(currentVelocity);
+            physicsProvider.getVelocity().set(currentVelocity);
         }
         physicsProvider.setState(StandardPhysicsProvider.STATE.ACTIVE);
         physicsProvider.setOnGround(false);
@@ -2312,11 +2330,11 @@ public final class ShieldCapThrowHomingService {
         }
 
         Vector3d contactNormal = physicsProvider.getContactNormal();
-        if (!contactNormal.isFinite() || contactNormal.closeToZero(1e-6)) {
+        if (!contactNormal.isFinite() || isCloseToZero(contactNormal, 1e-6)) {
             return false;
         }
 
-        Vector3d normalizedNormal = contactNormal.clone().normalize();
+        Vector3d normalizedNormal = new Vector3d(contactNormal).normalize();
         return Math.abs(normalizedNormal.y) >= THROW_KICK_VERTICAL_SURFACE_THRESHOLD;
     }
 
@@ -2339,35 +2357,35 @@ public final class ShieldCapThrowHomingService {
         Vector3d contactNormal = physicsProvider.getContactNormal();
         if (currentVelocity == null || !currentVelocity.isFinite()
                 || contactNormal == null || !contactNormal.isFinite()
-                || contactNormal.closeToZero(1e-6)) {
+                || isCloseToZero(contactNormal, 1e-6)) {
             return;
         }
 
-        Vector3d normalizedNormal = contactNormal.clone().normalize();
-        Vector3d reflectedVelocity = currentVelocity.clone()
-                .subtract(normalizedNormal.clone().scale(2.0 * currentVelocity.dot(normalizedNormal)));
-        if (!reflectedVelocity.isFinite() || reflectedVelocity.closeToZero(1e-6)) {
-            reflectedVelocity = normalizedNormal.clone().scale(MIN_PROJECTILE_SPEED);
+        Vector3d normalizedNormal = new Vector3d(contactNormal).normalize();
+        Vector3d reflectedVelocity = new Vector3d(currentVelocity)
+                .sub(new Vector3d(normalizedNormal).mul(2.0 * currentVelocity.dot(normalizedNormal)));
+        if (!reflectedVelocity.isFinite() || isCloseToZero(reflectedVelocity, 1e-6)) {
+            reflectedVelocity = new Vector3d(normalizedNormal).mul(MIN_PROJECTILE_SPEED);
         } else {
             double reflectedSpeed = Math.max(MIN_PROJECTILE_SPEED, currentVelocity.length() * NORMAL_BLOCK_BOUNCE_SPEED_MULTIPLIER);
-            reflectedVelocity.normalize().scale(reflectedSpeed);
+            reflectedVelocity.normalize().mul(reflectedSpeed);
         }
 
-        Vector3d newPosition = projectileTransform.getPosition().clone().add(normalizedNormal.clone().scale(IMPACT_UNSTICK_DISTANCE));
+        Vector3d newPosition = new Vector3d(projectileTransform.getPosition()).add(new Vector3d(normalizedNormal).mul(IMPACT_UNSTICK_DISTANCE));
         projectileTransform.setPosition(newPosition);
         projectileVelocity.set(reflectedVelocity);
 
         if (physicsProvider.getPosition() != null) {
-            physicsProvider.getPosition().assign(newPosition);
+            physicsProvider.getPosition().set(newPosition);
         }
         if (physicsProvider.getVelocity() != null) {
-            physicsProvider.getVelocity().assign(reflectedVelocity);
+            physicsProvider.getVelocity().set(reflectedVelocity);
         }
         if (physicsProvider.getMovement() != null) {
-            physicsProvider.getMovement().assign(reflectedVelocity.clone().normalize().scale(IMPACT_UNSTICK_DISTANCE));
+            physicsProvider.getMovement().set(new Vector3d(reflectedVelocity).normalize().mul(IMPACT_UNSTICK_DISTANCE));
         }
         if (physicsProvider.getNextMovement() != null) {
-            physicsProvider.getNextMovement().assign(reflectedVelocity.clone().normalize().scale(IMPACT_UNSTICK_DISTANCE));
+            physicsProvider.getNextMovement().set(new Vector3d(reflectedVelocity).normalize().mul(IMPACT_UNSTICK_DISTANCE));
         }
         physicsProvider.setState(StandardPhysicsProvider.STATE.ACTIVE);
         physicsProvider.setOnGround(false);
@@ -2393,25 +2411,25 @@ public final class ShieldCapThrowHomingService {
         }
 
         Vector3d contactNormal = physicsProvider.getContactNormal();
-        Vector3d newPosition = projectileTransform.getPosition().clone();
-        if (contactNormal != null && contactNormal.isFinite() && !contactNormal.closeToZero(1e-6)) {
-            newPosition.add(contactNormal.clone().normalize().scale(IMPACT_UNSTICK_DISTANCE * 0.25));
+        Vector3d newPosition = new Vector3d(projectileTransform.getPosition());
+        if (contactNormal != null && contactNormal.isFinite() && !isCloseToZero(contactNormal, 1e-6)) {
+            newPosition.add(new Vector3d(contactNormal).normalize().mul(IMPACT_UNSTICK_DISTANCE * 0.25));
             projectileTransform.setPosition(newPosition);
         }
 
         Vector3d zero = new Vector3d(0.0, 0.0, 0.0);
         projectileVelocity.set(zero);
         if (physicsProvider.getPosition() != null) {
-            physicsProvider.getPosition().assign(newPosition);
+            physicsProvider.getPosition().set(newPosition);
         }
         if (physicsProvider.getVelocity() != null) {
-            physicsProvider.getVelocity().assign(zero);
+            physicsProvider.getVelocity().set(zero);
         }
         if (physicsProvider.getMovement() != null) {
-            physicsProvider.getMovement().assign(zero);
+            physicsProvider.getMovement().set(zero);
         }
         if (physicsProvider.getNextMovement() != null) {
-            physicsProvider.getNextMovement().assign(zero);
+            physicsProvider.getNextMovement().set(zero);
         }
         try {
             physicsProvider.setState(Enum.valueOf(StandardPhysicsProvider.STATE.class, "INACTIVE"));
@@ -2445,27 +2463,27 @@ public final class ShieldCapThrowHomingService {
             return;
         }
 
-        Vector3d delta = ownerAimPosition.clone().subtract(projectileTransform.getPosition());
-        if (!delta.isFinite() || delta.closeToZero(1e-6)) {
+        Vector3d delta = new Vector3d(ownerAimPosition).sub(projectileTransform.getPosition());
+        if (!delta.isFinite() || isCloseToZero(delta, 1e-6)) {
             return;
         }
 
         Vector3d launchDirection = delta.normalize();
-        Vector3d launchVelocity = launchDirection.clone().scale(MIN_PROJECTILE_SPEED);
-        projectileTransform.setPosition(projectileTransform.getPosition().clone().add(launchDirection.clone().scale(IMPACT_UNSTICK_DISTANCE)));
+        Vector3d launchVelocity = new Vector3d(launchDirection).mul(MIN_PROJECTILE_SPEED);
+        projectileTransform.setPosition(new Vector3d(projectileTransform.getPosition()).add(new Vector3d(launchDirection).mul(IMPACT_UNSTICK_DISTANCE)));
         projectileVelocity.set(launchVelocity);
 
         if (physicsProvider.getPosition() != null) {
-            physicsProvider.getPosition().assign(projectileTransform.getPosition());
+            physicsProvider.getPosition().set(projectileTransform.getPosition());
         }
         if (physicsProvider.getVelocity() != null) {
-            physicsProvider.getVelocity().assign(launchVelocity);
+            physicsProvider.getVelocity().set(launchVelocity);
         }
         if (physicsProvider.getMovement() != null) {
-            physicsProvider.getMovement().assign(launchDirection.clone().scale(IMPACT_UNSTICK_DISTANCE));
+            physicsProvider.getMovement().set(new Vector3d(launchDirection).mul(IMPACT_UNSTICK_DISTANCE));
         }
         if (physicsProvider.getNextMovement() != null) {
-            physicsProvider.getNextMovement().assign(launchDirection.clone().scale(IMPACT_UNSTICK_DISTANCE));
+            physicsProvider.getNextMovement().set(new Vector3d(launchDirection).mul(IMPACT_UNSTICK_DISTANCE));
         }
         physicsProvider.setState(StandardPhysicsProvider.STATE.ACTIVE);
         physicsProvider.setOnGround(false);
@@ -2667,7 +2685,7 @@ public final class ShieldCapThrowHomingService {
                 continue;
             }
 
-            double distanceSq = ownerPos.distanceSquaredTo(projectileTransform.getPosition());
+            double distanceSq = ownerPos.distanceSquared(projectileTransform.getPosition());
             if (distanceSq < bestDistanceSq) {
                 bestDistanceSq = distanceSq;
                 bestRef = ref;
@@ -2726,7 +2744,7 @@ public final class ShieldCapThrowHomingService {
                 double speed = velocity.getVelocity().length();
                 double score = speed;
                 if (ownerPos != null) {
-                    double distance = ownerPos.distanceTo(projectileTransform.getPosition());
+                    double distance = ownerPos.distance(projectileTransform.getPosition());
                     if (Double.isFinite(distance)) {
                         score -= distance;
                     }
@@ -2818,7 +2836,7 @@ public final class ShieldCapThrowHomingService {
 
                 double distanceSq = ownerPos == null
                         ? 0.0
-                        : ownerPos.distanceSquaredTo(projectileTransform.getPosition());
+                        : ownerPos.distanceSquared(projectileTransform.getPosition());
                 if (distanceSq < bestDistanceSq[0]) {
                     bestDistanceSq[0] = distanceSq;
                     bestRef[0] = projectileRef;
@@ -2953,7 +2971,7 @@ public final class ShieldCapThrowHomingService {
 
             if (!trackedState.throwKickMode) {
                 state.lastKnownShieldProjectileRef = projectileRef;
-                state.lastKnownShieldProjectilePosition = projectileTransform.getPosition().clone();
+                state.lastKnownShieldProjectilePosition = new Vector3d(projectileTransform.getPosition());
                 state.lastKnownShieldProjectileSeenAtMs = nowMs;
             }
             snapshots.add(new ProjectileSnapshot(projectileRef, projectileTransform, projectileVelocity, physicsProvider, trackedState));
@@ -3034,7 +3052,7 @@ public final class ShieldCapThrowHomingService {
                 continue;
             }
 
-            Vector3d delta = targetPos.clone().subtract(projectilePos);
+            Vector3d delta = new Vector3d(targetPos).sub(projectilePos);
             double distanceSq3d = delta.dot(delta);
             if (distanceSq3d < 1e-8) {
                 continue;
@@ -3050,7 +3068,7 @@ public final class ShieldCapThrowHomingService {
                 continue;
             }
 
-            double distanceSq = projectilePos.distanceSquaredTo(targetPos);
+            double distanceSq = projectilePos.distanceSquared(targetPos);
             if (distanceSq < nearestDistanceSq) {
                 nearestDistanceSq = distanceSq;
                 nearestTarget = targetRef;
@@ -3071,7 +3089,7 @@ public final class ShieldCapThrowHomingService {
             return null;
         }
 
-        return velocity.clone().normalize();
+        return new Vector3d(velocity).normalize();
     }
 
     private static double getInitialForwardRange(Velocity projectileVelocity) {
@@ -3093,7 +3111,7 @@ public final class ShieldCapThrowHomingService {
             return FIRST_HOMING_FORWARD_RANGE;
         }
 
-        double ownerDistance = projectilePos.distanceTo(ownerTransform.getPosition());
+        double ownerDistance = projectilePos.distance(ownerTransform.getPosition());
         if (!Double.isFinite(ownerDistance) || ownerDistance <= 0.0) {
             return FIRST_HOMING_FORWARD_RANGE;
         }
@@ -3128,7 +3146,7 @@ public final class ShieldCapThrowHomingService {
             return null;
         }
 
-        return targetPos.clone().add(0.0, TARGET_AIM_HEIGHT_OFFSET, 0.0);
+        return new Vector3d(targetPos).add(0.0, TARGET_AIM_HEIGHT_OFFSET, 0.0);
     }
 
     private static boolean isTrackedProjectile(Store<EntityStore> store, Ref<EntityStore> targetRef) {
@@ -3155,7 +3173,7 @@ public final class ShieldCapThrowHomingService {
             return false;
         }
         return store.getComponent(targetRef, Player.getComponentType()) != null
-                || store.getComponent(targetRef, NPCMarkerComponent.getComponentType()) != null;
+                || store.getComponent(targetRef, NPCEntity.getComponentType()) != null;
     }
 
     private static boolean isProjectileEntity(Store<EntityStore> store, Ref<EntityStore> ref) {
@@ -3224,7 +3242,7 @@ public final class ShieldCapThrowHomingService {
             return;
         }
 
-        double targetDistance = projectilePos.distanceTo(targetPosition);
+        double targetDistance = projectilePos.distance(targetPosition);
         if (targetDistance <= STOP_STEER_DISTANCE) {
             return;
         }
@@ -3240,15 +3258,15 @@ public final class ShieldCapThrowHomingService {
         }
 
         double speed = Math.max(MIN_TRACKED_SPEED, Math.max(MIN_PROJECTILE_SPEED, currentSpeed) * speedMultiplier);
-        Vector3d desiredDirection = targetPosition.clone().subtract(projectilePos);
-        if (desiredDirection.closeToZero(1e-6)) {
+        Vector3d desiredDirection = new Vector3d(targetPosition).sub(projectilePos);
+        if (isCloseToZero(desiredDirection, 1e-6)) {
             return;
         }
 
-        desiredDirection.normalize().scale(speed);
-        Vector3d blendedVelocity = currentVelocity.clone()
-                .scale(1.0 - HOMING_STRENGTH)
-                .add(desiredDirection.clone().scale(HOMING_STRENGTH));
+        desiredDirection.normalize().mul(speed);
+        Vector3d blendedVelocity = new Vector3d(currentVelocity)
+                .mul(1.0 - HOMING_STRENGTH)
+                .add(new Vector3d(desiredDirection).mul(HOMING_STRENGTH));
 
         if (!blendedVelocity.isFinite()) {
             return;
@@ -3256,7 +3274,7 @@ public final class ShieldCapThrowHomingService {
 
         projectileVelocity.set(blendedVelocity);
         if (physicsProvider != null && physicsProvider.getVelocity() != null) {
-            physicsProvider.getVelocity().assign(blendedVelocity);
+            physicsProvider.getVelocity().set(blendedVelocity);
         }
         if (physicsProvider != null) {
             physicsProvider.setState(StandardPhysicsProvider.STATE.ACTIVE);
@@ -3278,7 +3296,7 @@ public final class ShieldCapThrowHomingService {
             return;
         }
 
-        Vector3d delta = targetPosition.clone().subtract(projectilePos);
+        Vector3d delta = new Vector3d(targetPosition).sub(projectilePos);
         double distance = delta.length();
         if (!Double.isFinite(distance) || distance <= STOP_STEER_DISTANCE) {
             return;
@@ -3294,28 +3312,28 @@ public final class ShieldCapThrowHomingService {
 
         double minStepDistance = speedMultiplier < 1.0 ? OWNER_RETURN_CLOSE_MIN_STEP : 0.35;
         double stepDistance = Math.min(distance, Math.max(minStepDistance, currentSpeed * (WORLD_TICK_INTERVAL_MS / 1000.0)));
-        Vector3d step = delta.normalize().scale(stepDistance);
-        Vector3d newPosition = projectilePos.clone().add(step);
+        Vector3d step = delta.normalize().mul(stepDistance);
+        Vector3d newPosition = new Vector3d(projectilePos).add(step);
         projectileTransform.setPosition(newPosition);
 
         double impliedSpeed = stepDistance / (WORLD_TICK_INTERVAL_MS / 1000.0);
-        Vector3d stepVelocity = delta.normalize().scale(impliedSpeed);
+        Vector3d stepVelocity = delta.normalize().mul(impliedSpeed);
         if (projectileVelocity != null) {
             projectileVelocity.set(stepVelocity);
         }
 
         if (physicsProvider != null) {
             if (physicsProvider.getPosition() != null) {
-                physicsProvider.getPosition().assign(newPosition);
+                physicsProvider.getPosition().set(newPosition);
             }
             if (physicsProvider.getMovement() != null) {
-                physicsProvider.getMovement().assign(step);
+                physicsProvider.getMovement().set(step);
             }
             if (physicsProvider.getNextMovement() != null) {
-                physicsProvider.getNextMovement().assign(step);
+                physicsProvider.getNextMovement().set(step);
             }
             if (physicsProvider.getVelocity() != null) {
-                physicsProvider.getVelocity().assign(stepVelocity);
+                physicsProvider.getVelocity().set(stepVelocity);
             }
             physicsProvider.setState(StandardPhysicsProvider.STATE.ACTIVE);
             physicsProvider.setOnGround(false);
@@ -3525,31 +3543,31 @@ public final class ShieldCapThrowHomingService {
             return;
         }
 
-        Vector3d normalizedRecoil = recoilVelocity.clone();
-        if (normalizedRecoil.closeToZero(1e-6)) {
+        Vector3d normalizedRecoil = new Vector3d(recoilVelocity);
+        if (isCloseToZero(normalizedRecoil, 1e-6)) {
             normalizedRecoil = new Vector3d(0.0, 0.0, -1.0);
         } else {
             normalizedRecoil.normalize();
         }
 
-        Vector3d launchVelocity = recoilVelocity.clone();
+        Vector3d launchVelocity = new Vector3d(recoilVelocity);
         launchVelocity.y = Math.min(launchVelocity.y, -PROJECTILE_CLASH_GROUND_FALL_SPEED);
         projectileVelocity.set(launchVelocity);
         projectileTransform.setPosition(
-                projectileTransform.getPosition().clone().add(normalizedRecoil.scale(IMPACT_UNSTICK_DISTANCE))
+                new Vector3d(projectileTransform.getPosition()).add(normalizedRecoil.mul(IMPACT_UNSTICK_DISTANCE))
         );
 
         if (physicsProvider.getPosition() != null) {
-            physicsProvider.getPosition().assign(projectileTransform.getPosition());
+            physicsProvider.getPosition().set(projectileTransform.getPosition());
         }
         if (physicsProvider.getVelocity() != null) {
-            physicsProvider.getVelocity().assign(launchVelocity);
+            physicsProvider.getVelocity().set(launchVelocity);
         }
         if (physicsProvider.getMovement() != null) {
-            physicsProvider.getMovement().assign(launchVelocity.clone().scale(WORLD_TICK_INTERVAL_MS / 1000.0));
+            physicsProvider.getMovement().set(new Vector3d(launchVelocity).mul(WORLD_TICK_INTERVAL_MS / 1000.0));
         }
         if (physicsProvider.getNextMovement() != null) {
-            physicsProvider.getNextMovement().assign(launchVelocity.clone().scale(WORLD_TICK_INTERVAL_MS / 1000.0));
+            physicsProvider.getNextMovement().set(new Vector3d(launchVelocity).mul(WORLD_TICK_INTERVAL_MS / 1000.0));
         }
         physicsProvider.setState(StandardPhysicsProvider.STATE.ACTIVE);
         physicsProvider.setOnGround(false);
@@ -3562,15 +3580,15 @@ public final class ShieldCapThrowHomingService {
     private static Vector3d buildProjectileClashRecoil(Velocity projectileVelocity) {
         Vector3d currentVelocity = projectileVelocity == null ? null : projectileVelocity.getVelocity();
         Vector3d recoilDirection =
-                currentVelocity == null || !currentVelocity.isFinite() || currentVelocity.closeToZero(1e-6)
+                currentVelocity == null || !currentVelocity.isFinite() || isCloseToZero(currentVelocity, 1e-6)
                         ? new Vector3d(0.0, 0.0, -1.0)
-                        : currentVelocity.clone().normalize().scale(-1.0);
+                        : new Vector3d(currentVelocity).normalize().mul(-1.0);
         recoilDirection.y -= 0.6;
-        if (!recoilDirection.isFinite() || recoilDirection.closeToZero(1e-6)) {
+        if (!recoilDirection.isFinite() || isCloseToZero(recoilDirection, 1e-6)) {
             recoilDirection = new Vector3d(0.0, -0.6, -1.0);
         }
         recoilDirection.normalize();
-        return recoilDirection.scale(PROJECTILE_CLASH_GROUND_FALL_SPEED);
+        return recoilDirection.mul(PROJECTILE_CLASH_GROUND_FALL_SPEED);
     }
 
     private static void continueProjectileClashGroundDrop(Velocity projectileVelocity,
@@ -3601,13 +3619,13 @@ public final class ShieldCapThrowHomingService {
             projectileVelocity.set(assistedVelocity);
         }
         if (physicsProvider.getVelocity() != null) {
-            physicsProvider.getVelocity().assign(assistedVelocity);
+            physicsProvider.getVelocity().set(assistedVelocity);
         }
         if (physicsProvider.getMovement() != null) {
-            physicsProvider.getMovement().assign(assistedVelocity.clone().scale(WORLD_TICK_INTERVAL_MS / 1000.0));
+            physicsProvider.getMovement().set(new Vector3d(assistedVelocity).mul(WORLD_TICK_INTERVAL_MS / 1000.0));
         }
         if (physicsProvider.getNextMovement() != null) {
-            physicsProvider.getNextMovement().assign(assistedVelocity.clone().scale(WORLD_TICK_INTERVAL_MS / 1000.0));
+            physicsProvider.getNextMovement().set(new Vector3d(assistedVelocity).mul(WORLD_TICK_INTERVAL_MS / 1000.0));
         }
         physicsProvider.setState(StandardPhysicsProvider.STATE.ACTIVE);
         physicsProvider.setOnGround(false);
@@ -3640,13 +3658,13 @@ public final class ShieldCapThrowHomingService {
 
         Vector3d zero = new Vector3d(0.0, 0.0, 0.0);
         if (physicsProvider.getVelocity() != null) {
-            physicsProvider.getVelocity().assign(zero);
+            physicsProvider.getVelocity().set(zero);
         }
         if (physicsProvider.getMovement() != null) {
-            physicsProvider.getMovement().assign(zero);
+            physicsProvider.getMovement().set(zero);
         }
         if (physicsProvider.getNextMovement() != null) {
-            physicsProvider.getNextMovement().assign(zero);
+            physicsProvider.getNextMovement().set(zero);
         }
         physicsProvider.setState(StandardPhysicsProvider.STATE.ACTIVE);
         physicsProvider.setOnGround(true);
@@ -3686,10 +3704,10 @@ public final class ShieldCapThrowHomingService {
 
         double bestDistance = ownerAimPosition == null
                 ? Double.MAX_VALUE
-                : projectilePosition.distanceTo(ownerAimPosition);
+                : projectilePosition.distance(ownerAimPosition);
         Vector3d ownerBasePosition = ownerTransform == null ? null : ownerTransform.getPosition();
         if (ownerBasePosition != null) {
-            bestDistance = Math.min(bestDistance, projectilePosition.distanceTo(ownerBasePosition));
+            bestDistance = Math.min(bestDistance, projectilePosition.distance(ownerBasePosition));
         }
         return bestDistance;
     }
@@ -3713,7 +3731,7 @@ public final class ShieldCapThrowHomingService {
             return null;
         }
 
-        return transform.getPosition().clone();
+        return new Vector3d(transform.getPosition());
     }
 
     private static Ref<EntityStore> normalizeTargetRef(Store<EntityStore> store, Ref<EntityStore> targetRef) {
@@ -3965,7 +3983,7 @@ public final class ShieldCapThrowHomingService {
             if (rememberedPosition == null || !rememberedPosition.isFinite()) {
                 continue;
             }
-            if (rememberedPosition.distanceSquaredTo(targetPosition) <= toleranceSq) {
+            if (rememberedPosition.distanceSquared(targetPosition) <= toleranceSq) {
                 return true;
             }
         }
@@ -4256,7 +4274,7 @@ public final class ShieldCapThrowHomingService {
                 continue;
             }
 
-            double distanceSq = targetPosition.distanceSquaredTo(projectileTransform.getPosition());
+            double distanceSq = targetPosition.distanceSquared(projectileTransform.getPosition());
             if (distanceSq < bestDistanceSq) {
                 bestDistanceSq = distanceSq;
                 bestRef = projectileRef;
@@ -4351,7 +4369,7 @@ public final class ShieldCapThrowHomingService {
                 continue;
             }
 
-            double distanceSq = ownerPos.distanceSquaredTo(projectileTransform.getPosition());
+            double distanceSq = ownerPos.distanceSquared(projectileTransform.getPosition());
             if (distanceSq < bestDistanceSq) {
                 bestDistanceSq = distanceSq;
                 bestRef = projectileRef;
@@ -4606,28 +4624,17 @@ public final class ShieldCapThrowHomingService {
         }
 
         Player player = commandBuffer.getComponent(ownerRef, Player.getComponentType());
-        if (player == null || player.getInventory() == null) {
+        if (player == null) {
             return null;
         }
 
-        Inventory inventory = player.getInventory();
-        String variant = findThrownShieldVariant(inventory.getHotbar());
-        if (variant != null) {
-            return variant;
+        for (ItemContainer container : ShieldCapInventoryCompat.getAllContainers(commandBuffer, ownerRef)) {
+            String variant = findThrownShieldVariant(container);
+            if (variant != null) {
+                return variant;
+            }
         }
-        variant = findThrownShieldVariant(inventory.getUtility());
-        if (variant != null) {
-            return variant;
-        }
-        variant = findThrownShieldVariant(inventory.getStorage());
-        if (variant != null) {
-            return variant;
-        }
-        variant = findThrownShieldVariant(inventory.getBackpack());
-        if (variant != null) {
-            return variant;
-        }
-        return findThrownShieldVariant(inventory.getTools());
+        return null;
     }
 
     private static String findThrownShieldVariant(ItemContainer container) {
@@ -4737,15 +4744,14 @@ public final class ShieldCapThrowHomingService {
         }
 
         Player player = store.getComponent(ownerRef, Player.getComponentType());
-        if (player == null || player.getInventory() == null) {
+        if (player == null) {
             return "inventory-missing";
         }
 
-        Inventory inventory = player.getInventory();
-        ItemContainer hotbar = inventory.getHotbar();
-        ItemContainer utility = inventory.getUtility();
-        byte hotbarSlot = inventory.getActiveHotbarSlot();
-        byte utilitySlot = inventory.getActiveUtilitySlot();
+        ItemContainer hotbar = ShieldCapInventoryCompat.getHotbar(store, ownerRef);
+        ItemContainer utility = ShieldCapInventoryCompat.getUtility(store, ownerRef);
+        byte hotbarSlot = ShieldCapInventoryCompat.getActiveHotbarSlot(store, ownerRef);
+        byte utilitySlot = ShieldCapInventoryCompat.getActiveUtilitySlot(store, ownerRef);
         String hotbarItem = isInventorySlotUsable(hotbar, hotbarSlot) ? describeItem(hotbar.getItemStack(hotbarSlot)) : "inactive";
         String utilityItem = isInventorySlotUsable(utility, utilitySlot) ? describeItem(utility.getItemStack(utilitySlot)) : "inactive";
         boolean utilityContainsThrown = containsItem(utility, ShieldCapThrownHandResolver.THROWN_ITEM_ID);
@@ -4799,7 +4805,7 @@ public final class ShieldCapThrowHomingService {
 
     private static boolean isInventorySlotUsable(ItemContainer container, byte slot) {
         return container != null
-                && slot != Inventory.INACTIVE_SLOT_INDEX
+                && slot != InventoryComponent.INACTIVE_SLOT_INDEX
                 && slot >= 0
                 && slot < container.getCapacity();
     }
@@ -4844,7 +4850,7 @@ public final class ShieldCapThrowHomingService {
         TransformComponent projectileTransform =
                 store.getComponent(projectileRef, EntityModule.get().getTransformComponentType());
         if (projectileTransform != null && projectileTransform.getPosition() != null) {
-            state.lastKnownShieldProjectilePosition = projectileTransform.getPosition().clone();
+            state.lastKnownShieldProjectilePosition = new Vector3d(projectileTransform.getPosition());
             state.lastKnownShieldProjectileSeenAtMs = nowMs;
         }
         state.lastShieldProjectileMarkedAtMs = Math.max(state.lastShieldProjectileMarkedAtMs, nowMs);
@@ -5021,6 +5027,10 @@ public final class ShieldCapThrowHomingService {
         NONE,
         NORMAL,
         THROW_KICK
+    }
+
+    private static boolean isCloseToZero(Vector3d vector, double epsilon) {
+        return vector == null || vector.lengthSquared() <= epsilon * epsilon;
     }
 
     private static final class TargetCandidate {

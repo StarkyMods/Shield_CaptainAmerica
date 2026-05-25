@@ -10,10 +10,10 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.spatial.SpatialResource;
-import com.hypixel.hytale.math.vector.Vector3d;
+import org.joml.Vector3d;
 import com.hypixel.hytale.protocol.InteractionType;
-import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.ProjectileComponent;
 import com.hypixel.hytale.server.core.modules.entity.EntityModule;
@@ -83,16 +83,24 @@ public class ShieldCapThrowHomingMarkProjectile extends SimpleInstantInteraction
         Ref<EntityStore> owningRef = context.getOwningEntity();
         Player owningPlayer = getPlayerFromRef(commandBuffer, owningRef);
         if (owningPlayer != null) {
-            return new ResolvedOwner(((CommandSender) owningPlayer).getUuid(), owningRef);
+            return new ResolvedOwner(getUuid(commandBuffer, owningRef), owningRef);
         }
 
         Ref<EntityStore> entityRef = context.getEntity();
         Player entityPlayer = getPlayerFromRef(commandBuffer, entityRef);
         if (entityPlayer != null) {
-            return new ResolvedOwner(((CommandSender) entityPlayer).getUuid(), entityRef);
+            return new ResolvedOwner(getUuid(commandBuffer, entityRef), entityRef);
         }
 
         return null;
+    }
+
+    private UUID getUuid(@Nonnull CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> ref) {
+        if (ref == null || !ref.isValid()) {
+            return null;
+        }
+        UUIDComponent uuidComponent = commandBuffer.getComponent(ref, UUIDComponent.getComponentType());
+        return uuidComponent == null ? null : uuidComponent.getUuid();
     }
 
     private Ref<EntityStore> resolveProjectileRef(@Nonnull CommandBuffer<EntityStore> commandBuffer,
@@ -180,7 +188,7 @@ public class ShieldCapThrowHomingMarkProjectile extends SimpleInstantInteraction
                 continue;
             }
 
-            double distanceSq = ownerPos.distanceSquaredTo(transform.getPosition());
+            double distanceSq = ownerPos.distanceSquared(transform.getPosition());
             if (distanceSq < bestDistanceSq) {
                 bestDistanceSq = distanceSq;
                 bestRef = ref;

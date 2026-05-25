@@ -1,6 +1,7 @@
 package co.carrd.starkymods.visuals;
 
 import co.carrd.starkymods.StarkyShieldCaptainAmerica;
+import co.carrd.starkymods.util.ShieldCapInventoryCompat;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -8,13 +9,13 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.event.events.ecs.SwitchActiveSlotEvent;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.event.events.ecs.InventorySetActiveSlotEvent;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
-public final class ShieldCapUtilityQuickSwapSystem extends EntityEventSystem<EntityStore, SwitchActiveSlotEvent> {
+public final class ShieldCapUtilityQuickSwapSystem extends EntityEventSystem<EntityStore, InventorySetActiveSlotEvent> {
     private static final String NORMAL_BASE_SHIELD_ID = "Weapon_Shield_CaptainAmerica_Starky";
     private static final String NORMAL_LEFT_SHIELD_ID = "Weapon_ShieldLeft_CaptainAmerica_Starky";
     private static final String VIBRANIUM_BASE_SHIELD_ID = "Weapon_Shield_Vibranium_Starky";
@@ -27,7 +28,7 @@ public final class ShieldCapUtilityQuickSwapSystem extends EntityEventSystem<Ent
     private static final String ANTI_LEFT_SHIELD_ID = "Weapon_ShieldLeft_AntiCaptainAmerica_Starky";
 
     public ShieldCapUtilityQuickSwapSystem() {
-        super(SwitchActiveSlotEvent.class);
+        super(InventorySetActiveSlotEvent.class);
     }
 
     @Override
@@ -40,8 +41,8 @@ public final class ShieldCapUtilityQuickSwapSystem extends EntityEventSystem<Ent
                        ArchetypeChunk<EntityStore> chunk,
                        Store<EntityStore> store,
                        CommandBuffer<EntityStore> commandBuffer,
-                       SwitchActiveSlotEvent event) {
-        if (event == null || event.getInventorySectionId() != Inventory.UTILITY_SECTION_ID) {
+                       InventorySetActiveSlotEvent event) {
+        if (event == null || event.getInventorySectionId() != InventoryComponent.UTILITY_SECTION_ID) {
             return;
         }
 
@@ -51,8 +52,7 @@ public final class ShieldCapUtilityQuickSwapSystem extends EntityEventSystem<Ent
         }
 
         Player player = chunk.getComponent(index, Player.getComponentType());
-        Inventory inventory = player != null ? player.getInventory() : null;
-        ItemContainer utility = inventory != null ? inventory.getUtility() : null;
+        ItemContainer utility = ShieldCapInventoryCompat.getUtility(commandBuffer, playerRef);
         if (utility == null) {
             return;
         }
@@ -74,7 +74,7 @@ public final class ShieldCapUtilityQuickSwapSystem extends EntityEventSystem<Ent
     }
 
     private String itemIdAt(ItemContainer container, int slot) {
-        if (container == null || slot == Inventory.INACTIVE_SLOT_INDEX || slot < 0 || slot >= container.getCapacity()) {
+        if (container == null || slot == InventoryComponent.INACTIVE_SLOT_INDEX || slot < 0 || slot >= container.getCapacity()) {
             return "";
         }
 

@@ -12,6 +12,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionManager;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageCause;
@@ -193,12 +194,8 @@ public final class ShieldCapGuardFallDamageReductionSystem extends DamageEventSy
             return null;
         }
 
-        Player player = commandBuffer.getComponent(playerRef, Player.getComponentType());
-        if (player != null && player.getPlayerRef() != null) {
-            return player.getPlayerRef().getUuid();
-        }
-
-        return null;
+        UUIDComponent uuidComponent = commandBuffer.getComponent(playerRef, UUIDComponent.getComponentType());
+        return uuidComponent == null ? null : uuidComponent.getUuid();
     }
 
     private static boolean hasMoreThanRequiredStamina(EntityStatMap statMap) {

@@ -10,8 +10,8 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.protocol.InteractionType;
-import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
 import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
@@ -55,7 +55,11 @@ public class ShieldCapSignatureEnergyLoad extends SimpleInstantInteraction {
             return;
         }
 
-        UUID uuid = ((CommandSender) player).getUuid();
+        UUIDComponent uuidComponent = commandBuffer.getComponent(playerRef, UUIDComponent.getComponentType());
+        UUID uuid = uuidComponent == null ? null : uuidComponent.getUuid();
+        if (uuid == null) {
+            return;
+        }
         Float cached = ShieldCapSignatureEnergyStore.load(uuid);
         if (cached == null) {
             return;

@@ -149,17 +149,6 @@
         ],
         "ConditionValueType": "Absolute"
       }
-    ],
-    "GlidingActive": [
-      {
-        "Condition": [
-          0,
-          0
-        ],
-        "WorldSoundEventId": "SFX_ShieldGeorgio_Motor",
-        "ConditionValueType": "Absolute",
-        "LocalSoundEventId": "SFX_ShieldGeorgio_Motor"
-      }
     ]
   },
   "InteractionVars": {

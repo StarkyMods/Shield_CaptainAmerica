@@ -3,7 +3,6 @@ package co.carrd.starkymods.commands;
 import co.carrd.starkymods.ui.ShieldCapConfigPage;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
@@ -14,6 +13,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
+import java.util.Locale;
 
 public class ShieldCapConfigCommand extends AbstractPlayerCommand {
     private final boolean editable;
@@ -23,8 +23,9 @@ public class ShieldCapConfigCommand extends AbstractPlayerCommand {
         super(commandName, editable ? "Open the SHIELDCAP config editor." : "Open the SHIELDCAP config viewer.", false);
         this.editable = editable;
         this.editorForOp = "capshield".equalsIgnoreCase(commandName);
+        this.requirePermission("starkymods.shieldcap.command." + commandName.toLowerCase(Locale.ROOT));
         if (!editable) {
-            this.setPermissionGroup(GameMode.Adventure);
+            this.setPermissionGroups("hytale:Adventurer");
         }
     }
 

@@ -8,10 +8,10 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 public final class ShieldCapForceReturn extends SimpleInstantInteraction {
     private static final boolean DEBUG = false;
@@ -32,12 +32,10 @@ public final class ShieldCapForceReturn extends SimpleInstantInteraction {
     protected void firstRun(@Nonnull InteractionType type,
                             @Nonnull InteractionContext context,
                             @Nonnull CooldownHandler cooldownHandler) {
-        Player player = resolvePlayer(context.getCommandBuffer(), context);
-        if (player == null) {
-            return;
-        }
-
-        PlayerRef playerRef = player.getPlayerRef();
+        Ref<EntityStore> ref = resolvePlayerRef(context.getCommandBuffer(), context);
+        PlayerRef playerRef = ref == null || context.getCommandBuffer() == null
+                ? null
+                : context.getCommandBuffer().getComponent(ref, PlayerRef.getComponentType());
         if (playerRef == null || !playerRef.isValid()) {
             return;
         }
@@ -51,14 +49,15 @@ public final class ShieldCapForceReturn extends SimpleInstantInteraction {
         }
     }
 
-    private Player resolvePlayer(@Nonnull CommandBuffer<EntityStore> commandBuffer,
-                                 @Nonnull InteractionContext context) {
-        Player player = getPlayerFromRef(commandBuffer, context.getEntity());
-        if (player != null) {
-            return player;
+    private Ref<EntityStore> resolvePlayerRef(@Nonnull CommandBuffer<EntityStore> commandBuffer,
+                                              @Nonnull InteractionContext context) {
+        Ref<EntityStore> entityRef = context.getEntity();
+        if (getPlayerFromRef(commandBuffer, entityRef) != null) {
+            return entityRef;
         }
 
-        return getPlayerFromRef(commandBuffer, context.getOwningEntity());
+        Ref<EntityStore> owningRef = context.getOwningEntity();
+        return getPlayerFromRef(commandBuffer, owningRef) != null ? owningRef : null;
     }
 
     private Player getPlayerFromRef(@Nonnull CommandBuffer<EntityStore> commandBuffer,

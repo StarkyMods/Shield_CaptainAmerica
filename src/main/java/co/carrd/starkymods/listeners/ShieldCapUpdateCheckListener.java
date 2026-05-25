@@ -1,12 +1,15 @@
 package co.carrd.starkymods.listeners;
 
 import co.carrd.starkymods.update.ShieldCapUpdateCheckService;
-import com.hypixel.hytale.server.core.command.system.CommandSender;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import java.util.Set;
 import java.util.UUID;
@@ -33,7 +36,7 @@ public final class ShieldCapUpdateCheckListener {
             return;
         }
 
-        UUID playerUuid = ((CommandSender) player).getUuid();
+        UUID playerUuid = resolvePlayerUuid(event.getPlayerRef());
         if (playerUuid == null) {
             return;
         }
@@ -53,5 +56,14 @@ public final class ShieldCapUpdateCheckListener {
         if (playerRef != null && playerRef.getUuid() != null) {
             CHECKED_PLAYERS.remove(playerRef.getUuid());
         }
+    }
+
+    private static UUID resolvePlayerUuid(Ref<EntityStore> playerRef) {
+        if (playerRef == null || !playerRef.isValid()) {
+            return null;
+        }
+        Store<EntityStore> store = playerRef.getStore();
+        UUIDComponent uuidComponent = store == null ? null : store.getComponent(playerRef, UUIDComponent.getComponentType());
+        return uuidComponent == null ? null : uuidComponent.getUuid();
     }
 }

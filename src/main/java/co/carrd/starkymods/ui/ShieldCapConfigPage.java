@@ -773,11 +773,6 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
             return;
         }
         String normalizedCommand = command.startsWith("/") ? command.substring(1) : command;
-        Player player = playerRef == null ? null : playerRef.getComponent(Player.getComponentType());
-        if (player != null) {
-            CommandManager.get().handleCommand(player, normalizedCommand);
-            return;
-        }
         CommandManager.get().handleCommand(playerRef, normalizedCommand);
     }
 
@@ -1119,5 +1114,4 @@ public class ShieldCapConfigPage extends InteractiveCustomUIPage<ShieldCapConfig
         }
     }
 }
-
 

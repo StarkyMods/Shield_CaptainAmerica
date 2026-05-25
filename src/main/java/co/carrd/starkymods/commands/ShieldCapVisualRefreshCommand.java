@@ -4,7 +4,6 @@ import co.carrd.starkymods.StarkyShieldCaptainAmerica;
 import co.carrd.starkymods.visuals.ShieldCapVisualSyncService;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
@@ -18,7 +17,8 @@ import javax.annotation.Nonnull;
 public final class ShieldCapVisualRefreshCommand extends AbstractPlayerCommand {
     public ShieldCapVisualRefreshCommand() {
         super("capshieldrefresh", "Refresh Cap's Shield back visual.", false);
-        this.setPermissionGroup(GameMode.Adventure);
+        this.requirePermission("starkymods.shieldcap.command.capshieldrefresh");
+        this.setPermissionGroups("hytale:Adventurer");
     }
 
     @Override

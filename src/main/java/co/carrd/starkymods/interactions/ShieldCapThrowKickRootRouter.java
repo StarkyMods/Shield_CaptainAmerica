@@ -1,5 +1,7 @@
 package co.carrd.starkymods.interactions;
 
+import co.carrd.starkymods.util.ShieldCapInventoryCompat;
+
 import javax.annotation.Nonnull;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -9,7 +11,6 @@ import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.protocol.WaitForDataFrom;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.RootInteraction;
@@ -75,12 +76,11 @@ public final class ShieldCapThrowKickRootRouter extends SimpleInstantInteraction
         }
 
         Player player = context.getCommandBuffer().getComponent(playerRef, Player.getComponentType());
-        if (player == null || player.getInventory() == null) {
+        if (player == null) {
             return false;
         }
 
-        Inventory inventory = player.getInventory();
-        ItemStack itemInHand = inventory.getItemInHand();
+        ItemStack itemInHand = ShieldCapInventoryCompat.getItemInHand(context.getCommandBuffer(), playerRef);
         return itemInHand != null && MJOLNIR_WEAPON_ID.equals(itemInHand.getItemId());
     }
 

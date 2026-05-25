@@ -10,9 +10,9 @@ import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.spatial.SpatialResource;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.math.vector.Transform;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
+import org.joml.Vector3d;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
@@ -90,7 +90,7 @@ public class ShieldCapThrowHomingLaunchProjectile extends SimpleInstantInteracti
 
         Transform look = TargetUtil.getLook(entityRef, commandBuffer);
         Vector3d position = look.getPosition();
-        Vector3f rotation = look.getRotation();
+        Rotation3f rotation = look.getRotation();
 
         UUIDComponent uuidComponent = commandBuffer.getComponent(entityRef, UUIDComponent.getComponentType());
         if (uuidComponent == null) {
@@ -123,11 +123,11 @@ public class ShieldCapThrowHomingLaunchProjectile extends SimpleInstantInteracti
         projectileComponent.shoot(
                 projectileHolder,
                 ownerUuid,
-                position.getX(),
-                position.getY(),
-                position.getZ(),
-                rotation.getYaw(),
-                rotation.getPitch()
+                position.x(),
+                position.y(),
+                position.z(),
+                rotation.yaw(),
+                rotation.pitch()
         );
 
         Ref<EntityStore> projectileRef = commandBuffer.addEntity(projectileHolder, AddReason.SPAWN);
@@ -207,7 +207,7 @@ public class ShieldCapThrowHomingLaunchProjectile extends SimpleInstantInteracti
                 continue;
             }
 
-            double distanceSq = ownerPos.distanceSquaredTo(transform.getPosition());
+            double distanceSq = ownerPos.distanceSquared(transform.getPosition());
             if (distanceSq < bestDistanceSq) {
                 bestDistanceSq = distanceSq;
                 bestRef = ref;

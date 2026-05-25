@@ -1,5 +1,7 @@
 package co.carrd.starkymods.interactions;
 
+import co.carrd.starkymods.util.ShieldCapInventoryCompat;
+
 import javax.annotation.Nonnull;
 
 import com.hypixel.hytale.codec.Codec;
@@ -12,7 +14,6 @@ import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.protocol.WaitForDataFrom;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
@@ -49,19 +50,14 @@ public class StarkyMainHandCondition extends SimpleInstantInteraction {
     protected void firstRun(@Nonnull InteractionType type,
                             @Nonnull InteractionContext context,
                             @Nonnull CooldownHandler cooldownHandler) {
-        Player player = resolvePlayer(context.getCommandBuffer(), context);
-        if (player == null || itemId == null || itemId.isBlank()) {
+        CommandBuffer<EntityStore> commandBuffer = context.getCommandBuffer();
+        Ref<EntityStore> playerRef = resolvePlayerRef(commandBuffer, context);
+        if (playerRef == null || itemId == null || itemId.isBlank()) {
             markFailed(context);
             return;
         }
 
-        Inventory inventory = player.getInventory();
-        if (inventory == null) {
-            markFailed(context);
-            return;
-        }
-
-        ItemStack mainHandStack = inventory.getItemInHand();
+        ItemStack mainHandStack = ShieldCapInventoryCompat.getItemInHand(commandBuffer, playerRef);
         if (!matchesConfiguredId(mainHandStack)) {
             markFailed(context);
         }
@@ -101,14 +97,15 @@ public class StarkyMainHandCondition extends SimpleInstantInteraction {
         }
     }
 
-    private Player resolvePlayer(@Nonnull CommandBuffer<EntityStore> commandBuffer,
-                                 @Nonnull InteractionContext context) {
-        Player player = getPlayerFromRef(commandBuffer, context.getEntity());
-        if (player != null) {
-            return player;
+    private Ref<EntityStore> resolvePlayerRef(@Nonnull CommandBuffer<EntityStore> commandBuffer,
+                                              @Nonnull InteractionContext context) {
+        Ref<EntityStore> entityRef = context.getEntity();
+        if (getPlayerFromRef(commandBuffer, entityRef) != null) {
+            return entityRef;
         }
 
-        return getPlayerFromRef(commandBuffer, context.getOwningEntity());
+        Ref<EntityStore> owningRef = context.getOwningEntity();
+        return getPlayerFromRef(commandBuffer, owningRef) != null ? owningRef : null;
     }
 
     private Player getPlayerFromRef(@Nonnull CommandBuffer<EntityStore> commandBuffer,

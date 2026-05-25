@@ -19,7 +19,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    implementation(files("C:\\Users\\Usuario\\AppData\\Roaming\\Hytale\\install\\release\\package\\game\\latest\\Server\\HytaleServer.jar"))
+    implementation(files("C:\\Users\\Usuario\\AppData\\Roaming\\Hytale\\install\\pre-release\\package\\game\\latest\\Server\\HytaleServer.jar"))
 
     // Lombok
     compileOnly("org.projectlombok:lombok:$lombokVersion")
@@ -38,5 +38,5 @@ tasks.jar {
 
     from("src/main/resources")
     
-    destinationDirectory.set(file("C:\\Users\\Usuario\\AppData\\Roaming\\Hytale\\UserData\\Mods"))
+    destinationDirectory.set(file("C:\\Users\\Usuario\\AppData\\Roaming\\Hytale\\data\\pre-release\\Mods"))
 }

@@ -11,6 +11,7 @@ public class ShieldCapCraftCommand extends CommandBase {
 
     public ShieldCapCraftCommand() {
         super("capshieldcraft", "Toggle Captain America's Shield crafting globally.");
+        this.requirePermission("starkymods.shieldcap.command.capshieldcraft");
     }
 
     @Override

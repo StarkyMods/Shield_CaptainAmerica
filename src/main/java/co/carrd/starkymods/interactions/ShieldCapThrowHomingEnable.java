@@ -4,8 +4,8 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.protocol.InteractionType;
-import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
@@ -37,7 +37,8 @@ public class ShieldCapThrowHomingEnable extends SimpleInstantInteraction {
             return;
         }
 
-        UUID ownerUuid = ((CommandSender) resolved.player).getUuid();
+        UUIDComponent uuidComponent = commandBuffer.getComponent(resolved.playerRef, UUIDComponent.getComponentType());
+        UUID ownerUuid = uuidComponent == null ? null : uuidComponent.getUuid();
         if (ownerUuid == null) {
             return;
         }

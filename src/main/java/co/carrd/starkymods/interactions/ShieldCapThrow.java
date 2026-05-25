@@ -1,16 +1,17 @@
 package co.carrd.starkymods.interactions;
 
+import co.carrd.starkymods.util.ShieldCapInventoryCompat;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.math.vector.Transform;
-import com.hypixel.hytale.math.vector.Vector3d;
+import org.joml.Vector3d;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
@@ -92,13 +93,8 @@ public final class ShieldCapThrow extends SimpleInstantInteraction {
             return null;
         }
 
-        Inventory inventory = player.getInventory();
-        if (inventory == null) {
-            return null;
-        }
-
-        byte activeHotbarSlot = inventory.getActiveHotbarSlot();
-        ItemContainer hotbarContainer = inventory.getHotbar();
+        byte activeHotbarSlot = ShieldCapInventoryCompat.getActiveHotbarSlot(commandBuffer, ref);
+        ItemContainer hotbarContainer = ShieldCapInventoryCompat.getHotbar(commandBuffer, ref);
         if (isValidSlot(hotbarContainer, activeHotbarSlot)) {
             ItemStack mainHandStack = hotbarContainer.getItemStack(activeHotbarSlot);
             if (matchesId(mainHandStack, MAIN_HAND_ITEM_ID)) {
@@ -128,8 +124,8 @@ public final class ShieldCapThrow extends SimpleInstantInteraction {
             }
         }
 
-        byte activeUtilitySlot = inventory.getActiveUtilitySlot();
-        ItemContainer utilityContainer = inventory.getUtility();
+        byte activeUtilitySlot = ShieldCapInventoryCompat.getActiveUtilitySlot(commandBuffer, ref);
+        ItemContainer utilityContainer = ShieldCapInventoryCompat.getUtility(commandBuffer, ref);
         if (isValidSlot(utilityContainer, activeUtilitySlot)) {
             ItemStack leftHandStack = utilityContainer.getItemStack(activeUtilitySlot);
             if (matchesId(leftHandStack, LEFT_HAND_ITEM_ID)) {
@@ -256,7 +252,7 @@ public final class ShieldCapThrow extends SimpleInstantInteraction {
 
     private boolean isValidSlot(ItemContainer container, byte slot) {
         return container != null
-                && slot != Inventory.INACTIVE_SLOT_INDEX
+                && slot != InventoryComponent.INACTIVE_SLOT_INDEX
                 && slot >= 0
                 && slot < container.getCapacity();
     }

@@ -1,13 +1,15 @@
 package co.carrd.starkymods.interactions;
 
+import co.carrd.starkymods.util.ShieldCapInventoryCompat;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.InteractionManager;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.InteractionModule;
@@ -187,8 +189,8 @@ public final class ShieldCapPerfectParryBridgeService {
             return;
         }
 
-        Player player = defenderRef.getStore().getComponent(defenderRef, Player.getComponentType());
-        UUID playerUuid = player != null && player.getPlayerRef() != null ? player.getPlayerRef().getUuid() : null;
+        UUIDComponent uuidComponent = defenderRef.getStore().getComponent(defenderRef, UUIDComponent.getComponentType());
+        UUID playerUuid = uuidComponent == null ? null : uuidComponent.getUuid();
         if (playerUuid != null) {
             PERFECT_PARRY_ACTIVE_UNTIL_MS.put(
                     playerUuid,
@@ -203,13 +205,12 @@ public final class ShieldCapPerfectParryBridgeService {
         }
 
         Player player = defenderRef.getStore().getComponent(defenderRef, Player.getComponentType());
-        if (player == null || player.getInventory() == null) {
+        if (player == null) {
             return false;
         }
 
-        Inventory inventory = player.getInventory();
-        ItemContainer hotbar = inventory.getHotbar();
-        byte activeHotbarSlot = inventory.getActiveHotbarSlot();
+        ItemContainer hotbar = ShieldCapInventoryCompat.getHotbar(defenderRef.getStore(), defenderRef);
+        byte activeHotbarSlot = ShieldCapInventoryCompat.getActiveHotbarSlot(defenderRef.getStore(), defenderRef);
         if (isValidSlot(hotbar, activeHotbarSlot)
                 && (matchesId(hotbar.getItemStack(activeHotbarSlot), MAIN_SHIELD_ID)
                 || matchesId(hotbar.getItemStack(activeHotbarSlot), VIBRANIUM_MAIN_SHIELD_ID)
@@ -220,8 +221,8 @@ public final class ShieldCapPerfectParryBridgeService {
             return true;
         }
 
-        ItemContainer utility = inventory.getUtility();
-        byte activeUtilitySlot = inventory.getActiveUtilitySlot();
+        ItemContainer utility = ShieldCapInventoryCompat.getUtility(defenderRef.getStore(), defenderRef);
+        byte activeUtilitySlot = ShieldCapInventoryCompat.getActiveUtilitySlot(defenderRef.getStore(), defenderRef);
         boolean leftEquipped = isValidSlot(utility, activeUtilitySlot)
                 && (matchesId(utility.getItemStack(activeUtilitySlot), LEFT_SHIELD_ID)
                 || matchesId(utility.getItemStack(activeUtilitySlot), MAIN_SHIELD_ID)
@@ -241,7 +242,7 @@ public final class ShieldCapPerfectParryBridgeService {
 
     private boolean isValidSlot(@Nullable ItemContainer container, byte slot) {
         return container != null
-                && slot != Inventory.INACTIVE_SLOT_INDEX
+                && slot != InventoryComponent.INACTIVE_SLOT_INDEX
                 && slot >= 0
                 && slot < container.getCapacity();
     }

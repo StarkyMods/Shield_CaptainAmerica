@@ -2,6 +2,7 @@ package co.carrd.starkymods.visuals;
 
 import co.carrd.starkymods.config.ShieldCapConfigManager;
 import co.carrd.starkymods.interactions.ShieldCapThrowHomingService;
+import co.carrd.starkymods.util.ShieldCapInventoryCompat;
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -10,7 +11,7 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -328,17 +329,15 @@ public final class ShieldCapVisualSyncService {
             return;
         }
 
-        Inventory inventory = player.getInventory();
-        if (inventory == null) {
+        Ref<EntityStore> playerRef = player.getReference();
+        if (playerRef == null || !playerRef.isValid()) {
             return;
         }
 
-        sanitizeThrownShieldItems(inventory.getHotbar());
-        sanitizeThrownShieldItems(inventory.getUtility());
-        sanitizeThrownShieldItems(inventory.getStorage());
-        sanitizeThrownShieldItems(inventory.getBackpack());
-        sanitizeThrownShieldItems(inventory.getTools());
-        sanitizeThrownShieldItems(inventory.getArmor());
+        Store<EntityStore> store = playerRef.getStore();
+        for (ItemContainer container : ShieldCapInventoryCompat.getAllContainers(store, playerRef)) {
+            sanitizeThrownShieldItems(container);
+        }
     }
 
     private void sanitizeThrownShieldItems(ItemContainer container) {
@@ -423,21 +422,22 @@ public final class ShieldCapVisualSyncService {
         }
 
         try {
-            Inventory inventory = player.getInventory();
-            if (inventory == null) {
+            Ref<EntityStore> ref = playerRef.getReference();
+            if (ref == null || !ref.isValid()) {
                 return;
             }
+            Store<EntityStore> store = ref.getStore();
 
-            ItemContainer hotbar = inventory.getHotbar();
-            ItemContainer utility = inventory.getUtility();
-            ItemContainer storage = inventory.getStorage();
-            ItemContainer backpack = inventory.getBackpack();
-            ItemContainer tools = inventory.getTools();
+            ItemContainer hotbar = ShieldCapInventoryCompat.getHotbar(store, ref);
+            ItemContainer utility = ShieldCapInventoryCompat.getUtility(store, ref);
+            ItemContainer storage = ShieldCapInventoryCompat.getSection(store, ref, InventoryComponent.STORAGE_SECTION_ID);
+            ItemContainer backpack = ShieldCapInventoryCompat.getSection(store, ref, InventoryComponent.BACKPACK_SECTION_ID);
+            ItemContainer tools = ShieldCapInventoryCompat.getSection(store, ref, InventoryComponent.TOOLS_SECTION_ID);
 
             byte activeHotbarSlot =
-                    hotbarOverride != null ? (byte) hotbarOverride.intValue() : inventory.getActiveHotbarSlot();
+                    hotbarOverride != null ? (byte) hotbarOverride.intValue() : ShieldCapInventoryCompat.getActiveHotbarSlot(store, ref);
             byte activeUtilitySlot =
-                    utilityOverride != null ? (byte) utilityOverride.intValue() : inventory.getActiveUtilitySlot();
+                    utilityOverride != null ? (byte) utilityOverride.intValue() : ShieldCapInventoryCompat.getActiveUtilitySlot(store, ref);
 
             boolean inventoryChanged = false;
             inventoryChanged |= normalizeActiveSlotItem(
@@ -464,11 +464,11 @@ public final class ShieldCapVisualSyncService {
             inventoryChanged |= normalizeContainerItems(backpack);
             inventoryChanged |= normalizeContainerItems(tools);
 
-            ItemStack activeMainStack = inventory.getItemInHand();
+            ItemStack activeMainStack = ShieldCapInventoryCompat.getItemInHand(store, ref);
             if (!isShield(activeMainStack)) {
                 activeMainStack = getActiveStack(hotbar, activeHotbarSlot);
             }
-            ItemStack activeUtilityStack = inventory.getUtilityItem();
+            ItemStack activeUtilityStack = ShieldCapInventoryCompat.getUtilityItem(store, ref);
             if (!isShield(activeUtilityStack)) {
                 activeUtilityStack = getActiveStack(utility, activeUtilitySlot);
             }
@@ -577,7 +577,7 @@ public final class ShieldCapVisualSyncService {
                                             String carterDesiredId,
                                             String georgioDesiredId,
                                             String antiDesiredId) {
-        if (container == null || activeSlot == Inventory.INACTIVE_SLOT_INDEX || activeSlot < 0 || activeSlot >= container.getCapacity()) {
+        if (container == null || activeSlot == InventoryComponent.INACTIVE_SLOT_INDEX || activeSlot < 0 || activeSlot >= container.getCapacity()) {
             return false;
         }
 
@@ -608,7 +608,7 @@ public final class ShieldCapVisualSyncService {
 
     private ItemStack getActiveStack(ItemContainer container, byte activeSlot) {
         if (container == null
-                || activeSlot == Inventory.INACTIVE_SLOT_INDEX
+                || activeSlot == InventoryComponent.INACTIVE_SLOT_INDEX
                 || activeSlot < 0
                 || activeSlot >= container.getCapacity()) {
             return null;
@@ -808,7 +808,7 @@ public final class ShieldCapVisualSyncService {
     }
 
     private int countShieldInEquippedSlot(ItemContainer container, byte activeSlot) {
-        if (container == null || activeSlot == Inventory.INACTIVE_SLOT_INDEX || activeSlot < 0 || activeSlot >= container.getCapacity()) {
+        if (container == null || activeSlot == InventoryComponent.INACTIVE_SLOT_INDEX || activeSlot < 0 || activeSlot >= container.getCapacity()) {
             return 0;
         }
 
@@ -1309,21 +1309,19 @@ public final class ShieldCapVisualSyncService {
             return;
         }
 
-        Inventory inventory = player.getInventory();
-        if (inventory == null) {
+        Ref<EntityStore> ref = playerRef.getReference();
+        if (ref == null || !ref.isValid()) {
             return;
         }
+        Store<EntityStore> store = ref.getStore();
 
         UUID playerUuid = playerRef.getUuid();
         unregisterInventoryListeners(playerUuid);
 
         List<EventRegistration<Void, ItemContainer.ItemContainerChangeEvent>> registrations = new ArrayList<>();
-        registerContainerListener(registrations, inventory.getHotbar(), playerRef);
-        registerContainerListener(registrations, inventory.getUtility(), playerRef);
-        registerContainerListener(registrations, inventory.getStorage(), playerRef);
-        registerContainerListener(registrations, inventory.getBackpack(), playerRef);
-        registerContainerListener(registrations, inventory.getTools(), playerRef);
-        registerContainerListener(registrations, inventory.getArmor(), playerRef);
+        for (ItemContainer container : ShieldCapInventoryCompat.getAllContainers(store, ref)) {
+            registerContainerListener(registrations, container, playerRef);
+        }
 
         if (!registrations.isEmpty()) {
             inventoryContainerRegistrations.put(playerUuid, registrations);
@@ -1339,6 +1337,11 @@ public final class ShieldCapVisualSyncService {
 
         EventRegistration<Void, ItemContainer.ItemContainerChangeEvent> registration =
                 container.registerChangeEvent(event -> {
+                    UUID playerUuid = playerRef.getUuid();
+                    if (playerUuid != null && syncingPlayers.contains(playerUuid)) {
+                        return;
+                    }
+
                     Player player = resolvePlayer(playerRef);
                     if (player != null) {
                         syncDeferred(player);
